@@ -26,7 +26,7 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	camera->SetupAttachment(cameraBoom, USpringArmComponent::SocketName);
-	camera->SetFieldOfView(58.f);
+	camera->SetFieldOfView(90.f);
 	camera->bUsePawnControlRotation = false;
 
 	occlusionFade = CreateDefaultSubobject<UCDOcclusionFadeComponent>(TEXT("OcclusionFade"));
