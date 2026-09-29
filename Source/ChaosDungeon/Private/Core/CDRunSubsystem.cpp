@@ -5,6 +5,7 @@
 #include "Core/CDMessageSubsystem.h"
 #include "Data/CDDungeonData.h"
 #include "Data/CDStageData.h"
+#include "Settings/CDDeveloperSettings.h"
 
 void UCDRunSubsystem::Initialize(FSubsystemCollectionBase& collection)
 {
@@ -12,8 +13,11 @@ void UCDRunSubsystem::Initialize(FSubsystemCollectionBase& collection)
 	collection.InitializeDependency<UCDLevelTransitionSubsystem>();
 	collection.InitializeDependency<UCDMessageSubsystem>();
 
-	dungeonData = dungeonDataAsset.LoadSynchronous();
-	ensureMsgf(dungeonData, TEXT("DefaultGame.ini 에 dungeonDataAsset 을 지정하세요."));
+	//dungeonData = dungeonDataAsset.LoadSynchronous();
+	//ensureMsgf(dungeonData, TEXT("DefaultGame.ini 에 dungeonDataAsset 을 지정하세요."));
+
+	const UCDDeveloperSettings* developerSettings = GetDefault<UCDDeveloperSettings>();
+	dungeonData = developerSettings->dungeonData.LoadSynchronous();
 }
 
 void UCDRunSubsystem::StartRun(ECDDifficulty difficulty)

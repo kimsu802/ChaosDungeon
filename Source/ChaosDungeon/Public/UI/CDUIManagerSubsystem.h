@@ -64,10 +64,6 @@ private:
 	UCDMessageSubsystem* GetMessages() const;
 
 private:
-	/** 화면 목록 에셋 경로 (ini) */
-	UPROPERTY(Config)
-	TSoftObjectPtr<UCDUIScreenSet> screenSetAsset;
-
 	/** 로드된 화면 목록 */
 	UPROPERTY(Transient)
 	TObjectPtr<UCDUIScreenSet> screenSet;
