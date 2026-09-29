@@ -41,7 +41,7 @@ void UCDUIManagerSubsystem::Deinitialize()
 
 void UCDUIManagerSubsystem::InitializeForPlayer(APlayerController* playerController)
 {
-	if (layout)
+	if (layout && layout->GetOwningPlayer() != playerController)
 	{
 		layout->RemoveFromParent();
 		layout = nullptr;
@@ -62,6 +62,14 @@ UCommonActivatableWidget* UCDUIManagerSubsystem::PushScreen(FGameplayTag layerTa
 		return nullptr;
 	}
 	return rootLayout->PushToLayer(layerTag, screenClass.LoadSynchronous());
+}
+
+void UCDUIManagerSubsystem::ClearLayerByTag(FGameplayTag layerTag)
+{
+	if (layout)
+	{
+		layout->ClearStack(layerTag);
+	}
 }
 
 void UCDUIManagerSubsystem::TogglePauseMenu()
@@ -85,7 +93,7 @@ UCDPrimaryLayout* UCDUIManagerSubsystem::EnsureLayout()
 	if (!layout && playerController && screenSet)
 	{
 		layout = CreateWidget<UCDPrimaryLayout>(playerController, screenSet->layoutClass.LoadSynchronous());
-		layout->AddToPlayerScreen();
+		layout->AddToPlayerScreen(100);
 	}
 	return layout;
 }

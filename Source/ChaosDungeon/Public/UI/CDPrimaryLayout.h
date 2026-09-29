@@ -26,6 +26,10 @@ public:
 	/** 해당 레이어 최상단이 screenClass 면 닫고 true */
 	bool DeactivateIfActive(FGameplayTag layerTag, TSubclassOf<UCommonActivatableWidget> screenClass);
 
+	/* 특정 레이어의 모든 위젯들을 비운다.*/
+	UFUNCTION(BlueprintCallable)
+	void ClearStack(FGameplayTag layerTag);
+
 protected:
 	// UUserWidget::NativeOnInitialized()
 	virtual void NativeOnInitialized() override;
