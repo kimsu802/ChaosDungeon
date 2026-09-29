@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "UI/CDPrimaryLayout.h"
 #include "UI/ViewModel/CDViewModelSubsystem.h"
+#include "Settings/CDDeveloperSettings.h"
 
 UCDUIManagerSubsystem* UCDUIManagerSubsystem::Get(const APlayerController* playerController)
 {
@@ -24,8 +25,10 @@ void UCDUIManagerSubsystem::Initialize(FSubsystemCollectionBase& collection)
 	Super::Initialize(collection);
 	collection.InitializeDependency<UCDViewModelSubsystem>();
 
-	screenSet = screenSetAsset.LoadSynchronous();
-	ensureMsgf(screenSet, TEXT("DefaultGame.ini 에 screenSetAsset 을 지정하세요."));
+	const UCDDeveloperSettings* DeveloperSettings = GetDefault<UCDDeveloperSettings>();
+	screenSet = DeveloperSettings->screenSet.LoadSynchronous();
+
+	//ensureMsgf(screenSet, TEXT("DefaultGame.ini 에 screenSetAsset 을 지정하세요."));
 
 	runFinishedHandle = GetMessages()->Listen(CDTags::Msg_Run_Finished, this, &ThisClass::HandleRunFinished);
 }

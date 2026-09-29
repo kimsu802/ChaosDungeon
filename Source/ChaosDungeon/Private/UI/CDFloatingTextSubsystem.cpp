@@ -21,7 +21,7 @@ void UCDFloatingTextSubsystem::Deinitialize()
 		UCDMessageSubsystem* messages = gameInstance->GetSubsystem<UCDMessageSubsystem>();
 		for (FCDListenerHandle& handle : handles)
 		{
-			messages->Unlisten(handle);
+			//messages->Unlisten(handle);
 		}
 	}
 	Super::Deinitialize();
