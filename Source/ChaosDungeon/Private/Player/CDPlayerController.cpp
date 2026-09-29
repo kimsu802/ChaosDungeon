@@ -46,7 +46,7 @@ void ACDPlayerController::SetupInputComponent()
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>(InputComponent);
 	input->BindAction(inputConfig->moveAction, ETriggerEvent::Started, this, &ThisClass::OnMoveStarted);
 	input->BindAction(inputConfig->moveAction, ETriggerEvent::Triggered, this, &ThisClass::OnMoveTriggered);
-	input->BindAction(inputConfig->moveAction, ETriggerEvent::Completed, this, &ThisClass::OnMoveReleased);
+	input->BindAction(inputConfig->moveAction, ETriggerEvent::Canceled, this, &ThisClass::OnMoveReleased);
 	input->BindAction(inputConfig->pauseAction, ETriggerEvent::Started, this, &ThisClass::OnPause);
 	input->BindAction(inputConfig->guideAction, ETriggerEvent::Started, this, &ThisClass::OnGuide);
 
@@ -64,25 +64,33 @@ void ACDPlayerController::PlayerTick(float deltaTime)
 
 void ACDPlayerController::OnMoveStarted()
 {
-	StopMovement();
 	movePressedTime = 0.f;
-	pendingInteraction = nullptr;
+	if (UpdateMoveDestination() && CanMove())
+	{
+		// 누르는 즉시 반응: 짧은 클릭은 이 길찾기 이동으로 끝난다
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, moveDestination);
+	}
 }
 
 void ACDPlayerController::OnMoveTriggered()
 {
+	const float previousTime = movePressedTime;
 	movePressedTime += GetWorld()->GetDeltaSeconds();
 
-	FHitResult hit;
-	if (!GetHitResultUnderCursor(ECC_Visibility, true, hit))
+	// 짧은 클릭 구간에서는 길찾기 이동을 방해하지 않는다
+	if (movePressedTime < shortPressThreshold)
 	{
 		return;
 	}
-	moveDestination = hit.Location;
-	pendingInteraction = Cast<ACDInteractable>(hit.GetActor());
+
+	// 길게 누르기로 막 전환된 순간: 길찾기 중단 후 커서 추적 이동으로
+	if (previousTime < shortPressThreshold)
+	{
+		StopMovement();
+	}
 
 	APawn* controlledPawn = GetPawn();
-	if (controlledPawn && CanMove())
+	if (UpdateMoveDestination() && controlledPawn && CanMove())
 	{
 		controlledPawn->AddMovementInput((moveDestination - controlledPawn->GetActorLocation()).GetSafeNormal2D());
 	}
@@ -90,10 +98,24 @@ void ACDPlayerController::OnMoveTriggered()
 
 void ACDPlayerController::OnMoveReleased()
 {
-	if (movePressedTime <= shortPressThreshold && CanMove())
+	// 길게 누르다 뗐으면 마지막 커서 위치까지는 이어서 이동
+	if (movePressedTime >= shortPressThreshold && CanMove())
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, moveDestination);
 	}
+	movePressedTime = 0.f;
+}
+
+bool ACDPlayerController::UpdateMoveDestination()
+{
+	FHitResult hit;
+	if (!GetHitResultUnderCursor(ECC_Visibility, true, hit))
+	{
+		return false;
+	}
+	moveDestination = hit.Location;
+	pendingInteraction = Cast<ACDInteractable>(hit.GetActor());
+	return true;
 }
 
 void ACDPlayerController::OnAbilityInput(FGameplayTag inputTag)
