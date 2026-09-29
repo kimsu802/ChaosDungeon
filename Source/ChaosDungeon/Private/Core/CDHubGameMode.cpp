@@ -13,11 +13,11 @@ void ACDHubGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetGameInstance()->GetSubsystem<UCDRunSubsystem>()->HasPlayedRun())
-	{
-		EnterHub(true);
-		return;
-	}
+	//if (GetGameInstance()->GetSubsystem<UCDRunSubsystem>()->HasPlayedRun())
+	//{
+	//	EnterHub(true);
+	//	return;
+	//}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
 	TArray<AActor*> cameras;
