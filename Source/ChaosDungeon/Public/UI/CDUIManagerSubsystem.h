@@ -20,13 +20,14 @@ struct FCDRunMessage;
  *   [/Script/ChaosDungeon.CDUIManagerSubsystem]
  *   screenSetAsset=/Game/UI/DA_UIScreenSet.DA_UIScreenSet
  */
-UCLASS(Config = Game)
+UCLASS(Config = Game,BlueprintType)
 class CHAOSDUNGEON_API UCDUIManagerSubsystem : public ULocalPlayerSubsystem
 {
 	GENERATED_BODY()
 
 public:
 	/** 플레이어 컨트롤러로 서브시스템 얻기 */
+	UFUNCTION(BlueprintCallable)
 	static UCDUIManagerSubsystem* Get(const APlayerController* playerController);
 
 	// USubsystem::Initialize()
@@ -39,7 +40,11 @@ public:
 	void InitializeForPlayer(APlayerController* playerController);
 
 	/** 레이어에 화면 추가 */
+	UFUNCTION(BlueprintCallable)
 	UCommonActivatableWidget* PushScreen(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass);
+
+	UFUNCTION(BlueprintCallable)
+	void ClearLayerByTag(FGameplayTag layerTag);
 
 	/** 일시정지 메뉴 열기/닫기 */
 	void TogglePauseMenu();

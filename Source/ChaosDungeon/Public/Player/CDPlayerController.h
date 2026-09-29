@@ -58,6 +58,9 @@ private:
 	/** 클릭한 상호작용 대상에 도착했으면 상호작용 */
 	void UpdatePendingInteraction();
 
+	/* 목적지 갱신*/
+	bool UpdateMoveDestination();
+
 protected:
 	/** 입력 설정 */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -65,7 +68,7 @@ protected:
 
 	/** 이 시간 이하로 누르면 짧은 클릭(길찾기 이동) */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	float shortPressThreshold = 0.2f;
+	float shortPressThreshold = 0.5f;
 
 	/** 커서 호버 외곽선 */
 	UPROPERTY(VisibleAnywhere)

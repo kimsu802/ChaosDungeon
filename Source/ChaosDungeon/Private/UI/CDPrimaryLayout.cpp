@@ -32,3 +32,11 @@ bool UCDPrimaryLayout::DeactivateIfActive(FGameplayTag layerTag, TSubclassOf<UCo
 	}
 	return false;
 }
+
+void UCDPrimaryLayout::ClearStack(FGameplayTag layerTag)
+{
+	if (UCommonActivatableWidgetStack* layer = layers.FindRef(layerTag))
+	{
+		layer->ClearWidgets();
+	}
+}
