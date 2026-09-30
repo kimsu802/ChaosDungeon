@@ -32,7 +32,7 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 	occlusionFade = CreateDefaultSubobject<UCDOcclusionFadeComponent>(TEXT("OcclusionFade"));
 
 	// 벽 뒤 실루엣: 항상 CustomDepth 렌더 (포스트프로세스 머티리얼에서 처리)
-	GetMesh()->SetRenderCustomDepth(false);
+	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(CDStencil::Player);
 }
 

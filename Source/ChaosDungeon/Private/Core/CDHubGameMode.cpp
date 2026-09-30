@@ -29,17 +29,8 @@ void ACDHubGameMode::BeginPlay()
 
 	// 타이틀 화면의 '시작' 버튼 → 화면 닫기 + EnterHub
 	if (UCDUIManagerSubsystem* uiManager = UCDUIManagerSubsystem::Get(playerController))
-	{	
-		UWorld* world = playerController->GetWorld();
-		if (!world)
-		{
-			return;
-		}
-
-		world->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, uiManager]()
-		{
-			uiManager->ShowTitle();
-		}));
+	{
+		uiManager->ShowTitle();
 	}
 }
 
