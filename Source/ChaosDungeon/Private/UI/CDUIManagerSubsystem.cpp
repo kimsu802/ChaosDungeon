@@ -51,7 +51,7 @@ void UCDUIManagerSubsystem::InitializeForPlayer(APlayerController* playerControl
 	GetLocalPlayer()->GetSubsystem<UCDViewModelSubsystem>()->BindPlayer(playerController);
 
 	EnsureLayout();
-	PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
+	//PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
 }
 
 UCommonActivatableWidget* UCDUIManagerSubsystem::PushScreen(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass)
