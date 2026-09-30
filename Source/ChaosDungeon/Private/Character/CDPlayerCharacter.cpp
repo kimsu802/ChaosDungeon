@@ -15,6 +15,9 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
+	// 09.30 Jun6 - Anim 설정을 위해 Nav Movement의 Use Accelration for Paths 변경
+	GetMovementComponent()->GetNavMovementProperties()->bUseAccelerationForPaths = true;
+
 	// 기획 확정값: Roll/Pitch/Yaw (0, 290, 208), ArmLength 2000, FOV 55~60, 회전 고정
 	cameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	cameraBoom->SetupAttachment(RootComponent);
@@ -34,6 +37,14 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 	// 벽 뒤 실루엣: 항상 CustomDepth 렌더 (포스트프로세스 머티리얼에서 처리)
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(CDStencil::Player);
+
+	// 09.30 Jun6 - Animation 추가
+	static ConstructorHelpers::FClassFinder<UAnimInstance> anim(TEXT("/Game/Character/Player/ABP_CDPlayer.ABP_CDPlayer_C"));
+	if (anim.Succeeded())
+	{
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		GetMesh()->SetAnimInstanceClass(anim.Class);
+	}
 }
 
 void ACDPlayerCharacter::PossessedBy(AController* newController)
