@@ -3,6 +3,7 @@
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "GameplayTagContainer.h"
 #include "Core/CDMessageSubsystem.h"
+#include "Core/CDTypes.h"
 #include "CDUIManagerSubsystem.generated.h"
 
 class APlayerController;
@@ -43,6 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UCommonActivatableWidget* PushScreen(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass);
 
+	void PushScreenAsync(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass, TFunction<void(UCommonActivatableWidget&)> initFunc);
+
 	UFUNCTION(BlueprintCallable)
 	void ClearLayerByTag(FGameplayTag layerTag);
 
@@ -54,6 +57,9 @@ public:
 
 	/** 타이틀 화면 열기 */
 	void ShowTitle();
+
+	/* 컨펌 화면 열기*/
+	void ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult);
 
 private:
 	/** 레이아웃이 없으면 생성 (GameMode/PlayerController 중 누가 먼저 요청해도 동작) */
