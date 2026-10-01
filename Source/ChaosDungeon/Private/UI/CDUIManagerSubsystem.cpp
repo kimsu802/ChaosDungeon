@@ -9,6 +9,7 @@
 #include "UI/CDPrimaryLayout.h"
 #include "UI/ViewModel/CDViewModelSubsystem.h"
 #include "Settings/CDDeveloperSettings.h"
+#include "UI/CDConfirmWidget.h"
 
 UCDUIManagerSubsystem* UCDUIManagerSubsystem::Get(const APlayerController* playerController)
 {
@@ -64,6 +65,10 @@ UCommonActivatableWidget* UCDUIManagerSubsystem::PushScreen(FGameplayTag layerTa
 	return rootLayout->PushToLayer(layerTag, screenClass.LoadSynchronous());
 }
 
+void UCDUIManagerSubsystem::PushScreenAsync(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass, TFunction<void(UCommonActivatableWidget&)> initFunc)
+{
+}
+
 void UCDUIManagerSubsystem::ClearLayerByTag(FGameplayTag layerTag)
 {
 	if (layout)
@@ -85,6 +90,24 @@ void UCDUIManagerSubsystem::ToggleGuide()
 void UCDUIManagerSubsystem::ShowTitle()
 {
 	PushScreen(CDTags::UI_Layer_Modal, screenSet->titleScreen);
+}
+
+void UCDUIManagerSubsystem::ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult)
+{
+	if (!screenSet || screenSet->confirmScreen.IsNull())
+	{
+		// 띄울 수 없으면 바로 닫힘 처리 (결과를 기다리는 쪽이 영원히 대기하지 않도록)
+		if (onResult)
+		{
+			onResult(ECDConfirmResult::Closed);
+		}
+		return;
+	}
+	
+	PushScreenAsync(CDTags::UI_Layer_Modal, screenSet->confirmScreen, [type, title, message, onResult](UCommonActivatableWidget& screen)
+	{
+		CastChecked<UCDConfirmWidget>(&screen)->Setup(type, title, message, onResult);
+	});
 }
 
 UCDPrimaryLayout* UCDUIManagerSubsystem::EnsureLayout()
