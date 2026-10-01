@@ -39,3 +39,12 @@ FGameplayTag UCDAttackAbility::GetCooldownTag() const
 
 void UCDAttackAbility::OnCompleteCallback()
 {}
+
+void UCDAttackAbility::OnInterruptedCallback()
+{}
+
+void UCDAttackAbility::StartComboTimer()
+{}
+
+void UCDAttackAbility::CheckComboInput()
+{}
