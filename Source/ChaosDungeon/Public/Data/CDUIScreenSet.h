@@ -39,4 +39,8 @@ public:
 	/** 타이틀 화면 */
 	UPROPERTY(EditDefaultsOnly, Category = "Screen")
 	TSoftClassPtr<UCommonActivatableWidget> titleScreen;
+
+	/** 컨펌 화면 */
+	UPROPERTY(EditDefaultsOnly, Category = "Screen")
+	TSoftClassPtr<UCommonActivatableWidget> confirmScreen;
 };
