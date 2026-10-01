@@ -15,10 +15,10 @@ UCDGameplayAbility::UCDGameplayAbility()
 const FGameplayTagContainer* UCDGameplayAbility::GetCooldownTags() const
 {
 	cooldownTagsCache.Reset();
-	const FGameplayTag cooldownTag = GetCooldownTag();
-	if (cooldownTag.IsValid())
+	const FGameplayTag cooldownTagConst = GetCooldownTag();
+	if (cooldownTagConst.IsValid())
 	{
-		cooldownTagsCache.AddTag(cooldownTag);
+		cooldownTagsCache.AddTag(cooldownTagConst);
 	}
 	return &cooldownTagsCache;
 }
@@ -42,12 +42,12 @@ void UCDGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle handle, 
 
 float UCDGameplayAbility::GetCooldownDuration() const
 {
-	return 0.f;
+	return cooldownDuration;
 }
 
 FGameplayTag UCDGameplayAbility::GetCooldownTag() const
 {
-	return FGameplayTag();
+	return cooldownTag;
 }
 
 ACDCharacterBase* UCDGameplayAbility::GetCDCharacter() const
