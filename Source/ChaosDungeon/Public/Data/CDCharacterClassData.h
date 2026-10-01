@@ -7,6 +7,7 @@
 
 class UCDSkillData;
 class UCDDodgeAbility;
+class UCDAttackAbility;
 
 /** 기본 스킬 배치 1칸 */
 USTRUCT(BlueprintType)
@@ -14,8 +15,8 @@ struct CHAOSDUNGEON_API FCDSkillSlot
 {
 	GENERATED_BODY()
 
-	/** 슬롯 입력 태그 (Input.Skill.1 ~ 4) */
-	UPROPERTY(EditAnywhere, meta = (Categories = "Input.Skill"))
+	/** 스킬 태그 - 10.01 Jun6 Input.Skill -> Skill로 수정 */
+	UPROPERTY(EditAnywhere, meta = (Categories = "Skill"))
 	FGameplayTag inputTag;
 
 	/** 배치할 스킬 */
@@ -43,6 +44,10 @@ public:
 	/** 기본 QWER 배치 (게임 중 드래그 앤 드롭으로 교체 가능) */
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FCDSkillSlot> defaultSkills;
+
+	/** 기본 공격 어빌리티 (직업별 몽타주/수치는 BP 자식) */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UCDAttackAbility> attackAbility;
 
 	/** 회피 어빌리티 (직업별 몽타주/수치는 BP 자식) */
 	UPROPERTY(EditDefaultsOnly)

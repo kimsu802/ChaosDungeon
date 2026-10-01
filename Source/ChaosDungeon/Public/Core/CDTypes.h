@@ -12,6 +12,23 @@ enum class ECDDifficulty : uint8
 	Hard
 };
 
+UENUM(BlueprintType)
+enum class ECDConfirmType : uint8
+{
+	Ok,        // 예
+	YesNo,     // 예 아니오
+	OkCancel   // 확인 취소
+};
+
+/** 확인창 결과 */
+UENUM(BlueprintType)
+enum class ECDConfirmResult : uint8
+{
+	Confirmed,  // 확인 / 예
+	Cancelled,  // 취소 / 아니오
+	Closed      // 버튼 없이 닫힘 (Esc/Back, 띄우기 실패)
+};
+
 /** 떠오르는 텍스트 종류 (색/연출은 위젯 BP 에서 결정) */
 UENUM(BlueprintType)
 enum class ECDFloatingTextStyle : uint8
