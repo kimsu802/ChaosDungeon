@@ -43,7 +43,7 @@ private:
 private:
 	/** 회피 몽타주 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	TArray<TObjectPtr<UAnimMontage>> montages;
+	TObjectPtr<UAnimMontage> montage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	int32 currentCombo = 0;
