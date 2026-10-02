@@ -10,6 +10,7 @@
 #include "UI/CDUIManagerSubsystem.h"
 #include "UserSettings/EnhancedInputUserSettings.h"
 #include "World/CDInteractable.h"
+#include "NavigationSystem.h"
 
 ACDPlayerController::ACDPlayerController()
 {
@@ -108,13 +109,32 @@ void ACDPlayerController::OnMoveReleased()
 
 bool ACDPlayerController::UpdateMoveDestination()
 {
-	FHitResult hit;
-	if (!GetHitResultUnderCursor(ECC_Visibility, true, hit))
+	const APawn* controlledPawn = GetPawn();
+	FVector rayOrigin;
+	FVector rayDirection;
+	if (!controlledPawn || !DeprojectMousePositionToWorld(rayOrigin, rayDirection) || rayDirection.Z > -KINDA_SMALL_NUMBER)
 	{
 		return false;
 	}
-	moveDestination = hit.Location;
-	pendingInteraction = Cast<ACDInteractable>(hit.GetActor());
+
+	// 커서 광선과 캐릭터 발 높이 평면의 교점. 벽이 화면을 가려도 그 뒤 바닥 지점을 얻는다
+	const float groundZ = controlledPawn->GetActorLocation().Z - controlledPawn->GetSimpleCollisionHalfHeight();
+	const FPlane groundPlane(FVector(0.f, 0.f, groundZ), FVector::UpVector);
+	const FVector planePoint = FMath::LinePlaneIntersection(rayOrigin, rayOrigin + rayDirection, groundPlane);
+
+	// 내비메시에 투영: 단차 보정 + 갈 수 없는 지점은 가장 가까운 이동 가능 지점으로
+	UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+	FNavLocation navLocation;
+	if (!navSystem || !navSystem->ProjectPointToNavigation(planePoint, navLocation))
+	{
+		return false;
+	}
+	moveDestination = navLocation.Location;
+
+	// 상호작용 대상은 커서 채널로 따로 확인 (NPC 캡슐이 Cursor 채널 Block)
+	FHitResult cursorHit;
+	GetHitResultUnderCursor(ECC_GameTraceChannel1, false, cursorHit);
+	pendingInteraction = Cast<ACDInteractable>(cursorHit.GetActor());
 	return true;
 }
 
