@@ -41,9 +41,18 @@ void UCDAbilitySystemComponent::AssignInputTag(FGameplayTag skillTag, FGameplayT
 
 void UCDAbilitySystemComponent::AbilityInputPressed(FGameplayTag inputTag)
 {
-	if (const FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
+	// 10.02 Jun6 - 공격/스킬 활성화 여부에 따라 호출함수 분기처리 (const 제거)
+	//if (const FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
+	if (FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
 	{
-		TryActivateAbility(spec->Handle);
+		if (spec->IsActive())
+		{
+			AbilitySpecInputPressed(*spec);
+		}
+		else
+		{
+			TryActivateAbility(spec->Handle);
+		}
 	}
 }
 

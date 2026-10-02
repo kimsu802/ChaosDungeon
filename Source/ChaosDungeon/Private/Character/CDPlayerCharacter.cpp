@@ -1,6 +1,7 @@
 #include "Character/CDPlayerCharacter.h"
 #include "AbilitySystem/CDAbilitySystemComponent.h"
 #include "AbilitySystem/CDDodgeAbility.h"
+#include "AbilitySystem/CDAttackAbility.h"
 #include "Camera/CameraComponent.h"
 #include "Core/CDGameplayTags.h"
 #include "Core/CDTypes.h"
@@ -63,6 +64,7 @@ void ACDPlayerCharacter::PossessedBy(AController* newController)
 	}
 
 	abilitySystem->GrantAbility(classData->dodgeAbility, CDTags::Input_Dodge);
+	abilitySystem->GrantAbility(classData->attackAbility, CDTags::Input_Attack);
 
 	// 10.02 - Jun6 스킬 Tag로 등록된 GA에 Input Tag 추가
 	for (const FCDSkillSlot& slot : classData->defaultSkillSlots)
