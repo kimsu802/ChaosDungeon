@@ -42,6 +42,15 @@ protected:
 	/** 돌진/회피 공용 이동. 어빌리티가 끝나면 이동도 끝난다 */
 	void StartDash(const FVector& direction, float distance, float duration);
 
+protected:
+	/* 쿨타임 태크 - 10.01 Jun6 Ability별 쿨타임 변수를 갖도록 선언*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Cooldown")
+	FGameplayTag cooldownTag;
+
+	/* 쿨타임 태크 - 10.01 Jun6 기존 가상 함수 상속에서 정의한 것을 변수로 변경*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Cooldown")
+	float cooldownDuration = 0.0f;
+
 private:
 	/** GetCooldownTags 반환용 캐시 */
 	mutable FGameplayTagContainer cooldownTagsCache;
