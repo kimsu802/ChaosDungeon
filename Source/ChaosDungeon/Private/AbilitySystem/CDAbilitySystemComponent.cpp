@@ -16,7 +16,7 @@ FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantAbility(TSubclassOf<U
 	return GiveAbility(spec);
 }
 
-FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantSkill(UCDSkillData* skill, FGameplayTag inputTag)
+FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantSkill(UCDSkillData* skill, FGameplayTag skillTag)
 {
 	if (!skill)
 	{
@@ -28,7 +28,15 @@ FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantSkill(UCDSkillData* s
 		// 특수 스킬
 		abilityClass = skill->abilityClass;
 	}
-	return GrantAbility(abilityClass, inputTag, skill);
+	return GrantAbility(abilityClass, skillTag, skill);
+}
+
+void UCDAbilitySystemComponent::AssignInputTag(FGameplayTag skillTag, FGameplayTag inputTag)
+{
+	if (FGameplayAbilitySpec* spec = FindSpecByInputTag(skillTag))
+	{
+		spec->GetDynamicSpecSourceTags().AddTag(inputTag);
+	}
 }
 
 void UCDAbilitySystemComponent::AbilityInputPressed(FGameplayTag inputTag)
