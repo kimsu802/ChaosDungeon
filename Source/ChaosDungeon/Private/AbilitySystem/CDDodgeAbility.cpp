@@ -11,16 +11,6 @@ UCDDodgeAbility::UCDDodgeAbility()
 	ActivationBlockedTags.AddTag(CDTags::State_HitReact);
 }
 
-float UCDDodgeAbility::GetCooldownDuration() const
-{
-	return cooldown;
-}
-
-FGameplayTag UCDDodgeAbility::GetCooldownTag() const
-{
-	return CDTags::Cooldown_Dodge;
-}
-
 void UCDDodgeAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 	const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData* triggerEventData)
 {

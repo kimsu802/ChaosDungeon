@@ -1,4 +1,4 @@
-#include "Core/CDGameplayTags.h"
+﻿#include "Core/CDGameplayTags.h"
 
 namespace CDTags
 {
@@ -7,11 +7,15 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_2, "Input.Skill.2", "W");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_3, "Input.Skill.3", "E");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_4, "Input.Skill.4", "R");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Attack, "Input.Attack", "일반 공격");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Dodge, "Input.Dodge", "Space");
 
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Skill, "Ability.Skill");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dodge, "Ability.Dodge");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_HitReact, "Ability.HitReact");
+
+	// 10.01 Jun6 - 일반공격 GA 구분용 Tag 추가
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack, "Ability.Attack");
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Casting, "State.Casting", "다른 스킬 사용 불가 구간. 회피는 가능");
 	UE_DEFINE_GAMEPLAY_TAG(State_HitReact, "State.HitReact");

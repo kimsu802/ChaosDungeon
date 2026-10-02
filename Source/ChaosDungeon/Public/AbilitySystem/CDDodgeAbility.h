@@ -22,13 +22,6 @@ public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 		const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData* triggerEventData) override;
 
-protected:
-	// UCDGameplayAbility::GetCooldownDuration()
-	virtual float GetCooldownDuration() const override;
-
-	// UCDGameplayAbility::GetCooldownTag()
-	virtual FGameplayTag GetCooldownTag() const override;
-
 private:
 	/** 이동 시간 경과 → 종료 */
 	UFUNCTION()
