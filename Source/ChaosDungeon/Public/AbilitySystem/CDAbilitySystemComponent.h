@@ -20,7 +20,10 @@ public:
 	FGameplayAbilitySpecHandle GrantAbility(TSubclassOf<UGameplayAbility> abilityClass, FGameplayTag inputTag = FGameplayTag(), UObject* sourceObject = nullptr);
 
 	/** 스킬 데이터를 SourceObject 로 가진 어빌리티를 부여한다 */
-	FGameplayAbilitySpecHandle GrantSkill(UCDSkillData* skill, FGameplayTag inputTag = FGameplayTag());
+	FGameplayAbilitySpecHandle GrantSkill(UCDSkillData* skill, FGameplayTag skillTag = FGameplayTag());
+
+	/** 10.02 Jun6 - 보유 스킬에 Input Tag 할당 */
+	void AssignInputTag(FGameplayTag skillTag, FGameplayTag inputTag);
 
 	/** 입력 태그에 연결된 어빌리티 발동 */
 	void AbilityInputPressed(FGameplayTag inputTag);
@@ -44,3 +47,5 @@ private:
 	/** 입력 태그로 Spec 검색 (수정용) */
 	FGameplayAbilitySpec* FindSpecByInputTag(FGameplayTag inputTag);
 };
+
+// TODO(Jun6) : 함수명에 Input Tag와 Skill Tag 구분해서 명명변경
