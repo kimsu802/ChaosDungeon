@@ -10,14 +10,14 @@
     <Platform Name="Win64-arm64ec" />
   </Configurations>
   <Folder Name="/Engine/">
-    <Project Path="Intermediate/ProjectFiles/UE5.vcxproj" Id="ab27d167-e472-3250-82e3-9cf32829aed6">
+    <Project Path="Intermediate/ProjectFiles/UE5.vcxproj" Id="2c08d25a-960a-3654-ae1f-4911035174f0">
       <BuildType Project="BuiltWithUnrealBuildTool" />
       <Platform Project="Win64" />
       <Build Project="false" />
     </Project>
   </Folder>
   <Folder Name="/Games/">
-    <Project Path="Intermediate/ProjectFiles/ChaosDungeon.vcxproj" Id="d2cb2f16-5139-37b2-8eb1-f9520567d7ff">
+    <Project Path="Intermediate/ProjectFiles/ChaosDungeon.vcxproj" Id="f2eb5fa2-24a0-357e-a2b1-fcdcb2aa871f">
       <BuildType Solution="DebugGame Editor|Win64" Project="DebugGame_Editor" />
       <BuildType Solution="DebugGame Editor|Win64-arm64" Project="Win64_arm64_DebugGame_Editor" />
       <BuildType Solution="DebugGame Editor|Win64-arm64ec" Project="Win64_arm64ec_DebugGame_Editor" />

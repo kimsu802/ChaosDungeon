@@ -10,6 +10,8 @@
 #include "UI/ViewModel/CDViewModelSubsystem.h"
 #include "Settings/CDDeveloperSettings.h"
 #include "UI/CDConfirmWidget.h"
+#include "Input/CommonUIActionRouterBase.h"
+
 
 UCDUIManagerSubsystem* UCDUIManagerSubsystem::Get(const APlayerController* playerController)
 {
@@ -89,7 +91,13 @@ void UCDUIManagerSubsystem::ToggleGuide()
 
 void UCDUIManagerSubsystem::ShowTitle()
 {
-	PushScreen(CDTags::UI_Layer_Modal, screenSet->titleScreen);
+	UCommonActivatableWidget* screen = PushScreen(CDTags::UI_Layer_Modal, screenSet->titleScreen);
+	UCommonUIActionRouterBase* actionRouter = GetLocalPlayer()->GetSubsystem<UCommonUIActionRouterBase>();
+	const TOptional<FUIInputConfig> desiredConfig = screen ? screen->GetDesiredInputConfig() : TOptional<FUIInputConfig>();
+	if (actionRouter && desiredConfig.IsSet())
+	{
+		actionRouter->SetActiveUIInputConfig(desiredConfig.GetValue(), screen);
+	}
 }
 
 void UCDUIManagerSubsystem::ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult)
