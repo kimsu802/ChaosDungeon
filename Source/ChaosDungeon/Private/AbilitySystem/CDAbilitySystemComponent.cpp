@@ -47,12 +47,18 @@ void UCDAbilitySystemComponent::AbilityInputPressed(FGameplayTag inputTag)
 	{
 		if (spec->IsActive())
 		{
+			UE_LOG(LogTemp, Log, TEXT("AbilitySpecInputPressed"));
 			AbilitySpecInputPressed(*spec);
 		}
 		else
 		{
+			UE_LOG(LogTemp, Log, TEXT("TryActivateAbility"));
 			TryActivateAbility(spec->Handle);
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("AbilityInputPressed - no tag[%s]"), *inputTag.ToString());
 	}
 }
 

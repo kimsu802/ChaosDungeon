@@ -16,6 +16,7 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 {
 	if (!CommitAbility(handle, actorInfo, activationInfo))
 	{
+		UE_LOG(LogTemp, Log, TEXT("fail commit"));
 		EndAbility(handle, actorInfo, activationInfo, true, true);
 		return;
 	}
@@ -49,8 +50,7 @@ void UCDAttackAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, con
 		}
 
 		currentCombo += 1;
-
-		FName nextSection = FName(*FString::Printf(TEXT("AM_Atttack%d"), currentCombo));
+		FName nextSection = FName(*FString::Printf(TEXT("AM_Attack%d"), currentCombo));
 		MontageJumpToSection(nextSection);
 	}
 }
@@ -69,12 +69,17 @@ void UCDAttackAbility::OnCompleteCallback()
 {
 	bCanCombo = false;
 	currentCombo = 1;
+	
+	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
 
 void UCDAttackAbility::OnInterruptedCallback()
 {
+	UE_LOG(LogTemp, Log, TEXT("OnInterruptedCallback"));
 	bCanCombo = false;
 	currentCombo = 1;
+
+	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, true);
 }
 
 void UCDAttackAbility::OnAnimNotifyCallback(FGameplayEventData eventData)
@@ -86,6 +91,5 @@ void UCDAttackAbility::OnAnimNotifyCallback(FGameplayEventData eventData)
 	else if (eventData.EventTag == CDTags::Event_Montage_ComboEnd)
 	{
 		bCanCombo = false;
-		currentCombo = 1;
 	}
 }
