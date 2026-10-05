@@ -24,8 +24,11 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Immune_Stagger, "State.Immune.Stagger");
 	UE_DEFINE_GAMEPLAY_TAG(State_Immune_Knockback, "State.Immune.Knockback");
 
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage, "Event.Montage");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Hit, "Event.Montage.Hit");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Recovery, "Event.Montage.Recovery");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboStart, "Event.Montage.ComboStart");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboEnd, "Event.Montage.ComboEnd");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Hit, "Event.Hit");
 
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dodge, "Cooldown.Dodge");

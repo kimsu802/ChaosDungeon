@@ -16,7 +16,7 @@ FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantAbility(TSubclassOf<U
 	return GiveAbility(spec);
 }
 
-FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantSkill(UCDSkillData* skill, FGameplayTag inputTag)
+FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantSkill(UCDSkillData* skill, FGameplayTag skillTag)
 {
 	if (!skill)
 	{
@@ -28,14 +28,37 @@ FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantSkill(UCDSkillData* s
 		// 특수 스킬
 		abilityClass = skill->abilityClass;
 	}
-	return GrantAbility(abilityClass, inputTag, skill);
+	return GrantAbility(abilityClass, skillTag, skill);
+}
+
+void UCDAbilitySystemComponent::AssignInputTag(FGameplayTag skillTag, FGameplayTag inputTag)
+{
+	if (FGameplayAbilitySpec* spec = FindSpecByInputTag(skillTag))
+	{
+		spec->GetDynamicSpecSourceTags().AddTag(inputTag);
+	}
 }
 
 void UCDAbilitySystemComponent::AbilityInputPressed(FGameplayTag inputTag)
 {
-	if (const FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
+	// 10.02 Jun6 - 공격/스킬 활성화 여부에 따라 호출함수 분기처리 (const 제거)
+	//if (const FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
+	if (FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
 	{
-		TryActivateAbility(spec->Handle);
+		if (spec->IsActive())
+		{
+			UE_LOG(LogTemp, Log, TEXT("AbilitySpecInputPressed"));
+			AbilitySpecInputPressed(*spec);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("TryActivateAbility"));
+			TryActivateAbility(spec->Handle);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("AbilityInputPressed - no tag[%s]"), *inputTag.ToString());
 	}
 }
 
