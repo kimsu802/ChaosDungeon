@@ -33,9 +33,12 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Immune_Knockback);
 
 	// 이벤트
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Hit);      // 애님 노티파이: 타격 시점
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Recovery); // 애님 노티파이: 후딜 시작
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Hit);              // 피격 리액션 트리거
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage);				// 몽타주 관련 상위 태그 - 노티파이 필터링용
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Hit);			// 애님 노티파이: 타격 시점
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Recovery);		// 애님 노티파이: 후딜 시작
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboStart);	// 애님 노티파이: 콤보 시작
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboEnd);		// 애님 노티파이: 콤보 종료
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Hit);					// 피격 리액션 트리거
 
 	// 쿨다운
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Dodge);

@@ -15,13 +15,14 @@ struct CHAOSDUNGEON_API FCDSkillSlot
 {
 	GENERATED_BODY()
 
-	/** 스킬 태그 - 10.01 Jun6 Input.Skill -> Skill로 수정 */
-	UPROPERTY(EditAnywhere, meta = (Categories = "Skill"))
+	/** 입력 태그 - 10.02 Jun6 입력 태그(Input.Skill)로 원복 */
+	UPROPERTY(EditAnywhere, meta = (Categories = "Input.Skill"))
 	FGameplayTag inputTag;
 
-	/** 배치할 스킬 */
+	/** 배치할 스킬 태그 - 10.02 Jun6 스킬 구조체가 아닌 스킬 구분자 Tag로 변경*/
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UCDSkillData> skill;
+	FGameplayTag skillTag;
+	//TObjectPtr<UCDSkillData> skill;
 };
 
 /**
@@ -41,9 +42,23 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FCDBaseStats stats;
 
+	/*
+		10.02 - Jun6 스킬 보유 구조 변경
+
+		어떤 스킬을 어떤 입력과 연결 시킬 것인가? -> 기본 FCDSkillSlot 구조체에 정의
+		어떤 스킬을 보유하고 있는가? -> TMap <Tag, USkillData> 추가
+
+		Input.Skill = 게임 UI상 슬롯
+		Skill - 실제 게임 인식 구분 Tag
+	*/
+
 	/** 기본 QWER 배치 (게임 중 드래그 앤 드롭으로 교체 가능) */
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FCDSkillSlot> defaultSkills;
+	TArray<FCDSkillSlot> defaultSkillSlots;
+
+	/** 기본 보유 스킬 */
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FGameplayTag, UCDSkillData*> defaultSkills;
 
 	/** 기본 공격 어빌리티 (직업별 몽타주/수치는 BP 자식) */
 	UPROPERTY(EditDefaultsOnly)
