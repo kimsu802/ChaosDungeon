@@ -1,6 +1,7 @@
 #include "Character/CDPlayerCharacter.h"
 #include "AbilitySystem/CDAbilitySystemComponent.h"
 #include "AbilitySystem/CDDodgeAbility.h"
+#include "AbilitySystem/CDAttackAbility.h"
 #include "Camera/CameraComponent.h"
 #include "Core/CDGameplayTags.h"
 #include "Core/CDTypes.h"
@@ -53,11 +54,23 @@ void ACDPlayerCharacter::PossessedBy(AController* newController)
 
 	check(classData);
 	InitializeAbilitySystem(classData->stats);
-	for (const FCDSkillSlot& slot : classData->defaultSkills)
+
+	// 10.02 - Jun6 캐릭터 기본 데이터 구조체 구조 변경에 따른 타입 변경
+	//for (const FCDSkillSlot& slot : classData->defaultSkills)
+	for (const TPair<FGameplayTag, UCDSkillData*>& skill : classData->defaultSkills)
 	{
-		abilitySystem->GrantSkill(slot.skill, slot.inputTag);
+		//abilitySystem->GrantSkill(slot.skill, slot.inputTag);
+		abilitySystem->GrantSkill(skill.Value, skill.Key);
 	}
+
 	abilitySystem->GrantAbility(classData->dodgeAbility, CDTags::Input_Dodge);
+	abilitySystem->GrantAbility(classData->attackAbility, CDTags::Input_Attack);
+
+	// 10.02 - Jun6 스킬 Tag로 등록된 GA에 Input Tag 추가
+	for (const FCDSkillSlot& slot : classData->defaultSkillSlots)
+	{
+		abilitySystem->AssignInputTag(slot.skillTag, slot.inputTag);
+	}
 }
 
 FVector ACDPlayerCharacter::GetAimLocation() const
