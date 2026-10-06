@@ -11,14 +11,20 @@ void UCDPrimaryLayout::NativeOnInitialized()
 	layers.Add(CDTags::UI_Layer_Modal, modalLayer);
 }
 
-UCommonActivatableWidget* UCDPrimaryLayout::PushToLayer(FGameplayTag layerTag, TSubclassOf<UCommonActivatableWidget> screenClass)
+UCommonActivatableWidget* UCDPrimaryLayout::PushToLayer(FGameplayTag layerTag, TSubclassOf<UCommonActivatableWidget> screenClass, TFunction<void(UCommonActivatableWidget&)> initFunc)
 {
 	UCommonActivatableWidgetStack* layer = layers.FindRef(layerTag);
 	if (!layer || !screenClass)
 	{
 		return nullptr;
 	}
-	return layer->AddWidget(screenClass);
+
+	if (!initFunc)
+	{
+		return layer->AddWidget(screenClass);
+	}
+
+	return layer->AddWidget<UCommonActivatableWidget>(screenClass, initFunc);
 }
 
 bool UCDPrimaryLayout::DeactivateIfActive(FGameplayTag layerTag, TSubclassOf<UCommonActivatableWidget> screenClass)

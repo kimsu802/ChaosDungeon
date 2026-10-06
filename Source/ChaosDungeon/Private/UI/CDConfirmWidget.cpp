@@ -15,18 +15,43 @@ UCDConfirmWidget::UCDConfirmWidget(const FObjectInitializer& objectInitializer)
 
 void UCDConfirmWidget::Setup(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult)
 {
-    if (titleText)
+    if (titleTextBlock)
     {
-        titleText->SetText(title);
+        titleTextBlock->SetText(title);
     }
-    if (messageText)
+    if (messageTextBlock)
     {
-        messageText->SetText(message);
+        messageTextBlock->SetText(message);
     }
     pendingResult = ECDConfirmResult::Closed;
     resultCallback = MoveTemp(onResult);
 
-    // 스택이 위젯 인스턴스를 재사용하므로, 이전 버튼과 클릭 
+    // 스택이 위젯 인스턴스를 재사용하므로, 이전 버튼과 클릭 바인딩을 비운다
+    buttonBox->Reset<UCDTextButton>([](UCDTextButton& button)
+        {
+            button.OnClicked().Clear();
+        });
+
+    switch (type)
+    {
+    case ECDConfirmType::YesNo:
+    {
+        AddButton(yesText, ECDConfirmResult::Confirmed);
+        AddButton(noText, ECDConfirmResult::Cancelled);
+        break;
+    }
+    case ECDConfirmType::OkCancel:
+    {
+        AddButton(okText, ECDConfirmResult::Confirmed);
+        AddButton(cancelText, ECDConfirmResult::Cancelled);
+        break;
+    }
+    default:
+    {
+        AddButton(okText, ECDConfirmResult::Confirmed);
+        break;
+    }
+    }
 
 }
 

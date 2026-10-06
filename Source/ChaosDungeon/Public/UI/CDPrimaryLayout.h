@@ -21,7 +21,7 @@ class CHAOSDUNGEON_API UCDPrimaryLayout : public UCommonUserWidget
 
 public:
 	/** 레이어에 화면 추가 */
-	UCommonActivatableWidget* PushToLayer(FGameplayTag layerTag, TSubclassOf<UCommonActivatableWidget> screenClass);
+	UCommonActivatableWidget* PushToLayer(FGameplayTag layerTag, TSubclassOf<UCommonActivatableWidget> screenClass, TFunction<void(UCommonActivatableWidget&)> initFunc = nullptr);
 
 	/** 해당 레이어 최상단이 screenClass 면 닫고 true */
 	bool DeactivateIfActive(FGameplayTag layerTag, TSubclassOf<UCommonActivatableWidget> screenClass);
