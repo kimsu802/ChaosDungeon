@@ -4,7 +4,7 @@
 
 ACDInteractable::ACDInteractable()
 {
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 }
 
 void ACDInteractable::Interact(APlayerController* interactor) const

@@ -40,11 +40,11 @@ private:
 protected:
 	/** 제목 */
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UCommonTextBlock> titleText;
+	TObjectPtr<UCommonTextBlock> titleTextBlock;
 
 	/** 본문 */
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UCommonTextBlock> messageText;
+	TObjectPtr<UCommonTextBlock> messageTextBlock;
 
 	/** 버튼 목록 */
 	UPROPERTY(meta = (BindWidget))
@@ -52,19 +52,19 @@ protected:
 
 	/** [확인] 버튼 글자 */
 	UPROPERTY(EditDefaultsOnly, Category = "Confirm")
-	FText okLabel = NSLOCTEXT("CDConfirm", "Ok", "확인");
+	FText okText = FText::FromString(TEXT("확인"));
 
 	/** [예] 버튼 글자 */
 	UPROPERTY(EditDefaultsOnly, Category = "Confirm")
-	FText yesLabel = NSLOCTEXT("CDConfirm", "Yes", "예");
+	FText yesText = FText::FromString(TEXT("예"));
 
 	/** [아니오] 버튼 글자 */
 	UPROPERTY(EditDefaultsOnly, Category = "Confirm")
-	FText noLabel = NSLOCTEXT("CDConfirm", "No", "아니오");
+	FText noText = FText::FromString(TEXT("아니오"));
 
 	/** [취소] 버튼 글자 */
 	UPROPERTY(EditDefaultsOnly, Category = "Confirm")
-	FText cancelLabel = NSLOCTEXT("CDConfirm", "Cancel", "취소");
+	FText cancelText = FText::FromString(TEXT("취소"));
 
 private:
 	/** 창이 닫힐 때 전달할 결과 (버튼을 누르면 갱신) */
