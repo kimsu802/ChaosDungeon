@@ -32,7 +32,7 @@ void UCDCursorHighlightComponent::TickComponent(float deltaTime, ELevelTick tick
 	playerController->GetHitResultUnderCursor(ECC_GameTraceChannel1, false, hit);
 
 	AActor* newHovered = hit.GetActor();
-	UE_LOG(LogTemp, Log, TEXT("Hover: %s / %s"), *GetNameSafe(hit.GetActor()), *GetNameSafe(hit.GetComponent()));
+	//UE_LOG(LogTemp, Log, TEXT("Hover: %s / %s"), *GetNameSafe(hit.GetActor()), *GetNameSafe(hit.GetComponent()));
 
 	if (newHovered == hoveredActor.Get())
 	{
