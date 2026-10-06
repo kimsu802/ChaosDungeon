@@ -119,6 +119,10 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<UCDDungeonData> dungeonData;
 
+	// 이번 런에서 방문할 스테이지를 무작위 순서로 보관한다.
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<UCDStageData>> runStages;
+
 	/** 현재 런 기록 */
 	FCDRunRecord record;
 
