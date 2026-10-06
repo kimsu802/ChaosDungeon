@@ -36,10 +36,7 @@ void ACDHubGameMode::BeginPlay()
 			return;
 		}
 
-		world->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(this, [this, uiManager]()
-		{
-			uiManager->ShowTitle();
-		}));
+		uiManager->ShowTitle();
 	}
 }
 

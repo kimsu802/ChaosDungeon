@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"DeveloperSettings",
-				"CommonUI"
+				"CommonUI",
+				"AIModule"
 			]
 		}
 	],
