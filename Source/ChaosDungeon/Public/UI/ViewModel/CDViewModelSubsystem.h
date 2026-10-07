@@ -47,6 +47,9 @@ private:
 	UFUNCTION()
 	void HandlePawnChanged(APawn* oldPawn, APawn* newPawn);
 
+	/** 슬롯 VM 들을 키 매핑 설정에 연결 (슬롯별 키 표시용) */
+	void BindSlotKeys(const APlayerController* playerController);
+
 	/** Combat.BossAppeared → 보스 HP VM 연결 */
 	void HandleBossAppeared(const FCDActorMessage& message);
 
