@@ -23,6 +23,12 @@ public:
 	/** 커서 표시, 외곽선 컴포넌트 생성 */
 	ACDPlayerController();
 
+	/** 입력 설정 (키 매핑 UI / 슬롯 VM 이 슬롯별 매핑 이름을 찾을 때 사용) */
+	FORCEINLINE const UCDInputConfig* GetInputConfig() const
+	{
+		return inputConfig;
+	}
+
 protected:
 	// AActor::BeginPlay()
 	virtual void BeginPlay() override;
