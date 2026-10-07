@@ -33,6 +33,13 @@ class CHAOSDUNGEON_API UCDInputConfig : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	/** 슬롯 입력 태그에 연결된 입력 액션 (없으면 nullptr) */
+	const UInputAction* FindAbilityAction(FGameplayTag inputTag) const;
+
+	/** 슬롯 입력 태그의 키 매핑 이름 (입력 액션의 Player Mappable Key Settings > Name). 없으면 NAME_None */
+	FName FindMappingName(FGameplayTag inputTag) const;
+
+public:
 	/** 기본 매핑 컨텍스트 */
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> mappingContext;
