@@ -3,10 +3,13 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Core/CDGameplayTags.h"
 #include "Core/CDMessages.h"
+#include "Data/CDInputConfig.h"
+#include "EnhancedInputSubsystems.h"
 #include "Engine/GameInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "MVVMGameSubsystem.h"
+#include "Player/CDPlayerController.h"
 #include "Types/MVVMViewModelCollection.h"
 #include "UI/ViewModel/CDHealthVM.h"
 #include "UI/ViewModel/CDRunResultVM.h"
@@ -62,6 +65,24 @@ void UCDViewModelSubsystem::BindPlayer(APlayerController* playerController)
 	playerController->OnPossessedPawnChanged.AddUniqueDynamic(this, &ThisClass::HandlePawnChanged);
 	// 이미 빙의된 경우
 	HandlePawnChanged(nullptr, playerController->GetPawn());
+	BindSlotKeys(playerController);
+}
+
+void UCDViewModelSubsystem::BindSlotKeys(const APlayerController* playerController)
+{
+	const ACDPlayerController* cdController = Cast<ACDPlayerController>(playerController);
+	const UCDInputConfig* inputConfig = cdController ? cdController->GetInputConfig() : nullptr;
+	const UEnhancedInputLocalPlayerSubsystem* inputSubsystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	UEnhancedInputUserSettings* userSettings = inputSubsystem ? inputSubsystem->GetUserSettings() : nullptr;
+	if (!inputConfig || !userSettings)
+	{
+		return;
+	}
+
+	for (const TPair<FGameplayTag, TObjectPtr<UCDSkillSlotVM>>& slot : skillSlots)
+	{
+		slot.Value->BindKey(userSettings, inputConfig->FindMappingName(slot.Key));
+	}
 }
 
 void UCDViewModelSubsystem::HandlePawnChanged(APawn* oldPawn, APawn* newPawn)
