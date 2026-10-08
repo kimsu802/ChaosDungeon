@@ -109,3 +109,8 @@ void ACDCharacterBase::HandleDeath()
 	message.contribution = GetKillContribution();
 	UCDMessageSubsystem::Get(this).Broadcast(CDTags::Msg_Combat_Death, message);
 }
+
+void ACDCharacterBase::DebugOnHitFunction(const AActor* attacker)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Attacked by %s"), *attacker->GetName());
+}
