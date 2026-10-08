@@ -42,15 +42,18 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 	BeginCastTowards(aimLocation);
 	SetCasting(true);
 
+	// 스킬 시전 시 이동 거리 계산 및 이동 연출
 	if (skillData->dashDistance > 0.f)
 	{
 		StartDash(character->GetActorForwardVector(), skillData->dashDistance, skillData->dashDuration);
 	}
 
+	// 몽타주 내 공격 노티파이 수신 기능
 	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
 	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnHitEvent);
 	hitTask->ReadyForActivation();
 
+	// 취소 가능 시, 취소 노티파이 수신 기능
 	if (skillData->bRecoveryCancelable)
 	{
 		UAbilityTask_WaitGameplayEvent* recoveryTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Recovery);
@@ -58,6 +61,7 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 		recoveryTask->ReadyForActivation();
 	}
 
+	// 스킬 몽타주 재생
 	UAbilityTask_PlayMontageAndWait* montageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, skillData->montage);
 	montageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
 	montageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
