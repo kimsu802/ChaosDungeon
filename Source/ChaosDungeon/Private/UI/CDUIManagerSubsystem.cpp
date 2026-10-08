@@ -11,6 +11,7 @@
 #include "Settings/CDDeveloperSettings.h"
 #include "UI/CDConfirmWidget.h"
 #include "Input/CommonUIActionRouterBase.h"
+#include "Engine/AssetManager.h"
 
 
 UCDUIManagerSubsystem* UCDUIManagerSubsystem::Get(const APlayerController* playerController)
@@ -53,8 +54,15 @@ void UCDUIManagerSubsystem::InitializeForPlayer(APlayerController* playerControl
 	// HUD 가 바인딩할 ViewModel 을 먼저 이 플레이어의 폰에 연결
 	GetLocalPlayer()->GetSubsystem<UCDViewModelSubsystem>()->BindPlayer(playerController);
 
-	EnsureLayout();
-	//PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
+	UCDPrimaryLayout* rootLayout = EnsureLayout();
+
+	UCommonActivatableWidget* hud = PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
+
+	UE_LOG(LogTemp, Warning, TEXT("InitializeForPlayer: PC=%s Layout=%s HudClass=%s Hud=%s"),
+		*GetNameSafe(playerController),
+		*GetNameSafe(rootLayout),
+		*screenSet->hudScreen.ToString(),
+		*GetNameSafe(hud));
 }
 
 UCommonActivatableWidget* UCDUIManagerSubsystem::PushScreen(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass)
@@ -69,6 +77,20 @@ UCommonActivatableWidget* UCDUIManagerSubsystem::PushScreen(FGameplayTag layerTa
 
 void UCDUIManagerSubsystem::PushScreenAsync(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass, TFunction<void(UCommonActivatableWidget&)> initFunc)
 {
+	if (screenClass.IsNull())
+	{
+		return;
+	}
+
+	// 이미 로드돼 있으면 즉시, 아니면 로딩이 끝난 뒤 콜백된다
+	// WeakLambda: 로딩 중 서브시스템이 사라지면(레벨 종료 등) 콜백을 무시
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(screenClass.ToSoftObjectPath(), FStreamableDelegate::CreateWeakLambda(this, [this, layerTag, screenClass, initFunc]()
+		{
+			if (UCDPrimaryLayout* rootLayout = EnsureLayout())
+			{
+				rootLayout->PushToLayer(layerTag, screenClass.Get(), initFunc);
+			}
+		}));
 }
 
 void UCDUIManagerSubsystem::ClearLayerByTag(FGameplayTag layerTag)

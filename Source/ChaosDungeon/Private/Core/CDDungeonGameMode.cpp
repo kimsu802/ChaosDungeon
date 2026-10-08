@@ -52,7 +52,8 @@ void ACDDungeonGameMode::BeginStage()
 {
 	stageStartTime = GetWorld()->GetTimeSeconds();
 	BroadcastStage(CDTags::Msg_Stage_Started);
-	spawnManager->StartSpawning();
+
+	 spawnManager->StartSpawning();
 }
 
 void ACDDungeonGameMode::ClearStage()
