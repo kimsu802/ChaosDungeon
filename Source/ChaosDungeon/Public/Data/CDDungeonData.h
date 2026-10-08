@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Engine/DataAsset.h"
 #include "Core/CDTypes.h"
@@ -29,6 +29,10 @@ public:
 	/** 스테이지 순서 */
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TObjectPtr<UCDStageData>> stages;
+
+	// 모든 일반 스테이지를 방문한 뒤 진행할 보스 스테이지.
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UCDStageData> bossStage;
 
 	/** 난이도별 배율 */
 	UPROPERTY(EditDefaultsOnly)

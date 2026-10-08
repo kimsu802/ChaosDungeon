@@ -22,6 +22,34 @@ void UCDRunSubsystem::Initialize(FSubsystemCollectionBase& collection)
 
 void UCDRunSubsystem::StartRun(ECDDifficulty difficulty)
 {
+	// 던전 설정과 스테이지 목록을 확인한다.
+	if (!dungeonData || dungeonData->stages.IsEmpty())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Dungeon Data or Stages is missing."));
+		return;
+	}
+
+	// 모든 스테이지에 목적지 맵이 지정되어 있어야 한다.
+	for (const TObjectPtr<UCDStageData>& stage : dungeonData->stages)
+	{
+		if (!stage || stage->level.IsNull())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Stage Data or Level is missing."));
+			return;
+		}
+	}
+
+	// 원본 데이터는 유지하고 이번 런에서 사용할 목록만 복사한다.
+	runStages = dungeonData->stages;
+
+	// 뒤에서부터 임의의 항목과 교환하여 방문 순서를 섞는다.
+	for (int32 i = runStages.Num() - 1; i > 0; --i)
+	{
+		const int32 randomIndex = FMath::RandRange(0, i);
+		runStages.Swap(i, randomIndex);
+	}
+
+	// 새 런의 기록과 현재 위치를 초기화한다.
 	record = FCDRunRecord();
 	record.difficulty = difficulty;
 	stageIndex = 0;
@@ -44,6 +72,11 @@ void UCDRunSubsystem::ReturnToHub()
 
 void UCDRunSubsystem::AdvanceStage()
 {
+	if (bRunFinished || !runStages.IsValidIndex(stageIndex + 1))
+	{
+		return;
+	}
+
 	++stageIndex;
 	TravelToCurrentStage();
 }
@@ -71,16 +104,17 @@ bool UCDRunSubsystem::RegisterDeath()
 
 const UCDStageData* UCDRunSubsystem::GetCurrentStage() const
 {
-	if (!dungeonData || !dungeonData->stages.IsValidIndex(stageIndex))
+	if (!runStages.IsValidIndex(stageIndex))
 	{
 		return nullptr;
 	}
-	return dungeonData->stages[stageIndex];
+
+	return runStages[stageIndex];
 }
 
 bool UCDRunSubsystem::IsLastStage() const
 {
-	return dungeonData && stageIndex >= dungeonData->stages.Num() - 1;
+	return runStages.IsValidIndex(stageIndex) && stageIndex == runStages.Num() - 1;
 }
 
 const FCDDifficultySettings& UCDRunSubsystem::GetDifficultySettings() const
