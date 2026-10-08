@@ -58,6 +58,9 @@ public:
 	/** 타이틀 화면 열기 */
 	void ShowTitle();
 
+	/** 게임 화면 열기 **/
+	void ShowGameHud();
+
 	/* 컨펌 화면 열기*/
 	void ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult);
 
@@ -70,6 +73,9 @@ private:
 
 	/** Run.Finished → 결과 화면 */
 	void HandleRunFinished(const FCDRunMessage& message);
+
+	/** 월드 정리(레벨 이동/종료): 그 월드의 레이아웃을 버린다. 남겨 두면 다음 레벨 HUD 가 화면에 없는 옛 레이아웃에 들어간다 */
+	void HandleWorldCleanup(UWorld* world, bool bSessionEnded, bool bCleanupResources);
 
 	/** 메시지 서브시스템 */
 	UCDMessageSubsystem* GetMessages() const;
@@ -85,4 +91,7 @@ private:
 
 	/** Run.Finished 구독 핸들 */
 	FCDListenerHandle runFinishedHandle;
+
+	/** FWorldDelegates::OnWorldCleanup 핸들 */
+	FDelegateHandle worldCleanupHandle;
 };
