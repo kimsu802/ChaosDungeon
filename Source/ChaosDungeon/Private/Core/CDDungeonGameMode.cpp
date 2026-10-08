@@ -9,6 +9,9 @@
 #include "World/CDSpawnPoint.h"
 #include "EngineUtils.h"
 #include "TimerManager.h"
+#include "UI/CDUIManagerSubsystem.h"
+#include "Kismet/GameplayStatics.h"
+
 
 ACDDungeonGameMode::ACDDungeonGameMode()
 {
@@ -19,6 +22,8 @@ ACDDungeonGameMode::ACDDungeonGameMode()
 void ACDDungeonGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
+	UCDUIManagerSubsystem::Get(playerController)->ShowGameHud();
 
 	UCDMessageSubsystem& messages = UCDMessageSubsystem::Get(this);
 	listenerHandles.Add(messages.Listen(CDTags::Msg_Combat_Damage, this, &ThisClass::HandleDamage));

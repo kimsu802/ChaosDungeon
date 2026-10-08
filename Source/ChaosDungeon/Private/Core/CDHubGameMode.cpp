@@ -46,5 +46,18 @@ void ACDHubGameMode::EnterHub(bool bSkipBlend)
 	if (APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0))
 	{
 		playerController->SetViewTargetWithBlend(playerController->GetPawn(), blendTime, VTBlend_Cubic);
+
+		if (UCDUIManagerSubsystem* uiManager = UCDUIManagerSubsystem::Get(playerController))
+		{
+			UWorld* world = playerController->GetWorld();
+			if (!world)
+			{
+				return;
+			}
+
+			uiManager->ShowGameHud();
+		}
 	}
+
+
 }
