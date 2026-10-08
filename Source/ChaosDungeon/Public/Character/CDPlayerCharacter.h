@@ -28,6 +28,13 @@ protected:
 	// APawn::PossessedBy()
 	virtual void PossessedBy(AController* newController) override;
 
+private:
+	/** 스킬 슬롯 배치: 저장된 배치가 있으면 그것을, 없으면 직업 기본 배치를 적용 */
+	void ApplySkillSlots();
+
+	/** ASC 의 슬롯 배치 변경 → 레벨 이동에도 유지되도록 저장 */
+	void HandleSkillLoadoutChanged();
+
 protected:
 	/** 카메라 암 (회전 고정) */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")

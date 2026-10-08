@@ -5,6 +5,9 @@
 
 class UCDSkillData;
 
+/** 스킬 슬롯 배치가 바뀜 (드래그 앤 드롭 교체) */
+DECLARE_MULTICAST_DELEGATE(FCDOnSkillLoadoutChanged);
+
 /**
  * 입력 태그 기반 어빌리티 관리.
  * - 어빌리티 Spec 의 DynamicSpecSourceTags 에 입력 태그(Input.Skill.1 등)를 달아 둔다.
@@ -31,8 +34,14 @@ public:
 	/** AI 용: 특정 스킬 발동 */
 	bool TryActivateSkill(const UCDSkillData* skill);
 
-	/** 스킬 슬롯 드래그 앤 드롭: 두 슬롯의 입력 태그를 맞바꾼다 */
+	/** 스킬 슬롯 드래그 앤 드롭: 두 슬롯의 입력 태그를 맞바꾼다 (onSkillLoadoutChanged 알림) */
 	void SwapInputTags(FGameplayTag slotA, FGameplayTag slotB);
+
+	/** 현재 스킬 슬롯 배치 (입력 태그 Input.Skill.* → 스킬 태그 Ability.Skill.*) */
+	TMap<FGameplayTag, FGameplayTag> GetSkillLoadout() const;
+
+	/** 스킬 슬롯 배치 적용: 기존 Input.Skill.* 태그를 모두 떼고 배치대로 다시 붙인다 */
+	void ApplySkillLoadout(const TMap<FGameplayTag, FGameplayTag>& loadout);
 
 	/** UI 조회: 슬롯에 있는 스킬 */
 	const UCDSkillData* GetSkillByInputTag(FGameplayTag inputTag) const;
@@ -46,6 +55,10 @@ private:
 
 	/** 입력 태그로 Spec 검색 (수정용) */
 	FGameplayAbilitySpec* FindSpecByInputTag(FGameplayTag inputTag);
+
+public:
+	/** 스킬 슬롯 배치 변경 알림 (캐릭터가 받아서 레벨 이동에도 유지되도록 저장) */
+	FCDOnSkillLoadoutChanged onSkillLoadoutChanged;
 };
 
 // TODO(Jun6) : 함수명에 Input Tag와 Skill Tag 구분해서 명명변경

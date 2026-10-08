@@ -12,6 +12,7 @@
 #include "UI/CDConfirmWidget.h"
 #include "Input/CommonUIActionRouterBase.h"
 #include "Engine/AssetManager.h"
+#include "Engine/World.h"
 
 
 UCDUIManagerSubsystem* UCDUIManagerSubsystem::Get(const APlayerController* playerController)
@@ -35,11 +36,13 @@ void UCDUIManagerSubsystem::Initialize(FSubsystemCollectionBase& collection)
 	//ensureMsgf(screenSet, TEXT("DefaultGame.ini 에 screenSetAsset 을 지정하세요."));
 
 	runFinishedHandle = GetMessages()->Listen(CDTags::Msg_Run_Finished, this, &ThisClass::HandleRunFinished);
+	worldCleanupHandle = FWorldDelegates::OnWorldCleanup.AddUObject(this, &ThisClass::HandleWorldCleanup);
 }
 
 void UCDUIManagerSubsystem::Deinitialize()
 {
 	GetMessages()->Unlisten(runFinishedHandle);
+	FWorldDelegates::OnWorldCleanup.Remove(worldCleanupHandle);
 	Super::Deinitialize();
 }
 
@@ -56,13 +59,13 @@ void UCDUIManagerSubsystem::InitializeForPlayer(APlayerController* playerControl
 
 	UCDPrimaryLayout* rootLayout = EnsureLayout();
 
-	UCommonActivatableWidget* hud = PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
+	//UCommonActivatableWidget* hud = PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
 
-	UE_LOG(LogTemp, Warning, TEXT("InitializeForPlayer: PC=%s Layout=%s HudClass=%s Hud=%s"),
-		*GetNameSafe(playerController),
-		*GetNameSafe(rootLayout),
-		*screenSet->hudScreen.ToString(),
-		*GetNameSafe(hud));
+	//UE_LOG(LogTemp, Warning, TEXT("InitializeForPlayer: PC=%s Layout=%s HudClass=%s Hud=%s"),
+	//	*GetNameSafe(playerController),
+	//	*GetNameSafe(rootLayout),
+	//	*screenSet->hudScreen.ToString(),
+	//	*GetNameSafe(hud));
 }
 
 UCommonActivatableWidget* UCDUIManagerSubsystem::PushScreen(FGameplayTag layerTag, const TSoftClassPtr<UCommonActivatableWidget>& screenClass)
@@ -113,13 +116,18 @@ void UCDUIManagerSubsystem::ToggleGuide()
 
 void UCDUIManagerSubsystem::ShowTitle()
 {
-	UCommonActivatableWidget* screen = PushScreen(CDTags::UI_Layer_Modal, screenSet->titleScreen);
+	UCommonActivatableWidget* screen = PushScreen(CDTags::UI_Layer_Game, screenSet->titleScreen);
 	UCommonUIActionRouterBase* actionRouter = GetLocalPlayer()->GetSubsystem<UCommonUIActionRouterBase>();
 	const TOptional<FUIInputConfig> desiredConfig = screen ? screen->GetDesiredInputConfig() : TOptional<FUIInputConfig>();
 	if (actionRouter && desiredConfig.IsSet())
 	{
 		actionRouter->SetActiveUIInputConfig(desiredConfig.GetValue(), screen);
 	}
+}
+
+void UCDUIManagerSubsystem::ShowGameHud()
+{
+	PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
 }
 
 void UCDUIManagerSubsystem::ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult)
@@ -164,6 +172,26 @@ void UCDUIManagerSubsystem::HandleRunFinished(const FCDRunMessage& message)
 {
 	// 표시할 값은 UCDRunResultVM 이 같은 메시지로 채운다
 	PushScreen(CDTags::UI_Layer_Modal, screenSet->resultScreen);
+}
+
+void UCDUIManagerSubsystem::HandleWorldCleanup(UWorld* world, bool bSessionEnded, bool bCleanupResources)
+{
+	if (!layout)
+	{
+		return;
+	}
+
+	// 다른 월드(에디터 프리뷰, 스트리밍 레벨 등) 정리는 무시.
+	// 레이아웃의 GetWorld() 는 게임 인스턴스의 "현재" 월드를 돌려줄 수 있으므로 소유 컨트롤러의 월드로 비교한다.
+	// 소유 컨트롤러가 이미 사라졌으면 어느 월드에도 속하지 않는 레이아웃이므로 버린다.
+	const APlayerController* owner = layout->GetOwningPlayer();
+	if (owner && owner->GetWorld() != world)
+	{
+		return;
+	}
+
+	layout->RemoveFromParent();
+	layout = nullptr;
 }
 
 UCDMessageSubsystem* UCDUIManagerSubsystem::GetMessages() const

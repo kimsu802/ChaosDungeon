@@ -9,6 +9,7 @@
 class UCDFloatingTextWidget;
 class UCDDungeonData;
 class UCDUIScreenSet;
+class UUserWidget;
 
 /**
  * 
@@ -35,8 +36,16 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category = "UI")
 	TSoftClassPtr<UCDFloatingTextWidget> floatingTextWidgetClass;
 
-	/** 레벨 전환 페이드 시간 */
-	UPROPERTY(Config, EditAnywhere, Category = "UI")
+	/** 레벨 전환 / 화면 페이드 시간 */
+	UPROPERTY(Config, EditAnywhere, Category = "UI|Fade", meta = (ClampMin = 0))
 	float fadeDuration = 0.5f;
+
+	/** 페이드 오버레이 위젯. 비우면 검은 화면 (로고/팁을 넣으려면 지정, 루트 Visibility = Visible 권장) */
+	UPROPERTY(Config, EditAnywhere, Category = "UI|Fade")
+	TSoftClassPtr<UUserWidget> fadeWidgetClass;
+
+	/** 페이드 오버레이 ZOrder. CommonUI 레이아웃(100)보다 커야 UI 까지 덮는다 */
+	UPROPERTY(Config, EditAnywhere, Category = "UI|Fade")
+	int32 fadeZOrder = 1000;
 	
 };

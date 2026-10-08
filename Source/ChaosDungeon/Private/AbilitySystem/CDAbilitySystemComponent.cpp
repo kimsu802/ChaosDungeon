@@ -1,5 +1,6 @@
 #include "AbilitySystem/CDAbilitySystemComponent.h"
 #include "AbilitySystem/CDSkillAbility.h"
+#include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
 
 FGameplayAbilitySpecHandle UCDAbilitySystemComponent::GrantAbility(TSubclassOf<UGameplayAbility> abilityClass, FGameplayTag inputTag, UObject* sourceObject)
@@ -36,6 +37,7 @@ void UCDAbilitySystemComponent::AssignInputTag(FGameplayTag skillTag, FGameplayT
 	if (FGameplayAbilitySpec* spec = FindSpecByInputTag(skillTag))
 	{
 		spec->GetDynamicSpecSourceTags().AddTag(inputTag);
+		MarkAbilitySpecDirty(*spec);
 	}
 }
 
@@ -84,6 +86,51 @@ void UCDAbilitySystemComponent::SwapInputTags(FGameplayTag slotA, FGameplayTag s
 	};
 	Retag(specA, slotA, slotB);
 	Retag(specB, slotB, slotA);
+
+	if (specA || specB)
+	{
+		onSkillLoadoutChanged.Broadcast();
+	}
+}
+
+TMap<FGameplayTag, FGameplayTag> UCDAbilitySystemComponent::GetSkillLoadout() const
+{
+	const FGameplayTagContainer inputFilter(CDTags::Input_Skill);
+	const FGameplayTagContainer skillFilter(CDTags::Ability_Skill);
+
+	TMap<FGameplayTag, FGameplayTag> loadout;
+	for (const FGameplayAbilitySpec& spec : ActivatableAbilities.Items)
+	{
+		// Filter: 부모 태그 기준으로 매칭 (Input.Skill.4 → Input.Skill, Ability.Skill.Strike → Ability.Skill)
+		const FGameplayTagContainer inputTags = spec.GetDynamicSpecSourceTags().Filter(inputFilter);
+		const FGameplayTagContainer skillTags = spec.GetDynamicSpecSourceTags().Filter(skillFilter);
+		if (inputTags.IsEmpty() || skillTags.IsEmpty())
+		{
+			continue;
+		}
+		loadout.Add(inputTags.First(), skillTags.First());
+	}
+	return loadout;
+}
+
+void UCDAbilitySystemComponent::ApplySkillLoadout(const TMap<FGameplayTag, FGameplayTag>& loadout)
+{
+	// 기존 슬롯 태그 제거 (회피/평타 등 Input.Skill 이 아닌 입력 태그는 유지)
+	const FGameplayTagContainer inputFilter(CDTags::Input_Skill);
+	for (FGameplayAbilitySpec& spec : ActivatableAbilities.Items)
+	{
+		const FGameplayTagContainer inputTags = spec.GetDynamicSpecSourceTags().Filter(inputFilter);
+		if (!inputTags.IsEmpty())
+		{
+			spec.GetDynamicSpecSourceTags().RemoveTags(inputTags);
+			MarkAbilitySpecDirty(spec);
+		}
+	}
+
+	for (const TPair<FGameplayTag, FGameplayTag>& slot : loadout)
+	{
+		AssignInputTag(slot.Value, slot.Key);
+	}
 }
 
 const UCDSkillData* UCDAbilitySystemComponent::GetSkillByInputTag(FGameplayTag inputTag) const
