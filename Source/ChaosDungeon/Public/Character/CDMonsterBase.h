@@ -40,6 +40,9 @@ public:
 	virtual FVector GetAimLocation() const override;
 
 protected:
+	/** 디버그용 - HitReactAbility 추가용 */
+	virtual void BeginPlay() override;
+
 	// ACDCharacterBase::GetKillContribution()
 	virtual float GetKillContribution() const override;
 
