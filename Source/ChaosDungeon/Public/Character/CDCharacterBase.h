@@ -61,6 +61,10 @@ public:
 	/** 사망 상태 해제 + 체력 회복. 플레이어 제자리 부활과 몬스터 풀 재사용이 함께 쓴다 */
 	void Revive(float invincibleTime);
 
+	/** 디버그용 함수 -> BP 테스트 가능하도록 BlueprintCallable로 선언 */
+	UFUNCTION(BlueprintCallable)
+	virtual void DebugOnHitFunction(const AActor* attacker);
+
 protected:
 	/** 스탯 적용 + 공통 어빌리티 부여. 재호출 가능 (풀링 재사용) */
 	void InitializeAbilitySystem(const FCDBaseStats& stats, float healthMultiplier = 1.f, float attackMultiplier = 1.f);
