@@ -1,4 +1,5 @@
 #include "Character/CDMonsterBase.h"
+#include "AbilitySystem/CDHitReactAbility.h"
 #include "AbilitySystem/CDAbilitySystemComponent.h"
 #include "AIController.h"
 #include "Components/CapsuleComponent.h"
@@ -60,6 +61,12 @@ FVector ACDMonsterBase::GetAimLocation() const
 		return Super::GetAimLocation();
 	}
 	return target->GetActorLocation();
+}
+
+void ACDMonsterBase::BeginPlay()
+{
+	Super::BeginPlay();
+	abilitySystem->GrantAbility(hitReactAbilityClass);
 }
 
 float ACDMonsterBase::GetKillContribution() const

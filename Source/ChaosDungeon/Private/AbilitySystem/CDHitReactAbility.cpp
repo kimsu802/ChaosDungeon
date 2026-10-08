@@ -25,6 +25,16 @@ void UCDHitReactAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle
 {
 	ACDCharacterBase* character = GetCDCharacter();
 
+	/* 10.08 - Jun6 디버그용 함수 호출 */
+	if (triggerEventData && triggerEventData->Instigator)
+	{
+		if (const AActor* attacker = triggerEventData->Instigator.Get())
+		{
+			const FString name = attacker->GetName();
+			character->DebugOnHitFunction(attacker);
+		}
+	}
+
 	const bool bKnockback = triggerEventData && triggerEventData->Instigator && triggerEventData->EventMagnitude > 0.f
 		&& !GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(CDTags::State_Immune_Knockback);
 	if (bKnockback)
