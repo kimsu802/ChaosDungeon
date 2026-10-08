@@ -4,11 +4,13 @@
 #include "AbilitySystem/CDAttackAbility.h"
 #include "Camera/CameraComponent.h"
 #include "Core/CDGameplayTags.h"
+#include "Core/CDSkillLoadoutSubsystem.h"
 #include "Core/CDTypes.h"
 #include "Data/CDCharacterClassData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Engine/GameInstance.h"
 #include "Player/CDOcclusionFadeComponent.h"
 
 ACDPlayerCharacter::ACDPlayerCharacter()
@@ -67,9 +69,36 @@ void ACDPlayerCharacter::PossessedBy(AController* newController)
 	abilitySystem->GrantAbility(classData->attackAbility, CDTags::Input_Attack);
 
 	// 10.02 - Jun6 스킬 Tag로 등록된 GA에 Input Tag 추가
+	// 10.08 - 레벨 이동 전 슬롯 배치 유지 (저장된 배치 우선)
+	ApplySkillSlots();
+
+	// 재빙의 시 중복 등록 방지
+	abilitySystem->onSkillLoadoutChanged.RemoveAll(this);
+	abilitySystem->onSkillLoadoutChanged.AddUObject(this, &ThisClass::HandleSkillLoadoutChanged);
+}
+
+void ACDPlayerCharacter::ApplySkillSlots()
+{
+	const UGameInstance* gameInstance = GetGameInstance();
+	const UCDSkillLoadoutSubsystem* loadout = gameInstance ? gameInstance->GetSubsystem<UCDSkillLoadoutSubsystem>() : nullptr;
+	if (loadout && loadout->HasLoadout())
+	{
+		abilitySystem->ApplySkillLoadout(loadout->GetLoadout());
+		return;
+	}
+
 	for (const FCDSkillSlot& slot : classData->defaultSkillSlots)
 	{
 		abilitySystem->AssignInputTag(slot.skillTag, slot.inputTag);
+	}
+}
+
+void ACDPlayerCharacter::HandleSkillLoadoutChanged()
+{
+	const UGameInstance* gameInstance = GetGameInstance();
+	if (UCDSkillLoadoutSubsystem* loadout = gameInstance ? gameInstance->GetSubsystem<UCDSkillLoadoutSubsystem>() : nullptr)
+	{
+		loadout->SaveLoadout(abilitySystem->GetSkillLoadout());
 	}
 }
 
