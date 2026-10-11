@@ -25,10 +25,10 @@ public:
 	ACDMonsterBase();
 
 	/** 풀에서 꺼내 데이터/난이도로 초기화 */
-	void ActivateFromPool(const UCDMonsterData* data, const FCDDifficultySettings& difficulty, const FVector& location);
+	virtual void ActivateFromPool(const UCDMonsterData* data, const FCDDifficultySettings& difficulty, const FVector& location);
 
 	/** 사망 연출 후 자동 호출. onReleased 로 스폰 매니저에 반환 */
-	void DeactivateToPool();
+	virtual void DeactivateToPool();
 
 	/** 몬스터 데이터 */
 	FORCEINLINE const UCDMonsterData* GetMonsterData() const
