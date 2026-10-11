@@ -31,6 +31,9 @@ public:
 	/** 입력 태그에 연결된 어빌리티 발동 */
 	void AbilityInputPressed(FGameplayTag inputTag);
 
+	/** AI 용: 스킬 사용 여부 확인 */
+	bool CanActivateSkill(const UCDSkillData* skill) const;
+
 	/** AI 용: 특정 스킬 발동 */
 	bool TryActivateSkill(const UCDSkillData* skill);
 

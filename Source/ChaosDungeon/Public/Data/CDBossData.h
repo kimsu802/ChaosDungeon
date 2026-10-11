@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AIController.h"
-#include "CDAIController.generated.h"
+#include "Data/CDMonsterData.h"
+#include "CDBossData.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CHAOSDUNGEON_API ACDAIController : public AAIController
+class CHAOSDUNGEON_API UCDBossData : public UCDMonsterData
 {
 	GENERATED_BODY()
 	
