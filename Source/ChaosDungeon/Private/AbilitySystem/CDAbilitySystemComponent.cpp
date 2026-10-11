@@ -1,5 +1,6 @@
 #include "AbilitySystem/CDAbilitySystemComponent.h"
 #include "AbilitySystem/CDSkillAbility.h"
+#include "Abilities/GameplayAbility.h"
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
 
@@ -56,6 +57,34 @@ void UCDAbilitySystemComponent::AbilityInputPressed(FGameplayTag inputTag)
 			TryActivateAbility(spec->Handle);
 		}
 	}
+}
+
+/* 10/11 스킬 실행 가능 여부 조회 기능 (보스에 사용) */
+bool UCDAbilitySystemComponent::CanActivateSkill(const UCDSkillData* skill) const
+{
+	if (!IsValid(skill) || !AbilityActorInfo.IsValid())
+	{
+		return false;
+	}
+
+	for (const FGameplayAbilitySpec& spec : ActivatableAbilities.Items)
+	{
+		if (spec.SourceObject.Get() != skill)
+		{
+			continue;
+		}
+
+		if (spec.IsActive())
+		{
+			return false;
+		}
+		const UGameplayAbility* ability = spec.GetPrimaryInstance();
+
+		return IsValid(ability) &&
+			ability->CanActivateAbility(
+				spec.Handle, AbilityActorInfo.Get());
+	}
+	return false;
 }
 
 bool UCDAbilitySystemComponent::TryActivateSkill(const UCDSkillData* skill)
