@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/CDGameplayAbility.h"
+#include "Data/CDHitShape.h"
 #include "CDAttackAbility.generated.h"
 
 /**
@@ -25,6 +26,12 @@ public:
 	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
 protected:
+	/** 타격 시점(애님 노티파이)마다 호출. 데이터로 표현 못 하는 특수 스킬은 이 함수만 재정의 */
+	virtual void ApplyHit();
+
+	/** 대상에게 데미지 GE 적용 + 피격 이벤트 전송 */
+	void ApplyDamageTo(AActor* target) const;
+
 	// UCDGameplayAbility::GetCooldownDuration()
 	virtual float GetCooldownDuration() const override;
 
@@ -32,6 +39,10 @@ protected:
 	virtual FGameplayTag GetCooldownTag() const override;
 
 private:
+	/** Event.Montage.Hit 수신 */
+	UFUNCTION()
+	void OnHitEvent(FGameplayEventData payload);
+
 	/* 공격 종료 콜백 */
 	UFUNCTION()
 	void OnCompleteCallback();
@@ -48,6 +59,12 @@ private:
 	/** 회피 몽타주 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	TObjectPtr<UAnimMontage> montage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	FCDHitShape hitShape;;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	float damageCoefficient;;
 
 	/* 현재 콤보 카운트 */
 	int32 currentCombo = 1;

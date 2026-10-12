@@ -53,9 +53,9 @@ protected:
 	void ApplyDamageTo(AActor* target) const;
 
 private:
-	/** Event.Montage.Hit 수신 */
+	/** Montage Tag 수신 - 10.12 Jun6 스킬 특수 기능 관련 처리를 위해 함수명 변경 */
 	UFUNCTION()
-	void OnHitEvent(FGameplayEventData payload);
+	virtual void OnEventReceived(FGameplayEventData payload);
 
 	/** Event.Montage.Recovery 수신: 후딜 캔슬 허용 */
 	UFUNCTION()

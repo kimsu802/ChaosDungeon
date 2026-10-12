@@ -5,6 +5,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
 
@@ -49,8 +50,9 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 	}
 
 	// 몽타주 내 공격 노티파이 수신 기능
-	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
-	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnHitEvent);
+	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage, nullptr, false, false);
+	//UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
+	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
 	hitTask->ReadyForActivation();
 
 	// 취소 가능 시, 취소 노티파이 수신 기능
@@ -132,9 +134,25 @@ void UCDSkillAbility::ApplyDamageTo(AActor* target) const
 	}
 }
 
-void UCDSkillAbility::OnHitEvent(FGameplayEventData payload)
+void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 {
-	ApplyHit();
+	if (payload.EventTag == CDTags::Event_Montage_Hit)
+	{
+		ApplyHit();
+	}
+	else
+	{
+		ACDCharacterBase* character = GetCDCharacter();
+
+		if (payload.EventTag == CDTags::Event_Montage_Fly)
+		{
+			character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		}
+		else if (payload.EventTag == CDTags::Event_Montage_Land)
+		{
+			character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		}
+	}
 }
 
 void UCDSkillAbility::OnRecoveryEvent(FGameplayEventData payload)

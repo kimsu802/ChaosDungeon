@@ -1,9 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "AbilitySystem/CDAttackAbility.h"
+#include "AbilitySystem/CDGameplayEffects.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Core/CDGameplayTags.h"
+#include "Character/CDCharacterBase.h"
 
+static TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("스킬 판정 범위를 그린다"));
 
 UCDAttackAbility::UCDAttackAbility()
 {
@@ -23,6 +28,12 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 
 	bCanCombo = false;
 	currentCombo = 1;
+
+	// 몽타주 내 공격 노티파이 수신 기능
+	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
+	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnHitEvent);
+	hitTask->ReadyForActivation();
+
 
 	UAbilityTask_PlayMontageAndWait* playAttackTask =
 	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
@@ -55,6 +66,41 @@ void UCDAttackAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, con
 	}
 }
 
+void UCDAttackAbility::ApplyHit()
+{
+	const ACDCharacterBase* character = GetCDCharacter();
+	const FVector origin = character->GetActorLocation();
+	const FVector forward = character->GetActorForwardVector();
+
+	TArray<AActor*> hitActors;
+	hitShape.FindActors(GetWorld(), origin, forward, hitActors);
+	for (AActor* actor : hitActors)
+	{
+		if (character->IsHostileTo(actor))
+		{
+			ApplyDamageTo(actor);
+		}
+	}
+
+	if (CVarDebugHitShape.GetValueOnGameThread())
+	{
+		hitShape.DrawDebug(GetWorld(), origin, forward, FColor::Red, 1.f);
+	}
+}
+
+void UCDAttackAbility::ApplyDamageTo(AActor* target) const
+{
+	UAbilitySystemComponent* targetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(target);
+	if (!targetAbilitySystem)
+	{
+		return;
+	}
+
+	const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDDamageEffect::StaticClass(), GetAbilityLevel());
+	specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Coefficient, damageCoefficient);
+	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*specHandle.Data, targetAbilitySystem);
+}
+
 float UCDAttackAbility::GetCooldownDuration() const
 {
 	return 0.0f;
@@ -63,6 +109,10 @@ float UCDAttackAbility::GetCooldownDuration() const
 FGameplayTag UCDAttackAbility::GetCooldownTag() const
 {
 	return FGameplayTag();
+}
+
+void UCDAttackAbility::OnHitEvent(FGameplayEventData payload)
+{
 }
 
 void UCDAttackAbility::OnCompleteCallback()
@@ -84,7 +134,11 @@ void UCDAttackAbility::OnInterruptedCallback()
 
 void UCDAttackAbility::OnAnimNotifyCallback(FGameplayEventData eventData)
 {
-	if (eventData.EventTag == CDTags::Event_Montage_ComboStart)
+	if (eventData.EventTag == CDTags::Event_Montage_Hit)
+	{
+		ApplyHit();
+	}
+	else if (eventData.EventTag == CDTags::Event_Montage_ComboStart)
 	{
 		bCanCombo = true;
 	}
