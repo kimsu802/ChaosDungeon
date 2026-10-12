@@ -9,8 +9,6 @@
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
 
-static TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("스킬 판정 범위를 그린다"));
-
 UCDSkillAbility::UCDSkillAbility()
 {
 	SetAssetTags(FGameplayTagContainer(CDTags::Ability_Skill));
