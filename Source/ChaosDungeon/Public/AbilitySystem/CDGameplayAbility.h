@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Abilities/GameplayAbility.h"
+#include "HAL/IConsoleManager.h"
 #include "CDGameplayAbility.generated.h"
 
 class ACDCharacterBase;
+
+// 일반 공격 및 스킬의 타격 판정 범위 디버그 출력 설정
+extern TAutoConsoleVariable<bool> CVarDebugHitShape;
 
 /**
  * 프로젝트 공용 어빌리티 베이스
