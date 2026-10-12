@@ -5,6 +5,8 @@
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
 
+TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("일반 공격 및 스킬 판정 범위를 그린다"));
+
 UCDGameplayAbility::UCDGameplayAbility()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
