@@ -8,8 +8,6 @@
 #include "Core/CDGameplayTags.h"
 #include "Character/CDCharacterBase.h"
 
-static TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("스킬 판정 범위를 그린다"));
-
 UCDAttackAbility::UCDAttackAbility()
 {
 	SetAssetTags(FGameplayTagContainer(CDTags::Ability_Attack));
