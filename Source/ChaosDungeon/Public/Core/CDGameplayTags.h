@@ -38,6 +38,8 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Recovery);		// 애님 노티파이: 후딜 시작
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboStart);	// 애님 노티파이: 콤보 시작
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboEnd);		// 애님 노티파이: 콤보 종료
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Fly);			// 애님 노티파이: 날기 시작
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Land);			// 애님 노티파이: 날기 종료
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Hit);					// 피격 리액션 트리거
 
 	// 쿨다운
