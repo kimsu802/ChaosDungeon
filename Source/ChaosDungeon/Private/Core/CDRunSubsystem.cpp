@@ -42,12 +42,13 @@ void UCDRunSubsystem::StartRun(ECDDifficulty difficulty)
 	// 원본 데이터는 유지하고 이번 런에서 사용할 목록만 복사한다.
 	runStages = dungeonData->stages;
 
-	// 뒤에서부터 임의의 항목과 교환하여 방문 순서를 섞는다.
-	for (int32 i = runStages.Num() - 1; i > 0; --i)
-	{
-		const int32 randomIndex = FMath::RandRange(0, i);
-		runStages.Swap(i, randomIndex);
-	}
+	// 10.13 김지형 - 던전은 DA에 넣은 스테이지 순대로 순차적으로 진행되어야 하므로 이 부분은 주석처리 해놓았음.
+	//// 뒤에서부터 임의의 항목과 교환하여 방문 순서를 섞는다.
+	//for (int32 i = runStages.Num() - 1; i > 0; --i)
+	//{
+	//	const int32 randomIndex = FMath::RandRange(0, i);
+	//	runStages.Swap(i, randomIndex);
+	//}
 
 	// 새 런의 기록과 현재 위치를 초기화한다.
 	record = FCDRunRecord();
