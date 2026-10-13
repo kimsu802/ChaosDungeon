@@ -56,15 +56,21 @@ private:
 	void OnAnimNotifyCallback(FGameplayEventData eventData);
 
 private:
-	/** 회피 몽타주 */
-	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	/** 공격 몽타주 */
+	UPROPERTY(EditDefaultsOnly, Category = "Attack/Montage")
 	TObjectPtr<UAnimMontage> montage;
 
+	/** 몽타주 재생 속도 */
+	UPROPERTY(EditDefaultsOnly, Category = "Attack/Montage")
+	float montagePlayRate = 1.0f;
+
+	/** 일반 공격 범위 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	FCDHitShape hitShape;;
 
+	/** 일반 공격 계수 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	float damageCoefficient;;
+	float damageCoefficient;
 
 	/* 현재 콤보 카운트 */
 	int32 currentCombo = 1;
