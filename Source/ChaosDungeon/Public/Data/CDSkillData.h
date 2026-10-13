@@ -36,6 +36,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<UTexture2D> icon;
 
+	/** 스킬 구분자 태그 */
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	FGameplayTag skillIdTag;
+
 	/** 비워두면 UCDSkillAbility */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TSubclassOf<UCDSkillAbility> abilityClass;
@@ -43,6 +47,14 @@ public:
 	/** 타격 시점에 Event.Montage.Hit, 후딜 시작에 Event.Montage.Recovery 노티파이를 넣는다 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TObjectPtr<UAnimMontage> montage;
+	
+	/** 몽타주 재생 속도 - 10.12 Jun6 공격 속도 조율을 위한 변수 추가 */
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	float montagePlayRate = 1.0f;
+
+	/** 원거리 타겟 지정형 스킬 여부 */
+	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
+	bool bIsTargeting = false;
 
 	/** 판정 기준점 */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
