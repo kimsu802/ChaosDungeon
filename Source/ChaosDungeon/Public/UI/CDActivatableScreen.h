@@ -41,4 +41,7 @@ protected:
 	/** 활성화 동안 게임 일시정지 */
 	UPROPERTY(EditDefaultsOnly, Category = "Screen")
 	bool bPauseGame = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Properties", meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"))
+	TArray<FDataTableRowHandle> BindingActions;
 };
