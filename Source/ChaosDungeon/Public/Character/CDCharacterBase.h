@@ -69,6 +69,12 @@ protected:
 	/** 스탯 적용 + 공통 어빌리티 부여. 재호출 가능 (풀링 재사용) */
 	void InitializeAbilitySystem(const FCDBaseStats& stats, float healthMultiplier = 1.f, float attackMultiplier = 1.f);
 
+	/** 보유중인 Ability Grant - 10.15 Jun6 초기 세팅 2번 호출에 대응하기 위해 기존 영역 가상함수로 생성 */
+	virtual void GrantOwnedAbilities();
+
+	/** 충돌 반응 Ability 추가 함수 - 10.15 위와 동일 */
+	void GrantHitReactAbility();
+
 	/** 처치 게이지 기여도 (Combat.Death 메시지에 실림) */
 	virtual float GetKillContribution() const;
 
@@ -99,7 +105,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> deathMontage;
 
-private:
-	/** 최초 1회 초기화 여부 */
+	/** 최초 1회 초기화 여부 - 10.15 Jun6 초기 세팅 2번 호출에 대응하기 위해 protected */
 	bool bAbilitySystemInitialized = false;
 };
