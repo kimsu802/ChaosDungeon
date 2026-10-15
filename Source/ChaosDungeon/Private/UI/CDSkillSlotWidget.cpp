@@ -23,6 +23,32 @@ void UCDSkillSlotWidget::NativeConstruct()
 	{
 		view->SetViewModelByClass(slotViewModel);
 	}
+
+	// 시작 시 하이라이트는 숨김 (디자이너 설정과 무관하게 상태 기준으로 맞춘다)
+	bIconHovered = false;
+	RefreshHighlight();
+}
+
+void UCDSkillSlotWidget::NativeOnMouseEnter(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent)
+{
+	Super::NativeOnMouseEnter(inGeometry, inMouseEvent);
+
+	// 슬롯에 들어왔어도 아이콘 영역 밖(키 라벨 탭 등)일 수 있으므로 위치로 판단
+	UpdateIconHover(inMouseEvent);
+}
+
+FReply UCDSkillSlotWidget::NativeOnMouseMove(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent)
+{
+	UpdateIconHover(inMouseEvent);
+	return Super::NativeOnMouseMove(inGeometry, inMouseEvent);
+}
+
+void UCDSkillSlotWidget::NativeOnMouseLeave(const FPointerEvent& inMouseEvent)
+{
+	Super::NativeOnMouseLeave(inMouseEvent);
+
+	bIconHovered = false;
+	RefreshHighlight();
 }
 
 FReply UCDSkillSlotWidget::NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent)
@@ -58,12 +84,19 @@ FReply UCDSkillSlotWidget::NativeOnMouseButtonUp(const FGeometry& inGeometry, co
 		slotViewModel->Activate();
 	}
 	bDragStarted = false;
+
+	// 마우스 캡처 중에는 Leave 가 오지 않을 수 있으므로 뗀 위치 기준으로 호버를 다시 판단
+	UpdateIconHover(inMouseEvent);
 	return FReply::Handled().ReleaseMouseCapture();
 }
 
 void UCDSkillSlotWidget::NativeOnDragDetected(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent, UDragDropOperation*& outOperation)
 {
 	bDragStarted = true;
+
+	// 드래그 중에는 마우스 이동/이탈 이벤트 대신 드래그 이벤트가 오므로, 원래 슬롯의 하이라이트를 미리 끈다
+	bIconHovered = false;
+	RefreshHighlight();
 
 	// 빈 슬롯은 드래그하지 않는다
 	if (!slotViewModel || !slotViewModel->GetIcon())
@@ -114,6 +147,11 @@ bool UCDSkillSlotWidget::NativeOnDrop(const FGeometry& inGeometry, const FDragDr
 
 void UCDSkillSlotWidget::SetIconTexture(UTexture2D* texture)
 {
+	bHasIcon = (texture != nullptr);
+
+	// 아이콘이 생기거나 사라지면 하이라이트 표시 조건도 바뀐다 (스킬 교체 직후 등)
+	RefreshHighlight();
+
 	if (!iconImage)
 	{
 		return;
@@ -126,20 +164,40 @@ void UCDSkillSlotWidget::SetIconTexture(UTexture2D* texture)
 		return;
 	}
 
-	if (UMaterialInstanceDynamic* material = iconImage->GetDynamicMaterial())
-	{
-		material->SetTextureParameterValue(iconParameterName, texture);
-	}
-	else
-	{
-		iconImage->SetBrushFromTexture(texture);
-	}
+	iconImage->SetBrushFromTexture(texture);
 }
 
 void UCDSkillSlotWidget::SetCooldownPercent(float percent)
 {
-	if (UMaterialInstanceDynamic* material = iconImage ? iconImage->GetDynamicMaterial() : nullptr)
+	if (UMaterialInstanceDynamic* material = coolDownImage ? coolDownImage->GetDynamicMaterial() : nullptr)
 	{
 		material->SetScalarParameterValue(cooldownParameterName, percent);
 	}
+}
+
+void UCDSkillSlotWidget::UpdateIconHover(const FPointerEvent& inMouseEvent)
+{
+	// 아이콘 위젯의 실제 화면 영역 안에 커서가 있는지로 판단 (슬롯 프레임/키 라벨 위는 제외)
+	const bool bNowHovered = iconImage && iconImage->GetCachedGeometry().IsUnderLocation(inMouseEvent.GetScreenSpacePosition());
+	if (bNowHovered == bIconHovered)
+	{
+		return;
+	}
+
+	bIconHovered = bNowHovered;
+	RefreshHighlight();
+}
+
+void UCDSkillSlotWidget::RefreshHighlight()
+{
+	if (!highlightImage)
+	{
+		return;
+	}
+
+	// 빈 슬롯은 누를 게 없으므로 하이라이트하지 않는다
+	const bool bShow = bIconHovered && bHasIcon;
+
+	// 하이라이트가 아이콘 위에 겹쳐도 클릭/드래그/드롭을 가로채지 않도록 HitTestInvisible
+	highlightImage->SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 }
