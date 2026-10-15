@@ -49,6 +49,11 @@ protected:
 	// ACDCharacterBase::HandleDeath()
 	virtual void HandleDeath() override;
 
+protected:
+	/* BP Monster 사망 연출을 위한 추가 -yoonsang */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Monster|Effects")
+	void OnDeathVisual();
+
 private:
 	/** 풀 활성/비활성 (표시, 충돌, 틱, 컨트롤러) */
 	void SetPoolActive(bool bActive);

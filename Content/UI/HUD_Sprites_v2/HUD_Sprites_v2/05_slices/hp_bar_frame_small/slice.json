@@ -1,0 +1,40 @@
+{
+ "source": "06_hp_bar_frame_small.png",
+ "size": [
+  330,
+  77
+ ],
+ "type": "5-slice",
+ "pieces": [
+  {
+   "file": "hp_bar_frame_small_0_fixed.png",
+   "src_x": 0,
+   "src_w": 48,
+   "stretch": false
+  },
+  {
+   "file": "hp_bar_frame_small_1_stretch.png",
+   "src_x": 48,
+   "src_w": 64,
+   "stretch": true
+  },
+  {
+   "file": "hp_bar_frame_small_2_fixed.png",
+   "src_x": 112,
+   "src_w": 78,
+   "stretch": false
+  },
+  {
+   "file": "hp_bar_frame_small_3_stretch.png",
+   "src_x": 190,
+   "src_w": 108,
+   "stretch": true
+  },
+  {
+   "file": "hp_bar_frame_small_4_fixed.png",
+   "src_x": 298,
+   "src_w": 32,
+   "stretch": false
+  }
+ ]
+}

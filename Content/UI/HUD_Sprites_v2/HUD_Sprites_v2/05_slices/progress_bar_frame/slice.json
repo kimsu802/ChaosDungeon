@@ -1,0 +1,38 @@
+{
+ "source": "03_progress_bar_frame.png",
+ "size": [
+  307,
+  50
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 43,
+  "right": 36
+ },
+ "umg_box_margin": {
+  "Left": 0.1401,
+  "Top": 0,
+  "Right": 0.1173,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "progress_bar_frame_0_fixed.png",
+   "src_x": 0,
+   "src_w": 43,
+   "stretch": false
+  },
+  {
+   "file": "progress_bar_frame_1_stretch.png",
+   "src_x": 43,
+   "src_w": 228,
+   "stretch": true
+  },
+  {
+   "file": "progress_bar_frame_2_fixed.png",
+   "src_x": 271,
+   "src_w": 36,
+   "stretch": false
+  }
+ ]
+}

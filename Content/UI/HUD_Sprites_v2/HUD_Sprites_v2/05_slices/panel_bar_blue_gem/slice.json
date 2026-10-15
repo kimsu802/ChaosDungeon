@@ -1,0 +1,38 @@
+{
+ "source": "70_panel_bar_blue_gem.png",
+ "size": [
+  285,
+  70
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 43,
+  "right": 204
+ },
+ "umg_box_margin": {
+  "Left": 0.1509,
+  "Top": 0,
+  "Right": 0.7158,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "panel_bar_blue_gem_0_fixed.png",
+   "src_x": 0,
+   "src_w": 43,
+   "stretch": false
+  },
+  {
+   "file": "panel_bar_blue_gem_1_stretch.png",
+   "src_x": 43,
+   "src_w": 38,
+   "stretch": true
+  },
+  {
+   "file": "panel_bar_blue_gem_2_fixed.png",
+   "src_x": 81,
+   "src_w": 204,
+   "stretch": false
+  }
+ ]
+}

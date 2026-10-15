@@ -1,0 +1,38 @@
+{
+ "source": "05_progress_counter_badge_notext.png",
+ "size": [
+  96,
+  49
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 21,
+  "right": 27
+ },
+ "umg_box_margin": {
+  "Left": 0.2188,
+  "Top": 0,
+  "Right": 0.2812,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "counter_badge_blank_0_fixed.png",
+   "src_x": 0,
+   "src_w": 21,
+   "stretch": false
+  },
+  {
+   "file": "counter_badge_blank_1_stretch.png",
+   "src_x": 21,
+   "src_w": 48,
+   "stretch": true
+  },
+  {
+   "file": "counter_badge_blank_2_fixed.png",
+   "src_x": 69,
+   "src_w": 27,
+   "stretch": false
+  }
+ ]
+}

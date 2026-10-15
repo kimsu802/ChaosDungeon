@@ -85,6 +85,11 @@ protected:
 	virtual void HandleDeath();
 
 protected:
+	/* BP Monster 피격 연출을 위한 추가 -yoonsang */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Combat|Effects")
+	void OnDamageVisual(float damage, bool bCritical);
+
+protected:
 	/** 어빌리티 시스템 */
 	UPROPERTY(VisibleAnywhere, Category = "Ability")
 	TObjectPtr<UCDAbilitySystemComponent> abilitySystem;
