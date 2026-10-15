@@ -97,6 +97,8 @@ float ACDCharacterBase::GetKillContribution() const
 
 void ACDCharacterBase::HandleDamageTaken(AActor* damageInstigator, float damage, bool bCritical)
 {
+	OnDamageVisual(damage, bCritical);
+
 	FCDDamageMessage message;
 	message.instigator = damageInstigator;
 	message.target = this;

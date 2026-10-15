@@ -3,6 +3,7 @@
 #include "Core/CDMessages.h"
 #include "Engine/GameInstance.h"
 #include "UI/CDFloatingTextWidget.h"
+#include "Settings/CDDeveloperSettings.h"
 
 void UCDFloatingTextSubsystem::OnWorldBeginPlay(UWorld& inWorld)
 {
@@ -15,15 +16,19 @@ void UCDFloatingTextSubsystem::OnWorldBeginPlay(UWorld& inWorld)
 
 void UCDFloatingTextSubsystem::Deinitialize()
 {
-	const UGameInstance* gameInstance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
-	if (gameInstance)
+	const UWorld* world = GetWorld();
+	const UGameInstance* gameInstance = world ? world->GetGameInstance() : nullptr;
+
+	// 레벨 이동: 메시지 서브시스템이 살아 있으므로 해제
+	// 게임/PIE 종료: GameInstance 가 먼저 정리돼 nullptr → 리스너 목록도 이미 사라졌으므로 건너뜀
+	if (UCDMessageSubsystem* messages = gameInstance ? gameInstance->GetSubsystem<UCDMessageSubsystem>() : nullptr)
 	{
-		UCDMessageSubsystem* messages = gameInstance->GetSubsystem<UCDMessageSubsystem>();
 		for (FCDListenerHandle& handle : handles)
 		{
-			//messages->Unlisten(handle);
+			messages->Unlisten(handle);
 		}
 	}
+	handles.Reset();
 	Super::Deinitialize();
 }
 
@@ -72,7 +77,7 @@ UCDFloatingTextWidget* UCDFloatingTextSubsystem::Acquire()
 	}
 
 	APlayerController* playerController = GetWorld()->GetFirstPlayerController();
-	UClass* loadedClass = widgetClass.LoadSynchronous();
+	UClass* loadedClass = GetDefault<UCDDeveloperSettings>()->floatingTextWidgetClass.LoadSynchronous();
 	if (!playerController || !loadedClass)
 	{
 		return nullptr;
