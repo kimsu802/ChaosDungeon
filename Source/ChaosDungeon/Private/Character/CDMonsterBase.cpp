@@ -77,7 +77,11 @@ float ACDMonsterBase::GetKillContribution() const
 void ACDMonsterBase::HandleDeath()
 {
 	Super::HandleDeath();
+
 	SpawnDrops();
+	
+	OnDeathVisual();
+
 	GetWorldTimerManager().SetTimer(releaseTimer, this, &ThisClass::DeactivateToPool, corpseLifetime, false);
 }
 
