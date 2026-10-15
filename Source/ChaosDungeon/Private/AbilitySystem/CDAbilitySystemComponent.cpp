@@ -44,6 +44,19 @@ void UCDAbilitySystemComponent::AssignInputTag(FGameplayTag skillTag, FGameplayT
 
 void UCDAbilitySystemComponent::AbilityInputPressed(FGameplayTag inputTag)
 {
+	if (inputTag == CDTags::Input_Attack)
+	{
+		// 10.15 Jun6 - 타겟 스킬 시전 중이라면 일반 공격 대신 스킬 확정
+		if (FGameplayAbilitySpec* targetingSpec = FindSpecByInputTag(CDTags::State_Targeting))
+		{
+			if (targetingSpec->IsActive())
+			{
+				AbilitySpecInputPressed(*targetingSpec);
+				return;
+			}
+		}
+	}
+		
 	// 10.02 Jun6 - 공격/스킬 활성화 여부에 따라 호출함수 분기처리 (const 제거)
 	//if (const FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
 	if (FGameplayAbilitySpec* spec = FindSpecByInputTag(inputTag))
@@ -182,6 +195,18 @@ bool UCDAbilitySystemComponent::GetCooldownByInputTag(FGameplayTag inputTag, flo
 	}
 	ability->GetCooldownTimeRemainingAndDuration(spec->Handle, AbilityActorInfo.Get(), outRemaining, outDuration);
 	return true;
+}
+
+/** 10.15 Jun6 - Targting인 GA 조회 후 활성화 상태일 시 취소 시키기 */
+void UCDAbilitySystemComponent::CancelTargetingSkill()
+{
+	if (FGameplayAbilitySpec* spec = FindSpecByInputTag(CDTags::State_Targeting))
+	{
+		if (spec->IsActive())
+		{
+			CancelAbilityHandle(spec->Handle);
+		}
+	}
 }
 
 const FGameplayAbilitySpec* UCDAbilitySystemComponent::FindSpecByInputTag(FGameplayTag inputTag) const

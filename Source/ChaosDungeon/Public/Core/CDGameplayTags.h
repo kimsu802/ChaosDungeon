@@ -10,13 +10,14 @@
 namespace CDTags
 {
 	// 입력 (InputConfig 에서 InputAction 과 연결)
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Skill);  // 부모: 드래그 앤 드롭 교체 가능한 슬롯
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Skill);				// 부모: 드래그 앤 드롭 교체 가능한 슬롯
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Skill_1);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Skill_2);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Skill_3);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Skill_4);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Attack);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Dodge);
+	//UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Cancel);				// 10.15 Jun6 - 스킬 취소 입력 : Escape 
 
 	// 어빌리티 분류
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Skill);
@@ -25,7 +26,8 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_HitReact);
 
 	// 상태
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Casting);          // 선딜~(캔슬 불가 구간) 동안 유지
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Casting);				// 선딜~(캔슬 불가 구간) 동안 유지
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Targeting);			// 10.15 Jun6 - 스킬 발동/취소 대기 상태 구분을 위한 태그
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_HitReact);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Dead);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Invincible);
@@ -38,12 +40,14 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Recovery);		// 애님 노티파이: 후딜 시작
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboStart);	// 애님 노티파이: 콤보 시작
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboEnd);		// 애님 노티파이: 콤보 종료
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Fly);			// 애님 노티파이: 날기 시작
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Land);			// 애님 노티파이: 날기 종료
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Land);			// 애님 노티파이: 궁극기 착지 시 위치 이동용
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Hit);					// 피격 리액션 트리거
 
 	// 쿨다운
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Dodge);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Strike);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Buff);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Ultimate);
 
 	// SetByCaller
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Cooldown);

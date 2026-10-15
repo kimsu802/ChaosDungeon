@@ -35,6 +35,12 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 
 	if (skillData->origin == ECDSkillOrigin::Cursor)
 	{
+		FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
+		if (spec)
+		{
+			spec->GetDynamicSpecSourceTags().AddTag(CDTags::State_Targeting);
+		}
+
 		UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData->hitShape);
 		onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::SkillActivate);
 		manage->ReadyForActivation();
@@ -53,9 +59,20 @@ void UCDSkillAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, cons
 
 	if (skillData->origin == ECDSkillOrigin::Cursor)
 	{
-		onConfirmInput.ExecuteIfBound();
-		ActivateSkillAbility();
-		onConfirmInput.Unbind();
+		FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
+		if (!spec)
+		{
+			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+			return;
+		}
+
+		if (spec->GetDynamicSpecSourceTags().HasTag(CDTags::State_Targeting))
+		{
+			spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
+			onConfirmInput.ExecuteIfBound();
+			ActivateSkillAbility();
+			onConfirmInput.Unbind();
+		}
 	}
 }
 
@@ -63,6 +80,13 @@ void UCDSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, const 
 	const FGameplayAbilityActivationInfo activationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	SetCasting(false);
+
+	FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
+	if (spec)
+	{
+		spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
+	}
+
 	Super::EndAbility(handle, actorInfo, activationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -131,11 +155,7 @@ void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 	{
 		ACDCharacterBase* character = GetCDCharacter();
 
-		if (payload.EventTag == CDTags::Event_Montage_Fly)
-		{
-			//->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		}
-		else if (payload.EventTag == CDTags::Event_Montage_Land)
+		if (payload.EventTag == CDTags::Event_Montage_Land)
 		{
 			const FVector aim = character->GetAimLocation();
 			const FVector location = character->GetActorLocation();
