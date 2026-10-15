@@ -1,0 +1,38 @@
+{
+ "source": "10_level_badge_notext.png",
+ "size": [
+  125,
+  49
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 22,
+  "right": 24
+ },
+ "umg_box_margin": {
+  "Left": 0.176,
+  "Top": 0,
+  "Right": 0.192,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "level_badge_blank_0_fixed.png",
+   "src_x": 0,
+   "src_w": 22,
+   "stretch": false
+  },
+  {
+   "file": "level_badge_blank_1_stretch.png",
+   "src_x": 22,
+   "src_w": 79,
+   "stretch": true
+  },
+  {
+   "file": "level_badge_blank_2_fixed.png",
+   "src_x": 101,
+   "src_w": 24,
+   "stretch": false
+  }
+ ]
+}

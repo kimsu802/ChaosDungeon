@@ -1,0 +1,38 @@
+{
+ "source": "66_panel_bar_gold_gem.png",
+ "size": [
+  345,
+  76
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 73,
+  "right": 180
+ },
+ "umg_box_margin": {
+  "Left": 0.2116,
+  "Top": 0,
+  "Right": 0.5217,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "panel_bar_gold_gem_0_fixed.png",
+   "src_x": 0,
+   "src_w": 73,
+   "stretch": false
+  },
+  {
+   "file": "panel_bar_gold_gem_1_stretch.png",
+   "src_x": 73,
+   "src_w": 92,
+   "stretch": true
+  },
+  {
+   "file": "panel_bar_gold_gem_2_fixed.png",
+   "src_x": 165,
+   "src_w": 180,
+   "stretch": false
+  }
+ ]
+}

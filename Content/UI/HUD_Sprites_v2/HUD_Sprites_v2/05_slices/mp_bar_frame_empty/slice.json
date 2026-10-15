@@ -1,0 +1,38 @@
+{
+ "source": "15_mp_bar_frame_empty.png",
+ "size": [
+  167,
+  34
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 20,
+  "right": 20
+ },
+ "umg_box_margin": {
+  "Left": 0.1198,
+  "Top": 0,
+  "Right": 0.1198,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "mp_bar_frame_empty_0_fixed.png",
+   "src_x": 0,
+   "src_w": 20,
+   "stretch": false
+  },
+  {
+   "file": "mp_bar_frame_empty_1_stretch.png",
+   "src_x": 20,
+   "src_w": 127,
+   "stretch": true
+  },
+  {
+   "file": "mp_bar_frame_empty_2_fixed.png",
+   "src_x": 147,
+   "src_w": 20,
+   "stretch": false
+  }
+ ]
+}

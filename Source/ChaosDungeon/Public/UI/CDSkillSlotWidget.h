@@ -15,6 +15,7 @@ class UWidget;
  * - inputTag 만 인스턴스마다 지정하면 NativeConstruct 에서 해당 VM 을 넣어준다
  * - 클릭(드래그 없이 떼기) = 스킬 발동, 드래그 후 다른 슬롯에 드롭 = 스킬 교체 (드래그 중 아이콘이 커서를 따라감)
  * - 빈 슬롯(Icon = null)은 아이콘을 투명하게 숨기고 드래그를 시작하지 않는다
+ * - 커서가 아이콘 영역 위에 있을 때만 하이라이트 이미지를 보여준다 (빈 슬롯, 드래그 중에는 숨김)
  * - MVVM 바인딩: VM.Icon → SetIconTexture, VM.CooldownPercent → SetCooldownPercent, VM.CooldownText → 텍스트
  */
 UCLASS(Abstract)
@@ -35,6 +36,15 @@ protected:
 	// UUserWidget::NativeConstruct()
 	virtual void NativeConstruct() override;
 
+	// UUserWidget::NativeOnMouseEnter()
+	virtual void NativeOnMouseEnter(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+
+	// UUserWidget::NativeOnMouseMove()
+	virtual FReply NativeOnMouseMove(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+
+	// UUserWidget::NativeOnMouseLeave()
+	virtual void NativeOnMouseLeave(const FPointerEvent& inMouseEvent) override;
+
 	// UUserWidget::NativeOnMouseButtonDown()
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
 
@@ -51,6 +61,12 @@ private:
 	/** 드래그 중 커서를 따라다닐 아이콘 이미지 생성 */
 	UWidget* CreateDragVisual() const;
 
+	/** 커서가 아이콘 영역 위에 있는지 검사해 호버 상태 갱신 */
+	void UpdateIconHover(const FPointerEvent& inMouseEvent);
+
+	/** 현재 상태(호버/아이콘 유무)에 맞춰 하이라이트 표시 여부 반영 */
+	void RefreshHighlight();
+
 protected:
 	/** 이 슬롯의 입력 태그 (Input.Skill.1 ~ 4, Input.Dodge) */
 	UPROPERTY(EditAnywhere, Category = "Slot", meta = (Categories = "Input"))
@@ -60,9 +76,12 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> iconImage;
 
-	/** 아이콘 머티리얼의 텍스처 파라미터 이름 */
-	UPROPERTY(EditDefaultsOnly, Category = "Slot")
-	FName iconParameterName = TEXT("Icon");
+	/** 아이콘 호버 시에만 보이는 하이라이트 이미지 (디자이너에서 Hidden/Collapsed 로 둬도 됨) */
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> highlightImage;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UImage> coolDownImage;
 
 	/** 아이콘 머티리얼의 쿨다운 파라미터 이름 */
 	UPROPERTY(EditDefaultsOnly, Category = "Slot")
@@ -79,4 +98,10 @@ private:
 
 	/** 이번 누름에서 드래그가 시작됐는가 (드래그였으면 떼어도 발동하지 않음) */
 	bool bDragStarted = false;
+
+	/** 커서가 아이콘 영역 위에 있는가 */
+	bool bIconHovered = false;
+
+	/** 슬롯에 아이콘(스킬)이 있는가 */
+	bool bHasIcon = false;
 };

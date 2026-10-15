@@ -1,0 +1,667 @@
+[
+ {
+  "file": "00_progress_bar_composite.png",
+  "x": 4,
+  "y": 14,
+  "w": 613,
+  "h": 142
+ },
+ {
+  "file": "01_hp_bar_large.png",
+  "x": 663,
+  "y": 7,
+  "w": 841,
+  "h": 154
+ },
+ {
+  "file": "02_progress_emblem_small.png",
+  "x": 22,
+  "y": 150,
+  "w": 76,
+  "h": 75
+ },
+ {
+  "file": "03_progress_bar_frame.png",
+  "x": 117,
+  "y": 158,
+  "w": 307,
+  "h": 50
+ },
+ {
+  "file": "04_progress_bar_fill_gold.png",
+  "x": 426,
+  "y": 166,
+  "w": 191,
+  "h": 33
+ },
+ {
+  "file": "05_progress_counter_badge.png",
+  "x": 623,
+  "y": 159,
+  "w": 96,
+  "h": 49
+ },
+ {
+  "file": "06_hp_bar_frame_small.png",
+  "x": 750,
+  "y": 139,
+  "w": 330,
+  "h": 77
+ },
+ {
+  "file": "07_hp_bar_small_filled.png",
+  "x": 1090,
+  "y": 160,
+  "w": 429,
+  "h": 43
+ },
+ {
+  "file": "08_portrait_small_lv.png",
+  "x": 12,
+  "y": 231,
+  "w": 156,
+  "h": 185
+ },
+ {
+  "file": "09_portrait_ring_empty.png",
+  "x": 1175,
+  "y": 255,
+  "w": 115,
+  "h": 120
+ },
+ {
+  "file": "10_level_badge.png",
+  "x": 1315,
+  "y": 285,
+  "w": 125,
+  "h": 49
+ },
+ {
+  "file": "11_skillbar_composite.png",
+  "x": 169,
+  "y": 256,
+  "w": 778,
+  "h": 142
+ },
+ {
+  "file": "12_portrait_large_lv.png",
+  "x": 959,
+  "y": 217,
+  "w": 207,
+  "h": 265
+ },
+ {
+  "file": "13_gem_red_01.png",
+  "x": 1357,
+  "y": 357,
+  "w": 54,
+  "h": 69
+ },
+ {
+  "file": "14_ornament_star_gold_01.png",
+  "x": 1438,
+  "y": 359,
+  "w": 78,
+  "h": 82
+ },
+ {
+  "file": "15_mp_bar_fill_blue.png",
+  "x": 1164,
+  "y": 398,
+  "w": 167,
+  "h": 34
+ },
+ {
+  "file": "16_portrait_frame_empty.png",
+  "x": 10,
+  "y": 410,
+  "w": 115,
+  "h": 116
+ },
+ {
+  "file": "17_skill_slot_01.png",
+  "x": 145,
+  "y": 428,
+  "w": 81,
+  "h": 99
+ },
+ {
+  "file": "18_skill_slot_02.png",
+  "x": 235,
+  "y": 428,
+  "w": 87,
+  "h": 97
+ },
+ {
+  "file": "19_skill_slot_03.png",
+  "x": 320,
+  "y": 428,
+  "w": 87,
+  "h": 99
+ },
+ {
+  "file": "20_skill_slot_04.png",
+  "x": 416,
+  "y": 427,
+  "w": 82,
+  "h": 100
+ },
+ {
+  "file": "21_skill_slot_05.png",
+  "x": 505,
+  "y": 429,
+  "w": 75,
+  "h": 97
+ },
+ {
+  "file": "22_skill_slot_06.png",
+  "x": 585,
+  "y": 429,
+  "w": 74,
+  "h": 96
+ },
+ {
+  "file": "23_skill_slot_07.png",
+  "x": 664,
+  "y": 430,
+  "w": 72,
+  "h": 97
+ },
+ {
+  "file": "24_key_slot_Q.png",
+  "x": 745,
+  "y": 436,
+  "w": 73,
+  "h": 60
+ },
+ {
+  "file": "25_key_slot_empty.png",
+  "x": 813,
+  "y": 433,
+  "w": 69,
+  "h": 64
+ },
+ {
+  "file": "26_key_slot_1.png",
+  "x": 889,
+  "y": 438,
+  "w": 63,
+  "h": 58
+ },
+ {
+  "file": "27_divider_star_thin.png",
+  "x": 1323,
+  "y": 449,
+  "w": 189,
+  "h": 42
+ },
+ {
+  "file": "28_btn_inventory.png",
+  "x": 988,
+  "y": 510,
+  "w": 70,
+  "h": 67
+ },
+ {
+  "file": "29_btn_scroll.png",
+  "x": 1060,
+  "y": 510,
+  "w": 77,
+  "h": 67
+ },
+ {
+  "file": "30_btn_settings.png",
+  "x": 1133,
+  "y": 510,
+  "w": 75,
+  "h": 67
+ },
+ {
+  "file": "31_btn_menu.png",
+  "x": 1214,
+  "y": 510,
+  "w": 68,
+  "h": 67
+ },
+ {
+  "file": "32_ornament_star_small.png",
+  "x": 1306,
+  "y": 501,
+  "w": 59,
+  "h": 59
+ },
+ {
+  "file": "33_arrow_right_small.png",
+  "x": 1391,
+  "y": 511,
+  "w": 26,
+  "h": 33
+ },
+ {
+  "file": "34_ornament_dot.png",
+  "x": 1424,
+  "y": 510,
+  "w": 36,
+  "h": 34
+ },
+ {
+  "file": "35_ornament_vertical.png",
+  "x": 1472,
+  "y": 489,
+  "w": 25,
+  "h": 83
+ },
+ {
+  "file": "36_diamond_frame_gold.png",
+  "x": 24,
+  "y": 538,
+  "w": 81,
+  "h": 81
+ },
+ {
+  "file": "37_diamond_frame_red.png",
+  "x": 119,
+  "y": 542,
+  "w": 79,
+  "h": 78
+ },
+ {
+  "file": "38_divider_short.png",
+  "x": 210,
+  "y": 565,
+  "w": 141,
+  "h": 29
+ },
+ {
+  "file": "39_corner_ornament.png",
+  "x": 349,
+  "y": 543,
+  "w": 98,
+  "h": 67
+ },
+ {
+  "file": "40_gem_red_small.png",
+  "x": 480,
+  "y": 544,
+  "w": 47,
+  "h": 71
+ },
+ {
+  "file": "41_gem_blue_small.png",
+  "x": 552,
+  "y": 550,
+  "w": 34,
+  "h": 62
+ },
+ {
+  "file": "42_gem_blue_tall.png",
+  "x": 620,
+  "y": 544,
+  "w": 44,
+  "h": 74
+ },
+ {
+  "file": "43_icon_shield.png",
+  "x": 680,
+  "y": 539,
+  "w": 76,
+  "h": 86
+ },
+ {
+  "file": "44_icon_bag_green.png",
+  "x": 751,
+  "y": 546,
+  "w": 76,
+  "h": 76
+ },
+ {
+  "file": "45_icon_target_blue.png",
+  "x": 823,
+  "y": 543,
+  "w": 70,
+  "h": 79
+ },
+ {
+  "file": "46_icon_orb_purple.png",
+  "x": 888,
+  "y": 542,
+  "w": 71,
+  "h": 81
+ },
+ {
+  "file": "47_arrow_down_01.png",
+  "x": 988,
+  "y": 603,
+  "w": 31,
+  "h": 28
+ },
+ {
+  "file": "48_arrow_down_02.png",
+  "x": 1026,
+  "y": 602,
+  "w": 31,
+  "h": 29
+ },
+ {
+  "file": "49_keycap_Q.png",
+  "x": 1070,
+  "y": 599,
+  "w": 40,
+  "h": 44
+ },
+ {
+  "file": "50_keycap_W.png",
+  "x": 1112,
+  "y": 599,
+  "w": 43,
+  "h": 44
+ },
+ {
+  "file": "51_keycap_E.png",
+  "x": 1151,
+  "y": 600,
+  "w": 42,
+  "h": 43
+ },
+ {
+  "file": "52_keycap_R.png",
+  "x": 1197,
+  "y": 597,
+  "w": 44,
+  "h": 45
+ },
+ {
+  "file": "53_btn_chat.png",
+  "x": 1293,
+  "y": 600,
+  "w": 57,
+  "h": 56
+ },
+ {
+  "file": "54_btn_party.png",
+  "x": 1346,
+  "y": 600,
+  "w": 61,
+  "h": 56
+ },
+ {
+  "file": "55_btn_sound.png",
+  "x": 1403,
+  "y": 600,
+  "w": 58,
+  "h": 56
+ },
+ {
+  "file": "56_btn_mic.png",
+  "x": 1459,
+  "y": 600,
+  "w": 60,
+  "h": 56
+ },
+ {
+  "file": "57_divider_long_01.png",
+  "x": 15,
+  "y": 641,
+  "w": 305,
+  "h": 25
+ },
+ {
+  "file": "58_panel_bar_dark_01.png",
+  "x": 334,
+  "y": 641,
+  "w": 254,
+  "h": 43
+ },
+ {
+  "file": "59_arrow_down_03.png",
+  "x": 988,
+  "y": 641,
+  "w": 31,
+  "h": 33
+ },
+ {
+  "file": "60_arrow_down_04.png",
+  "x": 1027,
+  "y": 645,
+  "w": 29,
+  "h": 29
+ },
+ {
+  "file": "61_keycap_1.png",
+  "x": 1070,
+  "y": 638,
+  "w": 40,
+  "h": 44
+ },
+ {
+  "file": "62_keycap_2.png",
+  "x": 1112,
+  "y": 638,
+  "w": 43,
+  "h": 49
+ },
+ {
+  "file": "63_keycap_3.png",
+  "x": 1151,
+  "y": 638,
+  "w": 47,
+  "h": 44
+ },
+ {
+  "file": "64_keycap_4.png",
+  "x": 1193,
+  "y": 638,
+  "w": 47,
+  "h": 45
+ },
+ {
+  "file": "65_divider_long_02.png",
+  "x": 15,
+  "y": 677,
+  "w": 305,
+  "h": 37
+ },
+ {
+  "file": "66_panel_bar_gold_gem.png",
+  "x": 608,
+  "y": 647,
+  "w": 345,
+  "h": 76
+ },
+ {
+  "file": "67_btn_plus_small.png",
+  "x": 1453,
+  "y": 688,
+  "w": 50,
+  "h": 38
+ },
+ {
+  "file": "68_panel_bar_dark_02.png",
+  "x": 19,
+  "y": 719,
+  "w": 308,
+  "h": 68
+ },
+ {
+  "file": "69_panel_bar_ornate.png",
+  "x": 342,
+  "y": 714,
+  "w": 261,
+  "h": 71
+ },
+ {
+  "file": "70_panel_bar_blue_gem.png",
+  "x": 614,
+  "y": 717,
+  "w": 285,
+  "h": 70
+ },
+ {
+  "file": "71_btn_plus.png",
+  "x": 1458,
+  "y": 722,
+  "w": 45,
+  "h": 46
+ },
+ {
+  "file": "72_quest_tracker_panel.png",
+  "x": 933,
+  "y": 697,
+  "w": 271,
+  "h": 166
+ },
+ {
+  "file": "73_minimap.png",
+  "x": 1216,
+  "y": 666,
+  "w": 243,
+  "h": 215
+ },
+ {
+  "file": "74_btn_locate.png",
+  "x": 1457,
+  "y": 764,
+  "w": 47,
+  "h": 47
+ },
+ {
+  "file": "75_panel_bar_red.png",
+  "x": 18,
+  "y": 789,
+  "w": 305,
+  "h": 70
+ },
+ {
+  "file": "76_panel_bar_navy.png",
+  "x": 334,
+  "y": 790,
+  "w": 283,
+  "h": 58
+ },
+ {
+  "file": "77_panel_bar_dark_03.png",
+  "x": 625,
+  "y": 790,
+  "w": 282,
+  "h": 62
+ },
+ {
+  "file": "78_btn_journal.png",
+  "x": 1460,
+  "y": 806,
+  "w": 43,
+  "h": 44
+ },
+ {
+  "file": "79_gem_red_02.png",
+  "x": 1456,
+  "y": 862,
+  "w": 48,
+  "h": 48
+ },
+ {
+  "file": "80_fx_smoke_dark.png",
+  "x": 14,
+  "y": 857,
+  "w": 201,
+  "h": 135
+ },
+ {
+  "file": "81_fx_smoke_red.png",
+  "x": 205,
+  "y": 857,
+  "w": 244,
+  "h": 127
+ },
+ {
+  "file": "82_fx_shadow_soft.png",
+  "x": 444,
+  "y": 883,
+  "w": 264,
+  "h": 83
+ },
+ {
+  "file": "83_fx_glow_gold.png",
+  "x": 716,
+  "y": 893,
+  "w": 150,
+  "h": 77
+ },
+ {
+  "file": "84_panel_box.png",
+  "x": 876,
+  "y": 880,
+  "w": 246,
+  "h": 112
+ },
+ {
+  "file": "85_fx_glow_red.png",
+  "x": 1127,
+  "y": 878,
+  "w": 154,
+  "h": 114
+ },
+ {
+  "file": "86_fx_shadow_soft_02.png",
+  "x": 1268,
+  "y": 898,
+  "w": 108,
+  "h": 96
+ },
+ {
+  "file": "87_fx_glow_red_vertical.png",
+  "x": 1370,
+  "y": 879,
+  "w": 73,
+  "h": 115
+ },
+ {
+  "file": "88_ornament_star_gold_02.png",
+  "x": 1454,
+  "y": 906,
+  "w": 53,
+  "h": 47
+ },
+ {
+  "file": "89_divider_bottom_01.png",
+  "x": 31,
+  "y": 977,
+  "w": 163,
+  "h": 35
+ },
+ {
+  "file": "90_divider_bottom_02.png",
+  "x": 190,
+  "y": 978,
+  "w": 204,
+  "h": 37
+ },
+ {
+  "file": "91_ornament_diamond_tiny.png",
+  "x": 413,
+  "y": 984,
+  "w": 27,
+  "h": 30
+ },
+ {
+  "file": "92_divider_bottom_03.png",
+  "x": 447,
+  "y": 980,
+  "w": 298,
+  "h": 36
+ },
+ {
+  "file": "93_divider_bottom_04.png",
+  "x": 767,
+  "y": 983,
+  "w": 100,
+  "h": 33
+ },
+ {
+  "file": "94_orb_dark.png",
+  "x": 1454,
+  "y": 948,
+  "w": 53,
+  "h": 59
+ }
+]

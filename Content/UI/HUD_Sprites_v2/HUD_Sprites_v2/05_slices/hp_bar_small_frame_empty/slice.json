@@ -1,0 +1,38 @@
+{
+ "source": "07_hp_bar_small_frame_empty.png",
+ "size": [
+  429,
+  43
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 38,
+  "right": 19
+ },
+ "umg_box_margin": {
+  "Left": 0.0886,
+  "Top": 0,
+  "Right": 0.0443,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "hp_bar_small_frame_empty_0_fixed.png",
+   "src_x": 0,
+   "src_w": 38,
+   "stretch": false
+  },
+  {
+   "file": "hp_bar_small_frame_empty_1_stretch.png",
+   "src_x": 38,
+   "src_w": 372,
+   "stretch": true
+  },
+  {
+   "file": "hp_bar_small_frame_empty_2_fixed.png",
+   "src_x": 410,
+   "src_w": 19,
+   "stretch": false
+  }
+ ]
+}
