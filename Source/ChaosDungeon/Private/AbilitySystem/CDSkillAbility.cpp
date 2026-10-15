@@ -1,11 +1,11 @@
 #include "AbilitySystem/CDSkillAbility.h"
 #include "AbilitySystem/CDGameplayEffects.h"
+#include "AbilitySystem/CDAbilityTask_ManageReticle.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
 
@@ -27,47 +27,36 @@ void UCDSkillAbility::OnGiveAbility(const FGameplayAbilityActorInfo* actorInfo, 
 void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 	const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData* triggerEventData)
 {
-	if (!skillData || !CommitAbility(handle, actorInfo, activationInfo))
+	if (!skillData)
 	{
-		EndAbility(handle, actorInfo, activationInfo, true, true);
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
 	}
 
-	const ACDCharacterBase* character = GetCDCharacter();
-	const FVector avatarLocation = character->GetActorLocation();
-	const FVector aimLocation = character->GetAimLocation();
-	targetLocation = avatarLocation + (aimLocation - avatarLocation).GetClampedToMaxSize2D(skillData->maxRange);
-
-	BeginCastTowards(aimLocation);
-	SetCasting(true);
-
-	// 스킬 시전 시 이동 거리 계산 및 이동 연출
-	if (skillData->dashDistance > 0.f)
+	if (skillData->origin == ECDSkillOrigin::Cursor)
 	{
-		StartDash(character->GetActorForwardVector(), skillData->dashDistance, skillData->dashDuration);
+		UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData->hitShape);
+		onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::SkillActivate);
+		manage->ReadyForActivation();
 	}
-
-	// 몽타주 내 공격 노티파이 수신 기능
-	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage, nullptr, false, false);
-	//UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
-	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
-	hitTask->ReadyForActivation();
-
-	// 취소 가능 시, 취소 노티파이 수신 기능
-	if (skillData->bRecoveryCancelable)
+	else
 	{
-		UAbilityTask_WaitGameplayEvent* recoveryTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Recovery);
-		recoveryTask->EventReceived.AddDynamic(this, &ThisClass::OnRecoveryEvent);
-		recoveryTask->ReadyForActivation();
+		/* 10.13 Jun6 타겟팅 함수의 타겟 지정완료(2차 입력) 시 기존 Activate 활용 위해 기능 실행부 함수화  */
+		ActivateSkillAbility();
 	}
+}
 
-	// 스킬 몽타주 재생
-	UAbilityTask_PlayMontageAndWait* montageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, skillData->montage);
-	montageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
-	montageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
-	montageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
-	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
-	montageTask->ReadyForActivation();
+/** 10.13 Jun6 활성화 상태에서 2차 입력 시 호출되는 함수 - 타겟팅 설정 후 스킬 실행 결정 시 이 함수에서 처리 */
+void UCDSkillAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+{
+	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
+
+	if (skillData->origin == ECDSkillOrigin::Cursor)
+	{
+		onConfirmInput.ExecuteIfBound();
+		ActivateSkillAbility();
+		onConfirmInput.Unbind();
+	}
 }
 
 void UCDSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
@@ -144,11 +133,14 @@ void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 
 		if (payload.EventTag == CDTags::Event_Montage_Fly)
 		{
-			character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+			//->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		}
 		else if (payload.EventTag == CDTags::Event_Montage_Land)
 		{
-			character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+			const FVector aim = character->GetAimLocation();
+			const FVector location = character->GetActorLocation();
+
+			character->SetActorLocation(FVector(aim.X, aim.Y, location.Z));
 		}
 	}
 }
@@ -185,4 +177,49 @@ void UCDSkillAbility::SetCasting(bool bNewCasting)
 	{
 		abilitySystem->RemoveLooseGameplayTag(CDTags::State_Casting);
 	}
+}
+
+void UCDSkillAbility::ActivateSkillAbility()
+{
+	if (!CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo))
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+		return;
+	}
+
+	const ACDCharacterBase* character = GetCDCharacter();
+	const FVector avatarLocation = character->GetActorLocation();
+	const FVector aimLocation = character->GetAimLocation();
+	targetLocation = avatarLocation + (aimLocation - avatarLocation).GetClampedToMaxSize2D(skillData->maxRange);
+
+	BeginCastTowards(aimLocation);
+	SetCasting(true);
+
+	// 스킬 시전 시 이동 거리 계산 및 이동 연출
+	if (skillData->dashDistance > 0.f)
+	{
+		StartDash(character->GetActorForwardVector(), skillData->dashDistance, skillData->dashDuration);
+	}
+
+	// 몽타주 내 공격 노티파이 수신 기능
+	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage, nullptr, false, false);
+	//UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
+	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
+	hitTask->ReadyForActivation();
+
+	// 취소 가능 시, 취소 노티파이 수신 기능
+	if (skillData->bRecoveryCancelable)
+	{
+		UAbilityTask_WaitGameplayEvent* recoveryTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Recovery);
+		recoveryTask->EventReceived.AddDynamic(this, &ThisClass::OnRecoveryEvent);
+		recoveryTask->ReadyForActivation();
+	}
+
+	// 스킬 몽타주 재생
+	UAbilityTask_PlayMontageAndWait* montageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, skillData->montage);
+	montageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
+	montageTask->OnBlendOut.AddDynamic(this, &ThisClass::OnMontageFinished);
+	montageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
+	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
+	montageTask->ReadyForActivation();
 }

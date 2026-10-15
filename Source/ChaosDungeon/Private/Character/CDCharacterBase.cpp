@@ -71,13 +71,23 @@ void ACDCharacterBase::InitializeAbilitySystem(const FCDBaseStats& stats, float 
 	abilitySystem->InitAbilityActorInfo(this, this);
 	attributes->InitFromStats(stats, healthMultiplier, attackMultiplier);
 
+	GrantOwnedAbilities();
+}
+
+void ACDCharacterBase::GrantOwnedAbilities()
+{
 	if (!bAbilitySystemInitialized)
 	{
 		bAbilitySystemInitialized = true;
-		abilitySystem->GrantAbility(hitReactAbilityClass);
-		attributes->onDamageTaken.AddUObject(this, &ThisClass::HandleDamageTaken);
-		attributes->onOutOfHealth.AddUObject(this, &ThisClass::HandleDeath);
+		GrantHitReactAbility();
 	}
+}
+
+void ACDCharacterBase::GrantHitReactAbility()
+{
+	abilitySystem->GrantAbility(hitReactAbilityClass);
+	attributes->onDamageTaken.AddUObject(this, &ThisClass::HandleDamageTaken);
+	attributes->onOutOfHealth.AddUObject(this, &ThisClass::HandleDeath);
 }
 
 float ACDCharacterBase::GetKillContribution() const
@@ -93,6 +103,12 @@ void ACDCharacterBase::HandleDamageTaken(AActor* damageInstigator, float damage,
 	message.amount = damage;
 	message.bCritical = bCritical;
 	message.bTargetIsPlayer = IsPlayerControlled();
+
+	if (nullptr != damageInstigator)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attacked by %s"), *damageInstigator->GetName());
+	}
+
 	UCDMessageSubsystem::Get(this).Broadcast(CDTags::Msg_Combat_Damage, message);
 }
 
@@ -112,5 +128,4 @@ void ACDCharacterBase::HandleDeath()
 
 void ACDCharacterBase::DebugOnHitFunction(const AActor* attacker)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Attacked by %s"), *attacker->GetName());
 }
