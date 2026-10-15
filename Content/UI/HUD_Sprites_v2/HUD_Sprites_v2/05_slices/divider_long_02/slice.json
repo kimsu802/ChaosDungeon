@@ -1,0 +1,38 @@
+{
+ "source": "65_divider_long_02.png",
+ "size": [
+  305,
+  37
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 50,
+  "right": 208
+ },
+ "umg_box_margin": {
+  "Left": 0.1639,
+  "Top": 0,
+  "Right": 0.682,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "divider_long_02_0_fixed.png",
+   "src_x": 0,
+   "src_w": 50,
+   "stretch": false
+  },
+  {
+   "file": "divider_long_02_1_stretch.png",
+   "src_x": 50,
+   "src_w": 47,
+   "stretch": true
+  },
+  {
+   "file": "divider_long_02_2_fixed.png",
+   "src_x": 97,
+   "src_w": 208,
+   "stretch": false
+  }
+ ]
+}

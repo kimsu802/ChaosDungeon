@@ -1,0 +1,38 @@
+{
+ "source": "69_panel_bar_ornate.png",
+ "size": [
+  261,
+  71
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 51,
+  "right": 52
+ },
+ "umg_box_margin": {
+  "Left": 0.1954,
+  "Top": 0,
+  "Right": 0.1992,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "panel_bar_ornate_0_fixed.png",
+   "src_x": 0,
+   "src_w": 51,
+   "stretch": false
+  },
+  {
+   "file": "panel_bar_ornate_1_stretch.png",
+   "src_x": 51,
+   "src_w": 158,
+   "stretch": true
+  },
+  {
+   "file": "panel_bar_ornate_2_fixed.png",
+   "src_x": 209,
+   "src_w": 52,
+   "stretch": false
+  }
+ ]
+}

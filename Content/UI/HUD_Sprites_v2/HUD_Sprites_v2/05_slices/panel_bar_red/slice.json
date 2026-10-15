@@ -1,0 +1,38 @@
+{
+ "source": "75_panel_bar_red.png",
+ "size": [
+  305,
+  70
+ ],
+ "type": "3-slice",
+ "margin_px": {
+  "left": 44,
+  "right": 168
+ },
+ "umg_box_margin": {
+  "Left": 0.1443,
+  "Top": 0,
+  "Right": 0.5508,
+  "Bottom": 0
+ },
+ "pieces": [
+  {
+   "file": "panel_bar_red_0_fixed.png",
+   "src_x": 0,
+   "src_w": 44,
+   "stretch": false
+  },
+  {
+   "file": "panel_bar_red_1_stretch.png",
+   "src_x": 44,
+   "src_w": 93,
+   "stretch": true
+  },
+  {
+   "file": "panel_bar_red_2_fixed.png",
+   "src_x": 137,
+   "src_w": 168,
+   "stretch": false
+  }
+ ]
+}
