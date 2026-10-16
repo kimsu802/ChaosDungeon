@@ -56,25 +56,35 @@ void ACDPlayerCharacter::PossessedBy(AController* newController)
 
 	check(classData);
 	InitializeAbilitySystem(classData->stats);
+}
 
-	// 10.02 - Jun6 캐릭터 기본 데이터 구조체 구조 변경에 따른 타입 변경
-	//for (const FCDSkillSlot& slot : classData->defaultSkills)
-	for (const TPair<FGameplayTag, UCDSkillData*>& skill : classData->defaultSkills)
+void ACDPlayerCharacter::GrantOwnedAbilities()
+{
+	if (!bAbilitySystemInitialized)
 	{
-		//abilitySystem->GrantSkill(slot.skill, slot.inputTag);
-		abilitySystem->GrantSkill(skill.Value, skill.Key);
+		bAbilitySystemInitialized = true;
+
+		GrantHitReactAbility();
+
+		// 10.02 - Jun6 캐릭터 기본 데이터 구조체 구조 변경에 따른 타입 변경
+		//for (const FCDSkillSlot& slot : classData->defaultSkills)
+		for (const TPair<FGameplayTag, UCDSkillData*>& skill : classData->defaultSkills)
+		{
+			//abilitySystem->GrantSkill(slot.skill, slot.inputTag);
+			abilitySystem->GrantSkill(skill.Value, skill.Key);
+		}
+
+		abilitySystem->GrantAbility(classData->dodgeAbility, CDTags::Input_Dodge);
+		abilitySystem->GrantAbility(classData->attackAbility, CDTags::Input_Attack);
+
+		// 10.02 - Jun6 스킬 Tag로 등록된 GA에 Input Tag 추가
+		// 10.08 - 레벨 이동 전 슬롯 배치 유지 (저장된 배치 우선)
+		ApplySkillSlots();
+
+		// 재빙의 시 중복 등록 방지
+		abilitySystem->onSkillLoadoutChanged.RemoveAll(this);
+		abilitySystem->onSkillLoadoutChanged.AddUObject(this, &ThisClass::HandleSkillLoadoutChanged);
 	}
-
-	abilitySystem->GrantAbility(classData->dodgeAbility, CDTags::Input_Dodge);
-	abilitySystem->GrantAbility(classData->attackAbility, CDTags::Input_Attack);
-
-	// 10.02 - Jun6 스킬 Tag로 등록된 GA에 Input Tag 추가
-	// 10.08 - 레벨 이동 전 슬롯 배치 유지 (저장된 배치 우선)
-	ApplySkillSlots();
-
-	// 재빙의 시 중복 등록 방지
-	abilitySystem->onSkillLoadoutChanged.RemoveAll(this);
-	abilitySystem->onSkillLoadoutChanged.AddUObject(this, &ThisClass::HandleSkillLoadoutChanged);
 }
 
 void ACDPlayerCharacter::ApplySkillSlots()

@@ -28,6 +28,9 @@ protected:
 	// APawn::PossessedBy()
 	virtual void PossessedBy(AController* newController) override;
 
+	// ACDCharacterBase::GrantOwnedAbilities()
+	virtual void GrantOwnedAbilities() override;
+
 private:
 	/** 스킬 슬롯 배치: 저장된 배치가 있으면 그것을, 없으면 직업 기본 배치를 적용 */
 	void ApplySkillSlots();
