@@ -52,10 +52,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	float montagePlayRate = 1.0f;
 
-	/** 원거리 타겟 지정형 스킬 여부 */
-	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	bool bIsTargeting = false;
-
 	/** 판정 기준점 */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	ECDSkillOrigin origin = ECDSkillOrigin::Self;
