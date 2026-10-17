@@ -62,11 +62,6 @@ protected:
 	/* 보스 제어 해제 */
 	virtual void OnUnPossess() override;
 
-	/* behavior tree */
-	UPROPERTY(EditDefaultsOnly, Category = BossAI)
-	TObjectPtr<UBehaviorTree> bossBehaviorTree;
-
-
 private:
 	const UCDBossSkillData* ReadyPattern() const;
 
@@ -75,6 +70,11 @@ private:
 
 	/* 공격 상태 정리 */
 	void FinishPattern(bool bSucceeded);
+
+protected:
+	/* behavior tree */
+	UPROPERTY(EditDefaultsOnly, Category = BossAI)
+	TObjectPtr<UBehaviorTree> bossBehaviorTree;
 
 private:
 	/* 추적할 플레이어 */

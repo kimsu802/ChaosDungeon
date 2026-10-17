@@ -41,11 +41,8 @@ protected:
 	/** 체력 0 → 사망 처리 + Combat.Death 발행 */
 	virtual void HandleDeath() override;
 
-	/** 보스의 패턴을 불러오는 함수 */
-	void BossPattern();
-
 	/* 맵에 배치한 보스에게 적용할 데이터 */
-	UPROPERTY(EditInstanceOnly, Category = "Boss | Initialization", meta = (DisplayName = "Placed Boss Data"))
+	UPROPERTY(EditInstanceOnly, Category = "BossInitialization", meta = (DisplayName = "Placed Boss Data"))
 	TObjectPtr<UCDMonsterData> placedBossData = nullptr;
 
 protected:

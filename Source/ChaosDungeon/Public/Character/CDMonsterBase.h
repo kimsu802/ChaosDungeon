@@ -66,7 +66,7 @@ public:
 protected:
 	/** 사망 후 풀로 돌아가기까지 시간 */
 	UPROPERTY(EditDefaultsOnly, Category = "Pool")
-	float corpseLifetime = 2.f;
+	float corpseLifetime = 7.f;
 
 private:
 	/** 현재 몬스터 데이터 */

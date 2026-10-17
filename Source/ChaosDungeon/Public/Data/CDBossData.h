@@ -13,5 +13,5 @@ UCLASS()
 class CHAOSDUNGEON_API UCDBossData : public UCDMonsterData
 {
 	GENERATED_BODY()
-	
+
 };

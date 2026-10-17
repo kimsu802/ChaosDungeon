@@ -67,7 +67,7 @@ void ACDBossCharacter::ActivateFromPool(
         ai->StopBossLogic();
     }
 
-   /*  데이터·능력치·스킬 부여와 활성화*/
+    /*  데이터·능력치·스킬 부여와 활성화*/
     Super::ActivateFromPool(data, difficulty, location);
 
     /* 초기화 완료 후 AI 시작*/
@@ -97,6 +97,3 @@ void ACDBossCharacter::HandleDeath()
 }
 
 
-void ACDBossCharacter::BossPattern()
-{
-}
