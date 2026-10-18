@@ -2,20 +2,16 @@
 
 #include "AbilitySystem/CDAbilityTask_ManageReticle.h"
 #include "AbilitySystem/CDReticleActor.h"
+#include "Data/CDSkillData.h"
 
 UCDAbilityTask_ManageReticle::UCDAbilityTask_ManageReticle()
 {
-	static ConstructorHelpers::FClassFinder<ACDReticleActor> reticleRef(TEXT("/Game/Character/Player/Abilities/BP_CDReticleActor.BP_CDReticleActor_C"));
-	if (reticleRef.Succeeded())
-	{
-		reticleClass = reticleRef.Class;
-	}
 }
 
-UCDAbilityTask_ManageReticle* UCDAbilityTask_ManageReticle::ManageReticle(UGameplayAbility* owningAbility, const FCDHitShape& inHitShape)
+UCDAbilityTask_ManageReticle* UCDAbilityTask_ManageReticle::ManageReticle(UGameplayAbility* owningAbility, const UCDSkillData* inSkillData)
 {
 	UCDAbilityTask_ManageReticle* task = NewAbilityTask<UCDAbilityTask_ManageReticle>(owningAbility);
-	task->hitShape = inHitShape;
+	task->skillData = inSkillData;
 
 	UE_LOG(LogTemp, Log, TEXT("Manage Reticle"));
 
@@ -28,17 +24,17 @@ void UCDAbilityTask_ManageReticle::Activate()
 	UE_LOG(LogTemp, Log, TEXT("Activate AT"));
 
 	UWorld* world = GetWorld();
-	if (nullptr == world || nullptr == reticleClass)
+	if (nullptr == world)
 	{
 		EndTask();
 		return;
 	}
 
-	spawnedReticle = world->SpawnActor<ACDReticleActor>(reticleClass, FTransform::Identity);
+	spawnedReticle = world->SpawnActor<ACDReticleActor>(ACDReticleActor::StaticClass(), FTransform::Identity);
 	if (IsValid(spawnedReticle))
 	{
 		UE_LOG(LogTemp, Log, TEXT("spawn Reticle"));
-		spawnedReticle->SetReticleConfig(hitShape);
+		spawnedReticle->SetReticleConfig(skillData);
 	}
 	else
 	{

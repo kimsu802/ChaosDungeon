@@ -33,7 +33,12 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 		return;
 	}
 
-	if (skillData->origin == ECDSkillOrigin::Cursor)
+	if (skillData->skillMode == ECDSkillCastMode::Instant)
+	{
+		/* 10.13 Jun6 타겟팅 함수의 타겟 지정완료(2차 입력) 시 기존 Activate 활용 위해 기능 실행부 함수화  */
+		ActivateSkillAbility();
+	}
+	else
 	{
 		FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
 		if (spec)
@@ -41,15 +46,11 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 			spec->GetDynamicSpecSourceTags().AddTag(CDTags::State_Targeting);
 		}
 
-		UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData->hitShape);
+		UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData);
 		onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::SkillActivate);
 		manage->ReadyForActivation();
 	}
-	else
-	{
-		/* 10.13 Jun6 타겟팅 함수의 타겟 지정완료(2차 입력) 시 기존 Activate 활용 위해 기능 실행부 함수화  */
-		ActivateSkillAbility();
-	}
+
 }
 
 /** 10.13 Jun6 활성화 상태에서 2차 입력 시 호출되는 함수 - 타겟팅 설정 후 스킬 실행 결정 시 이 함수에서 처리 */
@@ -57,22 +58,22 @@ void UCDSkillAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, cons
 {
 	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
 
-	if (skillData->origin == ECDSkillOrigin::Cursor)
-	{
-		FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
-		if (!spec)
-		{
-			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
-			return;
-		}
+	FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
 
-		if (spec->GetDynamicSpecSourceTags().HasTag(CDTags::State_Targeting))
-		{
-			spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
-			onConfirmInput.ExecuteIfBound();
-			ActivateSkillAbility();
-			onConfirmInput.Unbind();
-		}
+	// 즉발 스킬은 추가 입력 상황 자체가 말이 안되는 상황
+	if (skillData->skillMode == ECDSkillCastMode::Instant || nullptr == spec)
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+		return;
+	}
+
+	// 조준 상태 종료 - 스킬 발사
+	if (spec->GetDynamicSpecSourceTags().HasTag(CDTags::State_Targeting))
+	{
+		spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
+		onConfirmInput.ExecuteIfBound();
+		ActivateSkillAbility();
+		onConfirmInput.Unbind();
 	}
 }
 
@@ -157,10 +158,9 @@ void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 
 		if (payload.EventTag == CDTags::Event_Montage_Land)
 		{
-			const FVector aim = character->GetAimLocation();
-			const FVector location = character->GetActorLocation();
-
-			character->SetActorLocation(FVector(aim.X, aim.Y, location.Z));
+			const float airOffset = character->GetActorLocation().Z - preLocation.Z;
+			const float destinationZ = targetLocation.Z + character->GetSimpleCollisionHalfHeight() + airOffset;
+			character->SetActorLocation(FVector(targetLocation.X, targetLocation.Y, destinationZ));
 		}
 	}
 }
@@ -208,9 +208,9 @@ void UCDSkillAbility::ActivateSkillAbility()
 	}
 
 	const ACDCharacterBase* character = GetCDCharacter();
-	const FVector avatarLocation = character->GetActorLocation();
+	preLocation = character->GetActorLocation();
 	const FVector aimLocation = character->GetAimLocation();
-	targetLocation = avatarLocation + (aimLocation - avatarLocation).GetClampedToMaxSize2D(skillData->maxRange);
+	targetLocation = preLocation + (aimLocation - preLocation).GetClampedToMaxSize2D(skillData->maxRange);
 
 	BeginCastTowards(aimLocation);
 	SetCasting(true);
@@ -223,7 +223,6 @@ void UCDSkillAbility::ActivateSkillAbility()
 
 	// 몽타주 내 공격 노티파이 수신 기능
 	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage, nullptr, false, false);
-	//UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
 	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
 	hitTask->ReadyForActivation();
 

@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "Data/CDHitShape.h"
 #include "CDAbilityTask_ManageReticle.generated.h"
 
 class ACDReticleActor;
+class UCDSkillData;
 
 /**
  * 
@@ -21,7 +21,7 @@ public:
 	UCDAbilityTask_ManageReticle();
 
 	UFUNCTION()
-	static UCDAbilityTask_ManageReticle* ManageReticle(UGameplayAbility* owningAbility, const FCDHitShape& inHitShape);
+	static UCDAbilityTask_ManageReticle* ManageReticle(UGameplayAbility* owningAbility, const UCDSkillData* inSkillData);
 
 	virtual void Activate() override;
 
@@ -31,13 +31,11 @@ protected:
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 
 private:
-	UPROPERTY()
-	TSubclassOf<ACDReticleActor> reticleClass;
-
 	/** 생성한 Reticle 저장 변수 */
 	UPROPERTY()
 	TObjectPtr<ACDReticleActor> spawnedReticle;
 
-	FCDHitShape hitShape;
+	UPROPERTY()
+	const UCDSkillData* skillData;
 
 };
