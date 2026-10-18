@@ -47,6 +47,7 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Dodge);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Strike);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Buff);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Charging);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Ultimate);
 
 	// SetByCaller
