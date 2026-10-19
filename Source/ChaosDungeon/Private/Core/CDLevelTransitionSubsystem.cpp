@@ -36,24 +36,33 @@ void UCDLevelTransitionSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UCDLevelTransitionSubsystem::TravelTo(const TSoftObjectPtr<UWorld>& level)
+bool UCDLevelTransitionSubsystem::TravelTo(const TSoftObjectPtr<UWorld>& level, TFunction<void()> onAccepted)
 {
-	if (bTraveling || level.IsNull())
+	if (bTraveling || level.IsNull() || !GetWorld())
 	{
-		return;
+		return false;
 	}
+
+	// 다른 이동 요청이 들어오지 못하도록 먼저 잠근다.
 	bTraveling = true;
 	pendingLevel = level;
 
-	// 결과 화면 등에서 일시정지 상태일 수 있음
+	// 페이드와 UI 처리 전에 런 상태를 확정한다.
+	if (onAccepted)
+	{
+		onAccepted();
+	}
+
 	UGameplayStatics::SetGamePaused(GetGameInstance(), false);
 
-	// 이미 FadeScreen 으로 어두워진 상태면 그 알파에서 이어서 진행
 	ShowOverlay(currentAlpha);
+
 	StartFade(1.f, [this]()
-	{
-		OpenPendingLevel();
-	});
+		{
+			OpenPendingLevel();
+		});
+
+	return true;
 }
 
 bool UCDLevelTransitionSubsystem::FadeScreen(float targetAlpha, TFunction<void()> onFinished)
