@@ -5,6 +5,8 @@
 
 class UCDSkillData;
 
+DECLARE_DELEGATE(FOnConfirmInput);
+
 /**
  * 데이터 기반 스킬 (플레이어/몬스터 공용). 스킬 1종마다 클래스를 만들지 않는다.
  *
@@ -28,6 +30,9 @@ public:
 	// UGameplayAbility::ActivateAbility()
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 		const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData* triggerEventData) override;
+
+	// UGameplayAbility::InputPressed()
+	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
 	// UGameplayAbility::EndAbility()
 	virtual void EndAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
@@ -72,6 +77,9 @@ private:
 	/** State.Casting 부여/해제 */
 	void SetCasting(bool bNewCasting);
 
+	/** 기존 Activate 함수 별도 호출용 함수 */
+	void ActivateSkillAbility();
+
 private:
 	/** 스킬 데이터 (Spec 의 SourceObject) */
 	UPROPERTY(Transient)
@@ -79,7 +87,11 @@ private:
 
 	/** 장판 스킬의 판정 위치 */
 	FVector targetLocation = FVector::ZeroVector;
+	/** 장판 스킬 시전 시 위치 - 10.18 Jun6 스킬 시전 시 단차 계산을 위해 변수 추가 */
+	FVector preLocation = FVector::ZeroVector;
 
 	/** State.Casting 을 들고 있는가 */
 	bool bIsCasting = false;
+
+	FOnConfirmInput onConfirmInput;
 };

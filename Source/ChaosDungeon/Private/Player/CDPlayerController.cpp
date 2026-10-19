@@ -71,6 +71,12 @@ void ACDPlayerController::OnMoveStarted()
 		// 누르는 즉시 반응: 짧은 클릭은 이 길찾기 이동으로 끝난다
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, moveDestination);
 	}
+
+	// 10.15 Jun6 - 이동/ESC 입력으로 타겟팅 형 스킬 취소(state.Targeting)
+	if (const ACDCharacterBase* controlledCharacter = GetPawn<ACDCharacterBase>())
+	{
+		controlledCharacter->GetCDAbilitySystemComponent()->CancelTargetingSkill();
+	}
 }
 
 void ACDPlayerController::OnMoveTriggered()
