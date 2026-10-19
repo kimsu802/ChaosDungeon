@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Data/CDHitShape.h"
+#include "Data/CDSkillData.h"
 #include "CDReticleActor.generated.h"
+
+class UCDSkillData;
 
 UCLASS()
 class CHAOSDUNGEON_API ACDReticleActor : public AActor
@@ -13,20 +15,33 @@ class CHAOSDUNGEON_API ACDReticleActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	/** Reticle 컴포넌트 생성 */
 	ACDReticleActor();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
+	// AActor::Tick()
 	virtual void Tick(float DeltaTime) override;
 
-	void SetReticleConfig(const FCDHitShape& inHitShape);
+	/** 장판(Reticle) 설정 함수 */
+	void SetReticleConfig(const UCDSkillData& skillData);
 
-private:
-	UPROPERTY(VisibleAnywhere, Category = "Hit Shape", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UDecalComponent> skillReticle;
+	/** 장판(Reticle) 크기 설정 함수 */
+	void SetReticleSize(const float newHorizontalSize, const float newVerticalSize);
+	/** 부채꼴 장판(Reticle) 크기 설정 함수 */
+	void SetConeReticleSize(const float radius, const float degree);
+
+protected:
+	// AActor::BeginPlay()
+	virtual void BeginPlay() override;
+
+	/** Decal 컴포넌트 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hit Shape")
+	class UDecalComponent* skillReticle;
+
+	/** Decal용 Dynamic Material Instance 저장 변수 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hit Shape")
+	class UMaterialInstanceDynamic* reticleMID;
+
+	/** HitShape - MaterialInstance 저장 변수 - editor에서 설정*/
+	UPROPERTY(EditDefaultsOnly, Category = "Hit Shape")
+	TMap<ECDHitShapeType, class UMaterialInstance*> shapeMaterials;
 };

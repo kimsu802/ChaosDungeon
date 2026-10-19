@@ -11,8 +11,9 @@
 UCDAttackAbility::UCDAttackAbility()
 {
 	SetAssetTags(FGameplayTagContainer(CDTags::Ability_Attack));
-	
+
 	// TODO: 공격 취소/ block 조건 추가 
+	ActivationBlockedTags.AddTag(CDTags::State_HitReact);
 }
 
 void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo * actorInfo, const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData * triggerEventData)
@@ -34,7 +35,7 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 
 
 	UAbilityTask_PlayMontageAndWait* playAttackTask =
-	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, montagePlayRate);
+	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
 	playAttackTask->OnCompleted.AddDynamic(this, &ThisClass::OnCompleteCallback);
 	playAttackTask->OnInterrupted.AddDynamic(this, &ThisClass::OnInterruptedCallback);
 

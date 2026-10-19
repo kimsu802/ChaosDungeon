@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/CDReticleActor.h"
 #include "Components/DecalComponent.h"
+#include "Materials/MaterialInstance.h"
 
 ACDReticleActor::ACDReticleActor()
 {
@@ -16,7 +17,6 @@ ACDReticleActor::ACDReticleActor()
 	skillReticle->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
 }
 
-// Called when the game starts or when spawned
 void ACDReticleActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -28,24 +28,59 @@ void ACDReticleActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APlayerController* pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	if (nullptr == pc)
+}
+
+void ACDReticleActor::SetReticleConfig(const UCDSkillData& skillData)
+{
+	//if (nullptr == skillData)
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("SkillData for Reticle is nullptr"));
+	//}
+
+	auto material = shapeMaterials.Find(skillData.hitShape.type);
+	if (material == nullptr || nullptr == *material)
 	{
+		UE_LOG(LogTemp, Error, TEXT("shapeMaterials is null"));
 		return;
 	}
 
-	FHitResult result;
-	if (pc->GetHitResultUnderCursor(ECC_Visibility, false, result))
+
+	reticleMID = UMaterialInstanceDynamic::Create(*material, this);
+
+	reticleMID->SetVectorParameterValue(FName("BaseColor"), skillData.reticleConfig.reticleColor);
+
+	skillReticle->SetDecalMaterial(reticleMID);
+
+
+	if (skillData.hitShape.type == ECDHitShapeType::Circle)
 	{
-		SetActorLocation(result.ImpactPoint);
+		SetReticleSize(skillData.hitShape.radius, skillData.hitShape.radius);
+	}
+	else if (skillData.hitShape.type == ECDHitShapeType::Cone)
+	{
+		SetConeReticleSize(skillData.hitShape.radius, skillData.hitShape.angle);
+	}
+	else
+	{
+		SetReticleSize(skillData.hitShape.width * 0.5f, skillData.hitShape.length * 0.5f);
 	}
 }
 
-void ACDReticleActor::SetReticleConfig(const FCDHitShape& inHitShape)
+void ACDReticleActor::SetReticleSize(const float newHorizontalSize, const float newVerticalSize)
 {
-	if (inHitShape.type == ECDHitShapeType::Circle)
+	if (newHorizontalSize >= 0)
 	{
-		skillReticle->DecalSize.Y = inHitShape.radius + 50.0f;
-		skillReticle->DecalSize.Z = inHitShape.radius + 50.0f;
+		skillReticle->DecalSize.Y = newHorizontalSize;
 	}
+	if (newVerticalSize >= 0)
+	{
+		skillReticle->DecalSize.Z = newVerticalSize;
+	}
+}
+
+void ACDReticleActor::SetConeReticleSize(const float radius, const float degree)
+{
+	reticleMID->SetScalarParameterValue(FName("ConeAngle"), degree);
+	skillReticle->DecalSize.Y = radius;
+	skillReticle->DecalSize.Z = radius;
 }
