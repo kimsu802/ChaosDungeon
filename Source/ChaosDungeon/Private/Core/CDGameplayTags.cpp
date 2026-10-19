@@ -37,6 +37,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dodge, "Cooldown.Dodge");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Strike, "Cooldown.Strike");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Buff, "Cooldown.Buff");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Charging, "Cooldown.Charging");
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Ultimate, "Cooldown.Ultimate");
 
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Cooldown, "SetByCaller.Cooldown");

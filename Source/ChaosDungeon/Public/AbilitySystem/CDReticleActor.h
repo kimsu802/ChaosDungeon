@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Data/CDHitShape.h"
 #include "CDReticleActor.generated.h"
+
+class UCDSkillData;
 
 UCLASS()
 class CHAOSDUNGEON_API ACDReticleActor : public AActor
@@ -13,20 +14,22 @@ class CHAOSDUNGEON_API ACDReticleActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ACDReticleActor();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetReticleConfig(const FCDHitShape& inHitShape);
+	/** 장판(Reticle) 설정 함수 */
+	void SetReticleConfig(const UCDSkillData* skillData);
 
-private:
-	UPROPERTY(VisibleAnywhere, Category = "Hit Shape", meta = (AllowPrivateAccess = "true"))
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hit Shape")
 	TObjectPtr<class UDecalComponent> skillReticle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hit Shape")
+	TObjectPtr<class UMaterialInstanceDynamic> reticleMID;
 };
