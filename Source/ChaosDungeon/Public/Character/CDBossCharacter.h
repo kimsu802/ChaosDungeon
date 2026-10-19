@@ -7,6 +7,8 @@
 #include <Data/CDBossData.h>
 #include "CDBossCharacter.generated.h"
 
+class UCDBossPhaseComponent;
+
 /**
  * 
  */
@@ -26,10 +28,10 @@ public:
 		return bossData;
 	}
 
-	/** 보스의 페이즈 */
-	void GetPhaseComponent();
-
-	
+	UCDBossPhaseComponent* GetPhaseComponent() const
+	{
+		return phaseComponent;
+	}
 
 protected:
 	/** 풀에서 꺼내 데이터/난이도로 초기화 */
@@ -41,12 +43,19 @@ protected:
 	/** 체력 0 → 사망 처리 + Combat.Death 발행 */
 	virtual void HandleDeath() override;
 
+
+	virtual void HandleDamageTaken(AActor* damageInstigator, float damage, bool bCritical) override;
+
+protected:
 	/* 맵에 배치한 보스에게 적용할 데이터 */
 	UPROPERTY(EditInstanceOnly, Category = "BossInitialization", meta = (DisplayName = "Placed Boss Data"))
 	TObjectPtr<UCDMonsterData> placedBossData = nullptr;
 
-protected:
-	/**현재 몬스터 데이터 */
+	/* 현재 몬스터 데이터 */
 	UPROPERTY(Transient)
 	TObjectPtr<const UCDBossData> bossData;
+
+	/* 페이즈 관리 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Boss)
+	TObjectPtr<UCDBossPhaseComponent> phaseComponent;
 };
