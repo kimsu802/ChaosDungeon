@@ -93,5 +93,6 @@ private:
 	/** State.Casting 을 들고 있는가 */
 	bool bIsCasting = false;
 
+	/** 2차 입력 스킬에 대한 확인 입력 시 Task에 정보 전달용 Delegate 변수 */
 	FOnConfirmInput onConfirmInput;
 };

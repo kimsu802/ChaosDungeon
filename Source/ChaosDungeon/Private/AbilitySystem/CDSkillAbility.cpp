@@ -33,7 +33,8 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 		return;
 	}
 
-	if (skillData->skillMode == ECDSkillCastMode::Instant)
+	//if (skillData->skillMode == ECDSkillMode::Instant)
+	if (skillData->reticleConfig.displayMode == ECDReticleDisplayMode::None)
 	{
 		/* 10.13 Jun6 타겟팅 함수의 타겟 지정완료(2차 입력) 시 기존 Activate 활용 위해 기능 실행부 함수화  */
 		ActivateSkillAbility();
@@ -47,10 +48,9 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 		}
 
 		UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData);
-		onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::SkillActivate);
+		onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
 		manage->ReadyForActivation();
 	}
-
 }
 
 /** 10.13 Jun6 활성화 상태에서 2차 입력 시 호출되는 함수 - 타겟팅 설정 후 스킬 실행 결정 시 이 함수에서 처리 */
@@ -61,7 +61,7 @@ void UCDSkillAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, cons
 	FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
 
 	// 즉발 스킬은 추가 입력 상황 자체가 말이 안되는 상황
-	if (skillData->skillMode == ECDSkillCastMode::Instant || nullptr == spec)
+	if (skillData->skillMode == ECDSkillMode::Instant || nullptr == spec)
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;

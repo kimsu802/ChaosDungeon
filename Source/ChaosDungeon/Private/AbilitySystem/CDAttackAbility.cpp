@@ -11,8 +11,9 @@
 UCDAttackAbility::UCDAttackAbility()
 {
 	SetAssetTags(FGameplayTagContainer(CDTags::Ability_Attack));
-	
+
 	// TODO: 공격 취소/ block 조건 추가 
+	ActivationBlockedTags.AddTag(CDTags::State_HitReact);
 }
 
 void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo * actorInfo, const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData * triggerEventData)
