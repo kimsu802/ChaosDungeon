@@ -58,7 +58,7 @@ public:
 
 	/** 기본 보유 스킬 */
 	UPROPERTY(EditDefaultsOnly)
-	TMap<FGameplayTag, UCDSkillData*> defaultSkills;
+	TMap<FGameplayTag, TObjectPtr<UCDSkillData>> defaultSkills;
 
 	/** 기본 공격 어빌리티 (직업별 몽타주/수치는 BP 자식) */
 	UPROPERTY(EditDefaultsOnly)

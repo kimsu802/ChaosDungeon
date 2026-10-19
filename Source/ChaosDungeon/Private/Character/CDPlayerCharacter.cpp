@@ -68,7 +68,7 @@ void ACDPlayerCharacter::GrantOwnedAbilities()
 
 		// 10.02 - Jun6 캐릭터 기본 데이터 구조체 구조 변경에 따른 타입 변경
 		//for (const FCDSkillSlot& slot : classData->defaultSkills)
-		for (const TPair<FGameplayTag, UCDSkillData*>& skill : classData->defaultSkills)
+		for (auto& skill : classData->defaultSkills)
 		{
 			//abilitySystem->GrantSkill(slot.skill, slot.inputTag);
 			abilitySystem->GrantSkill(skill.Value, skill.Key);

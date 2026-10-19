@@ -87,6 +87,8 @@ private:
 
 	/** 장판 스킬의 판정 위치 */
 	FVector targetLocation = FVector::ZeroVector;
+	/** 장판 스킬 시전 시 위치 - 10.18 Jun6 스킬 시전 시 단차 계산을 위해 변수 추가 */
+	FVector preLocation = FVector::ZeroVector;
 
 	/** State.Casting 을 들고 있는가 */
 	bool bIsCasting = false;

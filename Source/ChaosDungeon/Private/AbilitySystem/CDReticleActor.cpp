@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/CDReticleActor.h"
 #include "Components/DecalComponent.h"
+#include "Data/CDSkillData.h"
+#include "Materials/MaterialInstance.h"
 
 ACDReticleActor::ACDReticleActor()
 {
@@ -16,7 +18,6 @@ ACDReticleActor::ACDReticleActor()
 	skillReticle->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
 }
 
-// Called when the game starts or when spawned
 void ACDReticleActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,11 +42,23 @@ void ACDReticleActor::Tick(float DeltaTime)
 	}
 }
 
-void ACDReticleActor::SetReticleConfig(const FCDHitShape& inHitShape)
+void ACDReticleActor::SetReticleConfig(const UCDSkillData* skillData)
 {
-	if (inHitShape.type == ECDHitShapeType::Circle)
+	if (nullptr == skillData)
 	{
-		skillReticle->DecalSize.Y = inHitShape.radius + 50.0f;
-		skillReticle->DecalSize.Z = inHitShape.radius + 50.0f;
+		UE_LOG(LogTemp, Error, TEXT("SkillData for Reticle is nullptr"));
+	}
+
+	reticleMID = UMaterialInstanceDynamic::Create(skillData->reticleConfig.reticleMaterial, this);
+
+	reticleMID->SetVectorParameterValue(FName("BaseColor"), skillData->reticleConfig.reticleColor);
+
+	skillReticle->SetDecalMaterial(reticleMID);
+
+
+	if (skillData->hitShape.type == ECDHitShapeType::Circle)
+	{
+		skillReticle->DecalSize.Y = skillData->hitShape.radius + 50.0f;
+		skillReticle->DecalSize.Z = skillData->hitShape.radius + 50.0f;
 	}
 }
