@@ -9,6 +9,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_4, "Input.Skill.4", "R");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Attack, "Input.Attack", "일반 공격");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Dodge, "Input.Dodge", "Space");
+	//UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Cancel, "Input.Cancel", "Escape, 스킬 발동 취소"); // 10.15 Jun6 - Pause 기능과 충돌되는 것 같아 잠시 보류
 
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Skill, "Ability.Skill");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dodge, "Ability.Dodge");
@@ -18,6 +19,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Attack, "Ability.Attack");
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Casting, "State.Casting", "다른 스킬 사용 불가 구간. 회피는 가능");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Targeting, "State.Targeting", "스킬 발동/취소 대기 상태 구분용");
 	UE_DEFINE_GAMEPLAY_TAG(State_HitReact, "State.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(State_Dead, "State.Dead");
 	UE_DEFINE_GAMEPLAY_TAG(State_Invincible, "State.Invincible");
@@ -29,11 +31,14 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Recovery, "Event.Montage.Recovery");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboStart, "Event.Montage.ComboStart");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboEnd, "Event.Montage.ComboEnd");
-	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Fly, "Event.Montage.Fly");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Land, "Event.Montage.Land");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Hit, "Event.Hit");
 
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dodge, "Cooldown.Dodge");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Strike, "Cooldown.Strike");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Buff, "Cooldown.Buff");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Charging, "Cooldown.Charging");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Ultimate, "Cooldown.Ultimate");
 
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Cooldown, "SetByCaller.Cooldown");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Coefficient, "SetByCaller.Coefficient");

@@ -3,6 +3,7 @@
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
 #include "Data/CDHitShape.h"
+#include "Data/CDReticleData.h"
 #include "CDSkillData.generated.h"
 
 class UAnimMontage;
@@ -16,6 +17,17 @@ enum class ECDSkillOrigin : uint8
 	Self,    // 시전자 기준 (원형/부채꼴/직선/돌진)
 	Cursor   // 조준 위치 기준 (장판)
 };
+
+/** 스킬 형태 - 10.18 Jun6 */
+UENUM(BlueprintType)
+enum class ECDSkillCastMode : uint8
+{
+	Instant,				// 즉발
+	AreaSection,			// 영역 선택 (like 레오나 R)
+	DirectionSelection,		// 방향 선택 (like 레오나 E)
+	Projectile				// 발사 (like 니달리 창)
+};
+
 
 /**
  * 스킬 1개 = 에셋 1개. 플레이어/몬스터 공용.
@@ -47,14 +59,9 @@ public:
 	/** 타격 시점에 Event.Montage.Hit, 후딜 시작에 Event.Montage.Recovery 노티파이를 넣는다 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TObjectPtr<UAnimMontage> montage;
-	
-	/** 몽타주 재생 속도 - 10.12 Jun6 공격 속도 조율을 위한 변수 추가 */
-	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	float montagePlayRate = 1.0f;
 
-	/** 원거리 타겟 지정형 스킬 여부 */
-	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	bool bIsTargeting = false;
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	ECDSkillCastMode skillMode;
 
 	/** 판정 기준점 */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
@@ -99,4 +106,7 @@ public:
 	/** 후딜을 다른 스킬로 캔슬할 수 있는가 (회피 캔슬은 항상 가능) */
 	UPROPERTY(EditDefaultsOnly, Category = "Cancel")
 	bool bRecoveryCancelable = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Reticle")
+	FCDReticleConfig reticleConfig;
 };

@@ -12,7 +12,8 @@
 				"Engine",
 				"DeveloperSettings",
 				"CommonUI",
-				"AIModule"
+				"AIModule",
+				"GameplayAbilities"
 			]
 		}
 	],

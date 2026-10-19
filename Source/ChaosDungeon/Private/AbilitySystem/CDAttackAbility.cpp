@@ -34,7 +34,7 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 
 
 	UAbilityTask_PlayMontageAndWait* playAttackTask =
-	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, montagePlayRate);
+	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
 	playAttackTask->OnCompleted.AddDynamic(this, &ThisClass::OnCompleteCallback);
 	playAttackTask->OnInterrupted.AddDynamic(this, &ThisClass::OnInterruptedCallback);
 
