@@ -20,7 +20,7 @@ enum class ECDSkillOrigin : uint8
 
 /** 스킬 형태 - 10.18 Jun6 */
 UENUM(BlueprintType)
-enum class ECDSkillCastMode : uint8
+enum class ECDSkillMode : uint8
 {
 	Instant,				// 즉발
 	AreaSection,			// 영역 선택 (like 레오나 R)
@@ -60,8 +60,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TObjectPtr<UAnimMontage> montage;
 
+	/** 스킬 발동 형태 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	ECDSkillCastMode skillMode;
+	ECDSkillMode skillMode;
 
 	/** 판정 기준점 */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
@@ -107,6 +108,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Cancel")
 	bool bRecoveryCancelable = false;
 
+	/** 조준 중 표시할 Reticle 설정 */
 	UPROPERTY(EditDefaultsOnly, Category = "Reticle")
 	FCDReticleConfig reticleConfig;
 };
