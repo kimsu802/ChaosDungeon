@@ -96,8 +96,7 @@ bool ACDBossAIController::StartPattern()
     {
         return false;
     }
-    /*  같은 Ability 클래스를 사용하는 스킬들도
-     SourceObject로 각각 구분한다.*/
+    /*  같은 Ability 클래스를 사용하는 스킬들도 SourceObject로 각각 구분*/
     FGameplayAbilitySpecHandle selectedHandle;
 
         for (const FGameplayAbilitySpec& spec : abilitySys->GetActivatableAbilities())
