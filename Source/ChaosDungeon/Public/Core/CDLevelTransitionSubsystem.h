@@ -30,7 +30,7 @@ public:
 	virtual void Deinitialize() override;
 
 	/** 연출과 함께 레벨 이동 */
-	void TravelTo(const TSoftObjectPtr<UWorld>& level);
+	bool TravelTo(const TSoftObjectPtr<UWorld>& level, TFunction<void()> onAccepted = nullptr);
 
 	/**
 	 * 화면 전체(UI 포함) 페이드. targetAlpha 1 = 가림, 0 = 걷힘

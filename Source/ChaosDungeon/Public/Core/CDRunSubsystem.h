@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GameplayTagContainer.h"
@@ -39,7 +39,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ReturnToHub();
 
-	/** 다음 스테이지로 이동 */
+	/* 다음 스테이지 넘어가기 */
 	void AdvanceStage();
 
 	/** 런 종료 (최고 기록 갱신 + Run.Finished 발행) */
@@ -140,4 +140,5 @@ private:
 
 	/** 런을 시작한 적이 있는가 */
 	bool bHasPlayedRun = false;
+
 };

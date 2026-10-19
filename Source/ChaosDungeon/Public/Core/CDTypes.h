@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "CDTypes.generated.h"
@@ -37,6 +37,14 @@ enum class ECDFloatingTextStyle : uint8
 	Critical,     // 내가 준 치명타
 	DamageTaken,  // 내가 받은 피해
 	Buff          // 버프 획득 텍스트
+};
+
+/* 문 상호작용 목적 - 윤상 */
+UENUM(BlueprintType)
+enum class ECDPortalType : uint8
+{
+	DungeonEntrance UMETA(DisplayName = "Dungeon Entrance"),
+	NextStage UMETA(DisplayName = "Next Stage")
 };
 
 /** 몬스터 등급 (경직/넉백 면역 규칙의 기준) */

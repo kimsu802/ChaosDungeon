@@ -1,4 +1,4 @@
-#include "Core/CDRunSubsystem.h"
+﻿#include "Core/CDRunSubsystem.h"
 #include "Core/CDGameplayTags.h"
 #include "Core/CDLevelTransitionSubsystem.h"
 #include "Core/CDMessages.h"
@@ -22,43 +22,80 @@ void UCDRunSubsystem::Initialize(FSubsystemCollectionBase& collection)
 
 void UCDRunSubsystem::StartRun(ECDDifficulty difficulty)
 {
-	// 던전 설정과 스테이지 목록을 확인한다.
-	if (!dungeonData || dungeonData->stages.IsEmpty())
+	// 던전 레벨 확인
+	if (dungeonData == nullptr || dungeonData->stages.IsEmpty())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Dungeon Data or Stages is missing."));
 		return;
 	}
 
-	// 모든 스테이지에 목적지 맵이 지정되어 있어야 한다.
-	for (const TObjectPtr<UCDStageData>& stage : dungeonData->stages)
+	// 보스 레벨 확인
+	if (dungeonData->bossStage == nullptr || dungeonData->bossStage->level.IsNull())
 	{
-		if (!stage || stage->level.IsNull())
-		{
-			UE_LOG(LogTemp, Error, TEXT("Stage Data or Level is missing."));
-			return;
-		}
+		UE_LOG(LogTemp, Error, TEXT("Boss Stage or Level is missing"));
+		return;
 	}
 
-	// 원본 데이터는 유지하고 이번 런에서 사용할 목록만 복사한다.
-	runStages = dungeonData->stages;
+	TSet<FSoftObjectPath> registeredLevels;
 
-	// 10.13 김지형 - 던전은 DA에 넣은 스테이지 순대로 순차적으로 진행되어야 하므로 이 부분은 주석처리 해놓았음.
-	//// 뒤에서부터 임의의 항목과 교환하여 방문 순서를 섞는다.
-	//for (int32 i = runStages.Num() - 1; i > 0; --i)
+	for (const TObjectPtr<UCDStageData>& stage : dungeonData->stages)
+	{
+		if (stage == nullptr || stage->level.IsNull())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Stage Data or Level is missing"));
+			return;
+		}
+
+		const FSoftObjectPath levelPath = stage->level.ToSoftObjectPath();
+
+		if (registeredLevels.Contains(levelPath)
+			|| levelPath == dungeonData->bossStage->level.ToSoftObjectPath())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Duplicate stage level is registered."));
+			return;
+		}
+
+		registeredLevels.Add(levelPath);
+	}
+
+	UCDLevelTransitionSubsystem* transition = GetGameInstance()->GetSubsystem<UCDLevelTransitionSubsystem>();
+
+	if (transition == nullptr)
+	{
+		return;
+	}
+
+	TArray<TObjectPtr<UCDStageData>> nextStages = dungeonData->stages;
+
+	// 뒤에서부터 임의의 항목과 교환하여 방문 순서를 섞는다.
+	//for (int32 i = nextStages.Num() - 1; i > 0; --i)
 	//{
 	//	const int32 randomIndex = FMath::RandRange(0, i);
-	//	runStages.Swap(i, randomIndex);
+	//	nextStages.Swap(i, randomIndex);
 	//}
 
-	// 새 런의 기록과 현재 위치를 초기화한다.
-	record = FCDRunRecord();
-	record.difficulty = difficulty;
-	stageIndex = 0;
-	bRunFinished = false;
-	bNewBestRecord = false;
-	bHasPlayedRun = true;
+	nextStages.Add(dungeonData->bossStage);
 
-	TravelToCurrentStage();
+	const TSoftObjectPtr<UWorld> firstLevel = nextStages[0]->level;
+
+	const bool accepted = transition->TravelTo(firstLevel, [this, difficulty, nextStages = MoveTemp(nextStages)]() mutable
+		{
+			runStages = MoveTemp(nextStages);
+
+			record = FCDRunRecord();
+			record.difficulty = difficulty;
+
+			stageIndex = 0;
+			bRunFinished = false;
+			bNewBestRecord = false;
+			bHasPlayedRun = true;
+		});
+
+	if (!accepted)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("StartRun travel request was rejected."));
+	}
+
 }
 
 void UCDRunSubsystem::RetryRun()
