@@ -14,8 +14,9 @@ class UCDSkillAbility;
 UENUM(BlueprintType)
 enum class ECDSkillOrigin : uint8
 {
-	Self,    // 시전자 기준 (원형/부채꼴/직선/돌진)
-	Cursor   // 조준 위치 기준 (장판)
+	Self,			// 시전자 기준 (원형/부채꼴/직선/돌진)
+	Cursor,			// 조준 위치 기준 (장판)
+	CastLocation	// 시전 위치 (10.20 Jun6 - 설치기 등 고정 위치 판정을 위해 추가)
 };
 
 /** 스킬 형태 - 10.18 Jun6 */
@@ -28,6 +29,11 @@ enum class ECDSkillMode : uint8
 	Projectile				// 발사 (like 니달리 창)
 };
 
+
+struct CHAOSDUNGEON_API FSkillEffect
+{
+
+};
 
 /**
  * 스킬 1개 = 에셋 1개. 플레이어/몬스터 공용.

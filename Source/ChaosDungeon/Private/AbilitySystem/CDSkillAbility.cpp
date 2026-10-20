@@ -104,7 +104,20 @@ FGameplayTag UCDSkillAbility::GetCooldownTag() const
 void UCDSkillAbility::ApplyHit()
 {
 	const ACDCharacterBase* character = GetCDCharacter();
-	const FVector origin = skillData->origin == ECDSkillOrigin::Cursor ? targetLocation : character->GetActorLocation();
+	FVector origin = FVector::Zero();
+	
+	switch (skillData->origin)
+	{
+		case ECDSkillOrigin::Cursor:
+			origin = targetLocation;
+			break;
+		case ECDSkillOrigin::Self:
+			origin = character->GetActorLocation();
+			break;
+		case ECDSkillOrigin::CastLocation:
+			origin = preLocation;
+			break;
+	}
 	const FVector forward = character->GetActorForwardVector();
 
 	TArray<AActor*> hitActors;
@@ -241,4 +254,21 @@ void UCDSkillAbility::ActivateSkillAbility()
 	montageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->ReadyForActivation();
+
+	UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+	FGameplayCueParameters params;
+	switch (skillData->origin)
+	{
+	case ECDSkillOrigin::Cursor:
+		params.Location = targetLocation;
+		break;
+	case ECDSkillOrigin::Self:
+		params.Location = character->GetActorLocation();
+		break;
+	case ECDSkillOrigin::CastLocation:
+		params.Location = preLocation;
+		break;
+	}
+
+	abilitySystem->ExecuteGameplayCue(CDTags::Ability_Dodge, params);
 }
