@@ -2,13 +2,14 @@
 
 
 #include "Character/CDBossCharacter.h"
+#include <Boss/CDBossPhaseComponent.h>
 #include <AI/CDBossAIController.h>
 #include <Components/CapsuleComponent.h>
 #include <Data/CDMonsterData.h>
 
 ACDBossCharacter::ACDBossCharacter()
 {
-
+    phaseComponent = CreateDefaultSubobject<UCDBossPhaseComponent>(TEXT("PhaseComponent"));
 }
 
 void ACDBossCharacter::BeginPlay()
@@ -48,10 +49,6 @@ void ACDBossCharacter::BeginPlay()
     );
 }
 
-void ACDBossCharacter::GetPhaseComponent()
-{
-}
-
 void ACDBossCharacter::ActivateFromPool(
     const UCDMonsterData* data,
     const FCDDifficultySettings& difficulty,
@@ -62,15 +59,25 @@ void ACDBossCharacter::ActivateFromPool(
         return;
     }
 
+    bossData = Cast<UCDBossData>(data);
+    if (!IsValid(bossData.Get()))
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("Boss initialization requires UCDBossData."));
+        return;
+    }
+
     if (ACDBossAIController* ai = GetController<ACDBossAIController>())
     {
         ai->StopBossLogic();
     }
 
-   /*  데이터·능력치·스킬 부여와 활성화*/
+    /* 데이터(능력치스킬 부여)와 활성화 */
     Super::ActivateFromPool(data, difficulty, location);
 
-    /* 초기화 완료 후 AI 시작*/
+    phaseComponent->ResetPhase();
+
+    /* 초기화 완료 후 AI 시작 */
     if (ACDBossAIController* ai = GetController<ACDBossAIController>())
     {
         ai->StartBossLogic();
@@ -79,9 +86,9 @@ void ACDBossCharacter::ActivateFromPool(
 
 void ACDBossCharacter::DeactivateToPool()
 {
-    if (ACDBossAIController* Ai = GetController<ACDBossAIController>())
+    if (ACDBossAIController* ai = GetController<ACDBossAIController>())
     {
-        Ai->StopBossLogic();
+        ai->StopBossLogic();
     }
 
     Super::DeactivateToPool();
@@ -90,13 +97,17 @@ void ACDBossCharacter::HandleDeath()
 {
     Super::HandleDeath();
 
-    if (ACDBossAIController* Ai = GetController<ACDBossAIController>())
+    if (ACDBossAIController* ai = GetController<ACDBossAIController>())
     {
-        Ai->StopBossLogic();
+        ai->StopBossLogic();
     }
 }
 
-
-void ACDBossCharacter::BossPattern()
+void ACDBossCharacter::HandleDamageTaken(AActor* damageInstigator, float damage, bool bCritical)
 {
+    Super::HandleDamageTaken(damageInstigator, damage, bCritical);
+
+    phaseComponent->EvaluateHealth();
 }
+
+

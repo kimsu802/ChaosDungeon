@@ -7,7 +7,10 @@
 #include "Player/CDPlayerController.h"
 #include "World/CDSpawnManagerComponent.h"
 #include "World/CDSpawnPoint.h"
+#include "World/CDDoorSpawnpoint.h"
+#include "World/CDInteractable.h"
 #include "EngineUtils.h"
+#include "Engine/World.h"
 #include "TimerManager.h"
 #include "UI/CDUIManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
@@ -63,6 +66,11 @@ void ACDDungeonGameMode::BeginStage()
 
 void ACDDungeonGameMode::ClearStage()
 {
+	if (bStageCleared)
+	{
+		return;
+	}
+
 	bStageCleared = true;
 	spawnManager->StopSpawning();
 	CommitStageTime();
@@ -74,7 +82,48 @@ void ACDDungeonGameMode::ClearStage()
 		return;
 	}
 
-	// 포탈이 구독해서 열림
+	ATargetPoint* exitPoint = nullptr;
+
+	for (TActorIterator<ACDDoorSpawnPoint> it(GetWorld()); it; ++it)
+	{
+		exitPoint = *it;
+		break;
+	}
+
+	if (!exitDoorClass || !exitPoint)
+	{
+		UE_LOG(
+			LogTemp,
+			Error,
+			TEXT("ExitDoorClass 또는 CDDoorSpawnPoint가 없습니다."));
+	}
+	else
+	{
+		FTransform spawnTransform = exitPoint->GetActorTransform();
+
+		// 위치 표시용 TargetPoint의 크기가 문에 적용되지 않게 한다.
+		spawnTransform.SetScale3D(FVector::OneVector);
+
+		// 변경: 문 설정을 지정한 뒤 생성을 완료한다.
+		ACDInteractable* exitDoor =
+			GetWorld()->SpawnActorDeferred<ACDInteractable>(
+				exitDoorClass,
+				spawnTransform,
+				this,
+				nullptr,
+				ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		
+		if (exitDoor)
+		{
+			exitDoor->SetPortalType(ECDPortalType::NextStage);
+			exitDoor->FinishSpawning(spawnTransform);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("출구 문 생성에 실패했습니다."));
+		}
+	}
+
 	BroadcastStage(CDTags::Msg_Stage_Cleared);
 }
 
@@ -153,6 +202,11 @@ void ACDDungeonGameMode::HandleDeath(const FCDDeathMessage& message)
 
 void ACDDungeonGameMode::HandlePortalEntered(const FCDStageMessage& message)
 {
+	if (!bStageCleared)
+	{
+		return;
+	}
+
 	GetRun()->AdvanceStage();
 }
 

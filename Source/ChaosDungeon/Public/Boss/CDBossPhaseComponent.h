@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CDBossPhaseComponent.generated.h"
 
+
 /* 보스의 페이즈 열거형 구분 */
 UENUM(BluePrintType)
 enum class ECDBossPhase : uint8
@@ -21,8 +22,8 @@ enum class ECDBossPhaseState : uint8
 	Inactive,
 	Combat,
 	Special,
-	Enrage,
-	Dead
+	Dead,
+	Transitioning
 };
 
 
@@ -35,13 +36,25 @@ public:
 	// Sets default values for this component's properties
 	UCDBossPhaseComponent();
 
+	/* 보스 활성화 시 1페이즈 전투 상태로 초기화 */
+	void ResetPhase();
+
+	/* 체력을 확인해 페이즈 전환 시작 여부 판단 */
+	virtual void EvaluateHealth();
+
+private:
+	void OnPhaseMontageEnded(UAnimMontage* montage, bool bInterrupted);
+
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	/* 페이즈 전환 애님 몽타주 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim)
+	UAnimMontage* PhaseChange;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+private:
+	/* 현재 보스 페이즈 */
+	ECDBossPhase currentPhase = ECDBossPhase::Phase1;
 
-		
+	/* 현재 페이즈의 진행 상태 */
+	ECDBossPhaseState phaseState = ECDBossPhaseState::Inactive;
+
 };

@@ -6,6 +6,7 @@
 
 class UCDSpawnManagerComponent;
 class UCDRunSubsystem;
+class ACDInteractable;
 struct FCDDamageMessage;
 struct FCDDeathMessage;
 struct FCDStageMessage;
@@ -84,6 +85,10 @@ protected:
 	/** 부활 직후 무적 시간 */
 	UPROPERTY(EditDefaultsOnly, Category = "Rule")
 	float reviveInvincibleTime = 2.f;
+
+	/* 클리어 후 생성할 출구 문BP - yoonsang */
+	UPROPERTY(EditDefaultsOnly, Category = "Portal")
+	TSubclassOf<ACDInteractable> exitDoorClass;
 
 private:
 	/** 메시지 구독 핸들 */
