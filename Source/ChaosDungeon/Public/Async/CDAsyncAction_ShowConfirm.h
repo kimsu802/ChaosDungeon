@@ -18,7 +18,7 @@ class CHAOSDUNGEON_API UCDAsyncAction_ShowConfirm : public UBlueprintAsyncAction
 public:
 	/** 확인창을 띄우고 결과를 기다린다 */
 	UFUNCTION(BlueprintCallable, Category = "UI", meta = (WorldContext = "worldContextObject", HidePin = "worldContextObject", BlueprintInternalUseOnly = "true", DisplayName = "Show Confirm"))
-	static UCDAsyncAction_ShowConfirm* ShowConfirm(const UObject* worldContextObject, ECDConfirmType type, FText title, FText message);
+	static UCDAsyncAction_ShowConfirm* ShowConfirm(const UObject* worldContextObject, ECDConfirmType type, FText title, FText message, FText submessage);
 
 	// UBlueprintAsyncActionBase::Activate()
 	virtual void Activate() override;
@@ -44,4 +44,7 @@ private:
 
 	/** 본문 */
 	FText cachedMessage;
+
+	/* 본문 아래에 붙는 짧막한 서브메시지*/
+	FText cachedSubMessage;
 };
