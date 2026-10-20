@@ -130,7 +130,7 @@ void UCDUIManagerSubsystem::ShowGameHud()
 	PushScreen(CDTags::UI_Layer_Game, screenSet->hudScreen);
 }
 
-void UCDUIManagerSubsystem::ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult)
+void UCDUIManagerSubsystem::ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, const FText& submessage, TFunction<void(ECDConfirmResult)> onResult)
 {
 	if (!screenSet || screenSet->confirmScreen.IsNull())
 	{
@@ -142,9 +142,9 @@ void UCDUIManagerSubsystem::ShowConfirm(ECDConfirmType type, const FText& title,
 		return;
 	}
 	
-	PushScreenAsync(CDTags::UI_Layer_Modal, screenSet->confirmScreen, [type, title, message, onResult](UCommonActivatableWidget& screen)
+	PushScreenAsync(CDTags::UI_Layer_Modal, screenSet->confirmScreen, [type, title, message, submessage, onResult](UCommonActivatableWidget& screen)
 	{
-		CastChecked<UCDConfirmWidget>(&screen)->Setup(type, title, message, onResult);
+		CastChecked<UCDConfirmWidget>(&screen)->Setup(type, title, message, submessage, onResult);
 	});
 }
 

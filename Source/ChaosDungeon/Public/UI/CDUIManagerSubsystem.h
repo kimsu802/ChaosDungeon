@@ -62,7 +62,7 @@ public:
 	void ShowGameHud();
 
 	/* 컨펌 화면 열기*/
-	void ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult);
+	void ShowConfirm(ECDConfirmType type, const FText& title, const FText& message, const FText& submessage, TFunction<void(ECDConfirmResult)> onResult);
 
 private:
 	/** 레이아웃이 없으면 생성 (GameMode/PlayerController 중 누가 먼저 요청해도 동작) */

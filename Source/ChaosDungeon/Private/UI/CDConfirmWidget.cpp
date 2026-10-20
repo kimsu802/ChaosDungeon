@@ -13,15 +13,24 @@ UCDConfirmWidget::UCDConfirmWidget(const FObjectInitializer& objectInitializer)
     bIsBackHandler = true;
 }
 
-void UCDConfirmWidget::Setup(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult)
+void UCDConfirmWidget::Setup(ECDConfirmType type, const FText& title, const FText& message, const FText& submessage, TFunction<void(ECDConfirmResult)> onResult)
 {
     if (titleTextBlock)
     {
+        ESlateVisibility eVisibility = !title.IsEmpty() ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed;
         titleTextBlock->SetText(title);
+        titleTextBlock->SetVisibility(eVisibility);
     }
     if (messageTextBlock)
     {
         messageTextBlock->SetText(message);
+    }
+
+    if (subTextBlock)
+    {
+        ESlateVisibility eVisibility = !submessage.IsEmpty() ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed;
+        subTextBlock->SetText(submessage);
+        subTextBlock->SetVisibility(eVisibility);
     }
     pendingResult = ECDConfirmResult::Closed;
     resultCallback = MoveTemp(onResult);

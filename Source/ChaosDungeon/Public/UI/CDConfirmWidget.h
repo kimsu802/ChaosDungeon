@@ -24,7 +24,7 @@ public:
 	UCDConfirmWidget(const FObjectInitializer& objectInitializer);
 
 	/** 내용, 버튼 구성, 결과 콜백 설정 (활성화 전에 호출) */
-	void Setup(ECDConfirmType type, const FText& title, const FText& message, TFunction<void(ECDConfirmResult)> onResult);
+	void Setup(ECDConfirmType type, const FText& title, const FText& message, const FText& submessage, TFunction<void(ECDConfirmResult)> onResult);
 
 protected:
 	// UCommonActivatableWidget::NativeGetDesiredFocusTarget()
@@ -45,6 +45,10 @@ protected:
 	/** 본문 */
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCommonTextBlock> messageTextBlock;
+
+	/* 본문 설명을 덧붙여줄 짧은 글*/
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UCommonTextBlock> subTextBlock;
 
 	/** 버튼 목록 */
 	UPROPERTY(meta = (BindWidget))
