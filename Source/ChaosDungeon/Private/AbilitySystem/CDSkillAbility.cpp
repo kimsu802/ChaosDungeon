@@ -255,20 +255,21 @@ void UCDSkillAbility::ActivateSkillAbility()
 	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->ReadyForActivation();
 
-	UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
-	FGameplayCueParameters params;
-	switch (skillData->origin)
-	{
-	case ECDSkillOrigin::Cursor:
-		params.Location = targetLocation;
-		break;
-	case ECDSkillOrigin::Self:
-		params.Location = character->GetActorLocation();
-		break;
-	case ECDSkillOrigin::CastLocation:
-		params.Location = preLocation;
-		break;
-	}
-
-	abilitySystem->ExecuteGameplayCue(CDTags::Ability_Dodge, params);
+	/* 10.20 Jun6 - 스킬 시각 효과 추가 계획 */
+	//UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+	//FGameplayCueParameters params;
+	//switch (skillData->origin)
+	//{
+	//case ECDSkillOrigin::Cursor:
+	//	params.Location = targetLocation;
+	//	break;
+	//case ECDSkillOrigin::Self:
+	//	params.Location = character->GetActorLocation();
+	//	break;
+	//case ECDSkillOrigin::CastLocation:
+	//	params.Location = preLocation;
+	//	break;
+	//}
+	//
+	//abilitySystem->ExecuteGameplayCue(CDTags::Ability_Dodge, params);
 }
