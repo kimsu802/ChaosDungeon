@@ -121,20 +121,19 @@ void UCDBossPhaseComponent::OnPhaseMontageEnded(
 
 	if (bInterrupted)
 	{
-		// 재생 실패·중단 시 1페이즈로 복구
+		// 재생 실패, 중단 시 1페이즈로 복구
 		ResetPhase();
 	}
 	else
 	{
 		currentPhase = ECDBossPhase::Phase2;
 		phaseState = ECDBossPhaseState::Combat;
+		boss->EnterPhase2();
 	}
 
 	if (ACDBossAIController* ai =
 		boss->GetController<ACDBossAIController>())
 	{
-		USkeletalMeshComponent* mesh = boss->GetMesh();
-
 		ai->StartBossLogic();
 	}
 }

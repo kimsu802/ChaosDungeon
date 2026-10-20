@@ -189,7 +189,7 @@ const UCDBossSkillData* ACDBossAIController::ReadyPattern() const
 
     const UCDBossSkillData* selected = nullptr;
 
-    for (const UCDSkillData* baseSkill : data->attackSkills)
+    for (const UCDSkillData* baseSkill : boss->GetActiveAttackSkills())
     {
         const UCDBossSkillData* skill = Cast<UCDBossSkillData>(baseSkill);
 

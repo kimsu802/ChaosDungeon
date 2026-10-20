@@ -27,9 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Boss)
 	TObjectPtr<USkeletalMesh> phaseMesh;
 
-	/* 2페이즈에 사용될 스킬 데이터*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Boss)
-	TObjectPtr<const UCDBossData> bossData;
+	/* 2페이즈 전환 완료 시 기존 attackSkills에 추가할 스킬 */
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	TArray<TObjectPtr<UCDSkillData>> phase2Skill;
 
 
 };
