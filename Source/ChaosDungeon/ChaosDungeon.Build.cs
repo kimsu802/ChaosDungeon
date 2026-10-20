@@ -12,7 +12,7 @@ public class ChaosDungeon : ModuleRules
             "GameplayAbilities", "GameplayTags", "GameplayTasks",
             "AIModule", "NavigationSystem",
             "UMG", "Slate", "SlateCore", "MoviePlayer",
-            "CommonUI", "CommonInput", "ModelViewViewModel", "FieldNotification" });
+            "CommonUI", "CommonInput", "ModelViewViewModel", "FieldNotification", "Niagara" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
