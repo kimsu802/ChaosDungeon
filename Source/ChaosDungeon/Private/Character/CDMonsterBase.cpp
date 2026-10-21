@@ -36,6 +36,9 @@ void ACDMonsterBase::ActivateFromPool(const UCDMonsterData* data, const FCDDiffi
 		abilitySystem->AddLooseGameplayTags(GetImmunityTags(data->grade));
 	}
 
+	/* 디졸브로 인해 사라진 모습 복구 - yoonsang */
+	OnResetVisual();
+
 	SetPoolActive(true);
 
 	if (data->grade == ECDMonsterGrade::Boss)
@@ -79,7 +82,12 @@ void ACDMonsterBase::HandleDeath()
 	Super::HandleDeath();
 
 	SpawnDrops();
+
+	/* Death 처리 시 충돌 끄기 
+	*(밑에 SetActorEnableCollision을 false로 되는 시점이 pool로 돌아갈 때 여서 죽음 처리 후 충돌 처리) - yoonsang */
+	SetActorEnableCollision(false);
 	
+	/* 죽음 처리 시 noiseTexture 재생 - yoonsang */ 
 	OnDeathVisual();
 
 	GetWorldTimerManager().SetTimer(releaseTimer, this, &ThisClass::DeactivateToPool, corpseLifetime, false);

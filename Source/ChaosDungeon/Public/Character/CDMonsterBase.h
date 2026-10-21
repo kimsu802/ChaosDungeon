@@ -54,6 +54,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Monster|Effects")
 	void OnDeathVisual();
 
+	/* BP Monster 사망 연출 리셋을 위한 추가 - yoonsang */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Monster|Effects")
+	void OnResetVisual();
+
 private:
 	/** 풀 활성/비활성 (표시, 충돌, 틱, 컨트롤러) */
 	void SetPoolActive(bool bActive);
