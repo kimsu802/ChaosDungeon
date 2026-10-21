@@ -26,6 +26,6 @@ public:
 
 protected:
 	/** 버튼 글자 */
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<UCommonTextBlock> labelText;
 };
