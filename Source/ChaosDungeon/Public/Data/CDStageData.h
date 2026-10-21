@@ -33,6 +33,10 @@ class CHAOSDUNGEON_API UCDStageData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
+	/** 우측 상단 지역명에 표시할 이름 (예: 카오스의 탑 · 1층). 비우면 "스테이지 N" 으로 표시 */
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	FText displayName;
+
 	/** 스테이지 레벨 */
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> level;

@@ -19,7 +19,7 @@ void UCDHealthBarWidget::SetTargetPercent(float newPercent)
 
 	if (targetPercent >= delayedPercent)
 	{
-		// 회복: 지연 바도 즉시 맞춤
+		// 회복 (또는 보스 줄 전환으로 값이 올라감): 지연 바도 즉시 맞춤
 		delayedPercent = targetPercent;
 	}
 
@@ -39,7 +39,15 @@ void UCDHealthBarWidget::NativeTick(const FGeometry& myGeometry, float inDeltaTi
 {
 	Super::NativeTick(myGeometry, inDeltaTime);
 
-	// 따라갈 구간이 없으면 아무것도 하지 않음
+	// 해상도·창 크기가 바뀌면 바 폭이 달라지므로 글로우 위치를 다시 계산
+	const float barWidth = hpBar->GetCachedGeometry().GetLocalSize().X;
+	if (FMath::IsNearlyEqual(barWidth, lastBarWidth) == false)
+	{
+		lastBarWidth = barWidth;
+		UpdateEdgeGlow();
+	}
+
+	// 따라갈 구간이 없으면 지연 바 처리는 건너뜀
 	if (delayedPercent <= targetPercent)
 	{
 		return;
@@ -86,9 +94,9 @@ void UCDHealthBarWidget::UpdateEdgeGlow()
 	const FVector2D borderPadding = hpBar->GetBorderPadding();
 	const float fillAreaWidth = barWidth - (borderPadding.X * 2.f);
 
-	// fill 텍스처의 실제 빨간 끝(728/734)을 넘지 않도록
+	// fill 텍스처의 실제 색 끝을 넘지 않도록
 	const float fillRight = borderPadding.X + (fillAreaWidth * targetPercent);
-	const float fillEnd = borderPadding.X + (fillAreaWidth * (728.f / 734.f));
+	const float fillEnd = borderPadding.X + (fillAreaWidth * fillEndRatio);
 
 	float glowWidth = edgeGlow->GetCachedGeometry().GetLocalSize().X;
 	if (glowWidth <= 0.f)
@@ -98,4 +106,10 @@ void UCDHealthBarWidget::UpdateEdgeGlow()
 
 	const float x = FMath::Min(fillRight, fillEnd) - (glowWidth * 0.5f) + glowOffset.X;
 	edgeGlow->SetRenderTranslation(FVector2D(x, glowOffset.Y));
+}
+
+void UCDHealthBarWidget::RestartDelayedFrom(float startPercent)
+{
+	delayedPercent = FMath::Clamp(startPercent, 0.f, 1.f);
+	holdRemaining = holdTime;
 }

@@ -77,6 +77,10 @@ struct CHAOSDUNGEON_API FCDStageMessage
 	UPROPERTY(BlueprintReadOnly)
 	int32 stageNumber = 0;
 
+	/** 스테이지 표시 이름 (UCDStageData::displayName). 비어 있을 수 있음 */
+	UPROPERTY(BlueprintReadOnly)
+	FText stageName;
+
 	/** 처치 게이지 (0 ~ 1) */
 	UPROPERTY(BlueprintReadOnly)
 	float progress = 0.f;
