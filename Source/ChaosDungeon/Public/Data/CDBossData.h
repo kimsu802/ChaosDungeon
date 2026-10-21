@@ -7,7 +7,8 @@
 #include "CDBossData.generated.h"
 
 /**
- * 
+ * 보스 전용 데이터. 일반 몬스터 데이터에 보스 HP 바 표시 정보를 더한다.
+ * 보스 등장 시 UCDStageVM 이 읽어 보스 HP 바(이름 · 줄 수)에 반영한다.
  */
 UCLASS()
 class CHAOSDUNGEON_API UCDBossData : public UCDMonsterData
@@ -31,5 +32,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	TArray<TObjectPtr<UCDSkillData>> phase2Skill;
 
+	/** 보스 HP 바에 표시할 이름 */
+	UPROPERTY(EditDefaultsOnly, Category = "Boss|UI")
+	FText bossName;
 
+	/** 보스 HP 바 줄 수 (예: 45). 전체 HP 를 이 개수로 나눠 한 줄씩 깎인다 */
+	UPROPERTY(EditDefaultsOnly, Category = "Boss|UI", meta = (ClampMin = 1))
+	int32 hpLineCount = 10;
 };

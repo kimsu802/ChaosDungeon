@@ -67,4 +67,7 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI_Layer_Game);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI_Layer_GameMenu);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI_Layer_Modal);
+
+	// VFX (Skill 이펙트)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Skill);
 }

@@ -69,5 +69,6 @@ void ACDInteractable::Interact(APlayerController* interactor)
         ECDConfirmType::OkCancel,
         FText::FromString(TEXT("다음 스테이지")),
         FText::FromString(TEXT("다음 스테이지로 이동하시겠습니까?")),
+        FText::FromString(TEXT("클리어 전까지 저장/세이브가 되지 않습니다")),
         MoveTemp(HandleConfirmResult));
 }

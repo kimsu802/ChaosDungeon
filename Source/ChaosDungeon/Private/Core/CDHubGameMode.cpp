@@ -3,6 +3,9 @@
 #include "Player/CDPlayerController.h"
 #include "UI/CDUIManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Core/CDMessages.h"
+#include "Core/CDGameplayTags.h"
+#include "Data/CDStageData.h"
 
 ACDHubGameMode::ACDHubGameMode()
 {

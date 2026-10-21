@@ -3,7 +3,7 @@
 #include "Engine/World.h"
 #include "UI/CDUIManagerSubsystem.h"
 
-UCDAsyncAction_ShowConfirm* UCDAsyncAction_ShowConfirm::ShowConfirm(const UObject* worldContextObject, ECDConfirmType type, FText title, FText message)
+UCDAsyncAction_ShowConfirm* UCDAsyncAction_ShowConfirm::ShowConfirm(const UObject* worldContextObject, ECDConfirmType type, FText title, FText message, FText submessage)
 {
 	UWorld* world = GEngine->GetWorldFromContextObject(worldContextObject, EGetWorldErrorMode::LogAndReturnNull);
 	if (!world)
@@ -16,6 +16,7 @@ UCDAsyncAction_ShowConfirm* UCDAsyncAction_ShowConfirm::ShowConfirm(const UObjec
 	action->cachedType = type;
 	action->cachedTitle = title;
 	action->cachedMessage = message;
+	action->cachedSubMessage = submessage;
 
 	// 결과가 나올 때까지 GC 되지 않도록 게임 인스턴스에 등록
 	action->RegisterWithGameInstance(world);
@@ -32,7 +33,7 @@ void UCDAsyncAction_ShowConfirm::Activate()
 		return;
 	}
 
-	uiManager->ShowConfirm(cachedType, cachedTitle, cachedMessage, [weakThis = TWeakObjectPtr<ThisClass>(this)](ECDConfirmResult result)
+	uiManager->ShowConfirm(cachedType, cachedTitle, cachedMessage, cachedSubMessage,[weakThis = TWeakObjectPtr<ThisClass>(this)](ECDConfirmResult result)
 		{
 			if (weakThis.IsValid())
 			{
