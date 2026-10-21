@@ -21,7 +21,7 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 
 protected:
-	/** 보낼 이벤트 태그 */
-	UPROPERTY(EditAnywhere, meta = (Categories = "Event.Montage"))
+	/** 보낼 이벤트 태그 - 10.20 Jun6 VFX On/Off를 위해 태그 카테고리 하나 더 추가 */
+	UPROPERTY(EditAnywhere, meta = (Categories = "Event.Montage,GameplayCue.Skill"))
 	FGameplayTag eventTag;
 };
