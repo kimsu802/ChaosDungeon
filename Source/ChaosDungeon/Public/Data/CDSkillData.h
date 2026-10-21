@@ -29,10 +29,31 @@ enum class ECDSkillMode : uint8
 	Projectile				// 발사 (like 니달리 창)
 };
 
-
-struct CHAOSDUNGEON_API FSkillEffect
+/** 스킬 이펙트 종류 - 10.20 Jun6 */
+UENUM(BlueprintType)
+enum class ECDSkillVFXType : uint8
 {
+	Burst,				// 즉발
+	Looping,			// 반복 실행
+};
 
+/*
+	스킬 시 사용할 Effect Tag
+*/
+USTRUCT(BlueprintType)
+struct CHAOSDUNGEON_API FCDSkillVFX
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag VFXCueTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	ECDSkillVFXType effectType = ECDSkillVFXType::Burst;
+
+	UPROPERTY(EditDefaultsOnly)
+	float VFXScale = 1.0f;
 };
 
 /**
@@ -117,4 +138,8 @@ public:
 	/** 조준 중 표시할 Reticle 설정 */
 	UPROPERTY(EditDefaultsOnly, Category = "Reticle")
 	FCDReticleConfig reticleConfig;
+
+	/** 스킬 VFX 목록 */
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	TArray<FCDSkillVFX> skillEffects;
 };

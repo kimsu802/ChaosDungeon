@@ -161,20 +161,57 @@ void UCDSkillAbility::ApplyDamageTo(AActor* target) const
 
 void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 {
-	if (payload.EventTag == CDTags::Event_Montage_Hit)
+	const FGameplayTag tag = payload.EventTag;
+
+	if (tag.MatchesTag(CDTags::Event_Montage))
 	{
-		ApplyHit();
+		if (tag == CDTags::Event_Montage_Hit)
+		{
+			ApplyHit();
+		}
+		else
+		{
+			ACDCharacterBase* character = GetCDCharacter();
+
+			if (tag == CDTags::Event_Montage_Land)
+			{
+				const float airOffset = character->GetActorLocation().Z - preLocation.Z;
+				const float destinationZ = targetLocation.Z + character->GetSimpleCollisionHalfHeight() + airOffset;
+				character->SetActorLocation(FVector(targetLocation.X, targetLocation.Y, destinationZ));
+			}
+		}
 	}
 	else
 	{
-		ACDCharacterBase* character = GetCDCharacter();
-
-		if (payload.EventTag == CDTags::Event_Montage_Land)
+		for (const FCDSkillVFX& vfx : skillData->skillEffects)
 		{
-			const float airOffset = character->GetActorLocation().Z - preLocation.Z;
-			const float destinationZ = targetLocation.Z + character->GetSimpleCollisionHalfHeight() + airOffset;
-			character->SetActorLocation(FVector(targetLocation.X, targetLocation.Y, destinationZ));
-		}
+			if (tag == vfx.VFXCueTag)
+			{
+				UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+				FGameplayCueParameters params;
+
+				FVector origin = FVector::Zero();
+
+				switch (skillData->origin)
+				{
+				case ECDSkillOrigin::Cursor:
+					origin = targetLocation;
+					break;
+				case ECDSkillOrigin::Self:
+					origin = GetCDCharacter()->GetActorLocation();
+					break;
+				case ECDSkillOrigin::CastLocation:
+					origin = preLocation;
+					break;
+				}
+
+				params.Location = origin;
+				abilitySystem->ExecuteGameplayCue(tag, params);
+				// Looping - AddGameplayCue / RemoveGameplayCue
+
+				break;
+			}
+		} 
 	}
 }
 
@@ -247,6 +284,11 @@ void UCDSkillAbility::ActivateSkillAbility()
 		recoveryTask->ReadyForActivation();
 	}
 
+	/* 10.20 Jun6 - 스킬 시각 효과 */
+	UAbilityTask_WaitGameplayEvent* vfxTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::GameplayCue_Skill, nullptr, false, false);
+	vfxTask->EventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
+	vfxTask->ReadyForActivation();
+
 	// 스킬 몽타주 재생
 	UAbilityTask_PlayMontageAndWait* montageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, skillData->montage);
 	montageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -254,22 +296,4 @@ void UCDSkillAbility::ActivateSkillAbility()
 	montageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->ReadyForActivation();
-
-	/* 10.20 Jun6 - 스킬 시각 효과 추가 계획 */
-	//UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
-	//FGameplayCueParameters params;
-	//switch (skillData->origin)
-	//{
-	//case ECDSkillOrigin::Cursor:
-	//	params.Location = targetLocation;
-	//	break;
-	//case ECDSkillOrigin::Self:
-	//	params.Location = character->GetActorLocation();
-	//	break;
-	//case ECDSkillOrigin::CastLocation:
-	//	params.Location = preLocation;
-	//	break;
-	//}
-	//
-	//abilitySystem->ExecuteGameplayCue(CDTags::Ability_Dodge, params);
 }
