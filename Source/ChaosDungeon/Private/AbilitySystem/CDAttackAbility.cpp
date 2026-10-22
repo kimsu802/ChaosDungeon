@@ -30,9 +30,6 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 	const ACDCharacterBase* character = GetCDCharacter();
 	character->GetController()->StopMovement();
 
-	//UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
-	//abilitySystem->AddLooseGameplayTag(CDTags::State_Casting);
-
 	UAbilityTask_PlayMontageAndWait* playAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
 	playAttackTask->OnCompleted.AddDynamic(this, &ThisClass::OnCompleteCallback);
 	playAttackTask->OnInterrupted.AddDynamic(this, &ThisClass::OnInterruptedCallback);
@@ -61,15 +58,6 @@ void UCDAttackAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, con
 		FName nextSection = FName(*FString::Printf(TEXT("AM_Attack%d"), currentCombo));
 		MontageJumpToSection(nextSection);
 	}
-}
-
-void UCDAttackAbility::EndAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo, const FGameplayAbilityActivationInfo activationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	//UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
-	//abilitySystem->RemoveLooseGameplayTag(CDTags::State_Casting);
-
-	UE_LOG(LogTemp, Log, TEXT("End Attack Ability"));
-	Super::EndAbility(handle, actorInfo, activationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UCDAttackAbility::ApplyHit()

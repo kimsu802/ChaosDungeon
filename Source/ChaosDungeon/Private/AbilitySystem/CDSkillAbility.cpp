@@ -16,6 +16,9 @@ UCDSkillAbility::UCDSkillAbility()
 	ActivationBlockedTags.AddTag(CDTags::State_HitReact);
 	// 후딜 캔슬 시 이전 스킬 종료
 	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Skill);
+
+	// 10.22 Jun6 - 일반 공격 시 스킬 씹히는 현상 방어용
+ 	BlockAbilitiesWithTag.AddTag(CDTags::Ability_Attack);
 }
 
 void UCDSkillAbility::OnGiveAbility(const FGameplayAbilityActorInfo* actorInfo, const FGameplayAbilitySpec& spec)
@@ -55,7 +58,7 @@ void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, c
 				spec->GetDynamicSpecSourceTags().AddTag(CDTags::State_Targeting);
 			}
 
-			UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData);
+			UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData, targetLocation);
 			onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
 			manage->ReadyForActivation();
 		}
@@ -95,6 +98,8 @@ void UCDSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, const 
 	if (spec)
 	{
 		spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
+		onConfirmInput.ExecuteIfBound();
+		onConfirmInput.Unbind();
 	}
 
 	Super::EndAbility(handle, actorInfo, activationInfo, bReplicateEndAbility, bWasCancelled);
@@ -197,6 +202,27 @@ void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 				const float airOffset = character->GetActorLocation().Z - skillCastLocation.Z;
 				const float destinationZ = targetLocation.Z + character->GetSimpleCollisionHalfHeight() + airOffset;
 				character->SetActorLocation(FVector(targetLocation.X, targetLocation.Y, destinationZ));
+			}
+			else if (tag == CDTags::Event_Montage_ReticleOn)
+			{
+				FVector origin = FVector::Zero();
+
+				switch (skillData->origin)
+				{
+				case ECDSkillOrigin::Cursor:
+					origin = targetLocation;
+					break;
+				case ECDSkillOrigin::Self:
+					origin = GetCDCharacter()->GetActorLocation();
+					break;
+				case ECDSkillOrigin::CastLocation:
+					origin = skillCastLocation;
+					break;
+				}
+
+				UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData, origin);
+				onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
+				manage->ReadyForActivation();
 			}
 		}
 	}

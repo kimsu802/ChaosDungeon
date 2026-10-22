@@ -33,8 +33,8 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboStart, "Event.Montage.ComboStart");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboEnd, "Event.Montage.ComboEnd");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ReticleOn, "Event.Montage.ReticleOn");
-	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Targetable, "Event.Montage.CollisionOn");
-	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Untargetable, "Event.Montage.CollisionOff");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Targetable, "Event.Montage.Targetable");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Untargetable, "Event.Montage.UnTargetable");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Land, "Event.Montage.Land");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Hit, "Event.Hit");
 
