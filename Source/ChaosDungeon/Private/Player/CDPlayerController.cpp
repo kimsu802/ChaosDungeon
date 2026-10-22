@@ -68,6 +68,7 @@ void ACDPlayerController::OnMoveStarted()
 	movePressedTime = 0.f;
 	if (UpdateMoveDestination() && CanMove())
 	{
+		UE_LOG(LogTemp, Log, TEXT("Can Move"));
 		// 누르는 즉시 반응: 짧은 클릭은 이 길찾기 이동으로 끝난다
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, moveDestination);
 	}
@@ -170,10 +171,23 @@ void ACDPlayerController::OnGuide()
 
 bool ACDPlayerController::CanMove() const
 {
+	const ACDCharacterBase* controlledCharacter = GetPawn<ACDCharacterBase>(); 
+	if (controlledCharacter)
+	{
+		const UCDAbilitySystemComponent* abilitySystem =
+			controlledCharacter->GetCDAbilitySystemComponent();
+
+		UE_LOG(LogTemp, Warning,
+			TEXT("CanMove tags: Casting=%d, HitReact=%d, Dead=%d"),
+			abilitySystem->GetTagCount(CDTags::State_Casting),
+			abilitySystem->GetTagCount(CDTags::State_HitReact),
+			abilitySystem->GetTagCount(CDTags::State_Dead));
+	}
+
 	static const TArray<FGameplayTag> blockTagList = { CDTags::State_Casting, CDTags::State_HitReact, CDTags::State_Dead };
 	static const FGameplayTagContainer blockTags = FGameplayTagContainer::CreateFromArray(blockTagList);
 
-	const ACDCharacterBase* controlledCharacter = GetPawn<ACDCharacterBase>();
+	//const ACDCharacterBase* controlledCharacter = GetPawn<ACDCharacterBase>();
 	return controlledCharacter && !controlledCharacter->GetCDAbilitySystemComponent()->HasAnyMatchingGameplayTags(blockTags);
 }
 

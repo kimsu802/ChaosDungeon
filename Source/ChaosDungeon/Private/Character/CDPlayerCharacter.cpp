@@ -122,3 +122,13 @@ FVector ACDPlayerCharacter::GetAimLocation() const
 	}
 	return Super::GetAimLocation();
 }
+
+bool ACDPlayerCharacter::IsPlayer() const
+{
+	return true;
+}
+
+bool ACDPlayerCharacter::CanBeTargeted() const
+{
+	return !IsDead() && !abilitySystem->HasMatchingGameplayTag(CDTags::State_Untargetable);
+}

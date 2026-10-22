@@ -25,6 +25,10 @@ public:
 	// UGameplayAbility::InputPressed()
 	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
+	// UGameplayAbility::EndAbility()
+	virtual void EndAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
+		const FGameplayAbilityActivationInfo activationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
 protected:
 	/** 타격 시점(애님 노티파이)마다 호출. 데이터로 표현 못 하는 특수 스킬은 이 함수만 재정의 */
 	virtual void ApplyHit();
@@ -39,10 +43,6 @@ protected:
 	virtual FGameplayTag GetCooldownTag() const override;
 
 private:
-	/** Event.Montage.Hit 수신 */
-	UFUNCTION()
-	void OnHitEvent(FGameplayEventData payload);
-
 	/* 공격 종료 콜백 */
 	UFUNCTION()
 	void OnCompleteCallback();
