@@ -22,6 +22,7 @@ void UCDRunResultVM::HandleRunFinished(const FCDRunMessage& message)
 	UE_MVVM_SET_PROPERTY_VALUE(bIsNewRecord, message.bNewRecord);
 
 	// 표시용 텍스트는 record 에서 계산되므로 함께 알림
+	UE_MVVM_BROADCAST_FIELD_VALUE_CHANGED(GetIsSuccess);
 	UE_MVVM_BROADCAST_FIELD_VALUE_CHANGED(GetElapsedTimeText);
 	UE_MVVM_BROADCAST_FIELD_VALUE_CHANGED(GetKillsText);
 	UE_MVVM_BROADCAST_FIELD_VALUE_CHANGED(GetDeathsText);
