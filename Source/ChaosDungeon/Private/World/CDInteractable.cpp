@@ -25,6 +25,8 @@ void ACDInteractable::Interact(APlayerController* interactor)
     {
         if (!screenClass.IsNull())
         {
+            bPortalRequested = true;
+
             uiManager->PushScreen(
                 CDTags::UI_Layer_Modal,
                 screenClass);
@@ -39,7 +41,7 @@ void ACDInteractable::Interact(APlayerController* interactor)
         return;
     }
 
-    bPortalRequested = true;
+   
 
     auto HandleConfirmResult =
         [weakThis = TWeakObjectPtr<ACDInteractable>(this)]

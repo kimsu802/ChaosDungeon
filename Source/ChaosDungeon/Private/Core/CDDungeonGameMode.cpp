@@ -6,6 +6,8 @@
 #include "Data/CDStageData.h"
 #include "Player/CDPlayerController.h"
 #include "World/CDSpawnManagerComponent.h"
+#include "World/CDDoorSpawnPoint.h"
+#include "World/CDInteractable.h"
 #include "World/CDSpawnPoint.h"
 #include "EngineUtils.h"
 #include "TimerManager.h"
@@ -76,6 +78,21 @@ void ACDDungeonGameMode::ClearStage()
 
 	// 포탈이 구독해서 열림
 	BroadcastStage(CDTags::Msg_Stage_Cleared);
+
+	for (TActorIterator<ACDDoorSpawnPoint> it(GetWorld()); it; ++it)
+	{
+		ACDInteractable* door = GetWorld()->SpawnActor<ACDInteractable>(
+			exitDoorClass,
+			it->GetActorLocation(),
+			it->GetActorRotation());
+
+		if (door)
+		{
+			door->SetPortalType(ECDPortalType::NextStage);
+		}
+
+		break;
+	}
 }
 
 void ACDDungeonGameMode::FailRun()
