@@ -81,6 +81,9 @@ private:
 	/** Run.DeathCount */
 	void HandleDeathCount(const FCDRunMessage& message);
 
+	/** Run.Finished → 런 종료: 스테이지 전용 HUD(부활 횟수 · 지역명 · 보스 바) 숨김 */
+	void HandleRunFinished(const FCDRunMessage& message);
+
 	/** Combat.BossAppeared */
 	void HandleBossAppeared(const FCDActorMessage& message);
 
