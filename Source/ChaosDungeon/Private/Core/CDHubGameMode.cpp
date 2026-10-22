@@ -16,11 +16,12 @@ void ACDHubGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//if (GetGameInstance()->GetSubsystem<UCDRunSubsystem>()->HasPlayedRun())
-	//{
-	//	EnterHub(true);
-	//	return;
-	//}
+	// 던전(결과 화면 "돌아가기")에서 돌아온 경우: 타이틀을 건너뛰고 바로 허브 HUD
+	if (GetGameInstance()->GetSubsystem<UCDRunSubsystem>()->HasPlayedRun())
+	{
+		EnterHub(true);
+		return;
+	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
 	TArray<AActor*> cameras;
