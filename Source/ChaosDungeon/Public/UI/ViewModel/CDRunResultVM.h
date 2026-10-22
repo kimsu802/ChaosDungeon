@@ -67,6 +67,12 @@ public:
 	UFUNCTION(BlueprintPure, FieldNotify)
 	FLinearColor GetDifficultyColor() const;
 
+	UFUNCTION(BlueprintPure, FieldNotify)
+	bool GetIsSuccess() const
+	{
+		return record.bSuccess;
+	}
+
 	/** 초 → "MM:SS" (난이도 카드의 최고 기록 표시에서도 사용) */
 	static FText FormatRunTime(float seconds);
 
