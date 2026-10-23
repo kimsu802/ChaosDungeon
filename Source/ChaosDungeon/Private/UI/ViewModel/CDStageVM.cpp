@@ -28,8 +28,11 @@ void UCDStageVM::StopListening(UCDMessageSubsystem& messages)
 void UCDStageVM::HandleStageStarted(const FCDStageMessage& message)
 {
 	UE_MVVM_SET_PROPERTY_VALUE(bIsInStage, true);
-	UE_MVVM_SET_PROPERTY_VALUE(bIsBossVisible, false);
-	currentBoss = nullptr;
+	if (currentBoss.IsValid() == false)
+	{
+		UE_MVVM_SET_PROPERTY_VALUE(bIsBossVisible, false);
+		currentBoss = nullptr;
+	}
 	UE_MVVM_SET_PROPERTY_VALUE(stageNumber, message.stageNumber);
 
 	// 데이터에 이름이 없으면 "스테이지 N" 으로 대신 표시

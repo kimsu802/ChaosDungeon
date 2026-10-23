@@ -32,6 +32,11 @@ void ACDDungeonGameMode::BeginPlay()
 	listenerHandles.Add(messages.Listen(CDTags::Msg_Combat_Death, this, &ThisClass::HandleDeath));
 	listenerHandles.Add(messages.Listen(CDTags::Msg_Stage_PortalEntered, this, &ThisClass::HandlePortalEntered));
 
+	if (GetRun()->BeginTestRunForWorld(GetWorld()) == false)
+	{
+		return;
+	}
+
 	const UCDStageData* stage = GetRun()->GetCurrentStage();
 	targetProgress = stage->targetProgress;
 	spawnManager->Initialize(GatherSpawnPoints(), stage, GetRun()->GetDifficultySettings());
