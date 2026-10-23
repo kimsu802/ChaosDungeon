@@ -12,6 +12,7 @@ UCDHitReactAbility::UCDHitReactAbility()
 	ActivationBlockedTags.AddTag(CDTags::State_Immune_Stagger);
 	ActivationBlockedTags.AddTag(CDTags::State_Invincible);
 	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Skill);
+	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Attack);			// 10.22 Jun6 - 상태 이상 시 일반 공격 멈추기 추가
 	bRetriggerInstancedAbility = true;
 
 	FAbilityTriggerData trigger;

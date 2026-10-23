@@ -21,7 +21,7 @@ public:
 
 	/** 초기 데이터 설정 함수 */
 	UFUNCTION()
-	static UCDAbilityTask_ManageReticle* ManageReticle(UGameplayAbility* owningAbility, const UCDSkillData* inSkillData);
+	static UCDAbilityTask_ManageReticle* ManageReticle(UGameplayAbility* owningAbility, const UCDSkillData* inSkillData, const FVector& targetLocation);
 
 	// UGameplayTask::Activate()
 	virtual void Activate() override;
@@ -52,4 +52,6 @@ private:
 	UPROPERTY()
 	const UCDSkillData* skillData;
 
+	UPROPERTY()
+	FVector targetLocation;
 };

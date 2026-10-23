@@ -23,6 +23,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(State_HitReact, "State.HitReact");
 	UE_DEFINE_GAMEPLAY_TAG(State_Dead, "State.Dead");
 	UE_DEFINE_GAMEPLAY_TAG(State_Invincible, "State.Invincible");
+	UE_DEFINE_GAMEPLAY_TAG(State_Untargetable, "State.Untargetable");
 	UE_DEFINE_GAMEPLAY_TAG(State_Immune_Stagger, "State.Immune.Stagger");
 	UE_DEFINE_GAMEPLAY_TAG(State_Immune_Knockback, "State.Immune.Knockback");
 
@@ -31,6 +32,9 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Recovery, "Event.Montage.Recovery");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboStart, "Event.Montage.ComboStart");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboEnd, "Event.Montage.ComboEnd");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ReticleOn, "Event.Montage.ReticleOn");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Targetable, "Event.Montage.Targetable");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Untargetable, "Event.Montage.UnTargetable");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Land, "Event.Montage.Land");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Hit, "Event.Hit");
 

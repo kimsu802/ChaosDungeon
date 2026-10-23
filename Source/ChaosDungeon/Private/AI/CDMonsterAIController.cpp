@@ -61,7 +61,7 @@ void ACDMonsterAIController::Tick(float deltaSeconds)
 AActor* ACDMonsterAIController::FindTarget() const
 {
 	ACDCharacterBase* player = Cast<ACDCharacterBase>(UGameplayStatics::GetPlayerPawn(this, 0));
-	if (!player || player->IsDead())
+	if (!player || player->IsDead() || !player->CanBeTargeted())
 	{
 		return nullptr;
 	}

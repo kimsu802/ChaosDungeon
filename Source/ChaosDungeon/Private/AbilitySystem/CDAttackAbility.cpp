@@ -11,8 +11,8 @@
 UCDAttackAbility::UCDAttackAbility()
 {
 	SetAssetTags(FGameplayTagContainer(CDTags::Ability_Attack));
+	ActivationOwnedTags.AddTag(CDTags::State_Casting);
 
-	// TODO: 공격 취소/ block 조건 추가 
 	ActivationBlockedTags.AddTag(CDTags::State_HitReact);
 }
 
@@ -20,7 +20,6 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 {
 	if (!CommitAbility(handle, actorInfo, activationInfo))
 	{
-		UE_LOG(LogTemp, Log, TEXT("fail commit"));
 		EndAbility(handle, actorInfo, activationInfo, true, true);
 		return;
 	}
@@ -28,19 +27,15 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 	bCanCombo = false;
 	currentCombo = 1;
 
-	// 몽타주 내 공격 노티파이 수신 기능
-	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage_Hit, nullptr, false);
-	hitTask->EventReceived.AddDynamic(this, &ThisClass::OnHitEvent);
-	hitTask->ReadyForActivation();
+	const ACDCharacterBase* character = GetCDCharacter();
+	character->GetController()->StopMovement();
 
-
-	UAbilityTask_PlayMontageAndWait* playAttackTask =
-	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
+	UAbilityTask_PlayMontageAndWait* playAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
 	playAttackTask->OnCompleted.AddDynamic(this, &ThisClass::OnCompleteCallback);
 	playAttackTask->OnInterrupted.AddDynamic(this, &ThisClass::OnInterruptedCallback);
-
 	playAttackTask->ReadyForActivation();
 
+	// 몽타주 내 공격 노티파이 수신 기능
 	UAbilityTask_WaitGameplayEvent* event = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage, nullptr, false, false);
 	event->EventReceived.AddDynamic(this, &ThisClass::OnAnimNotifyCallback);
 	event->ReadyForActivation();
@@ -110,15 +105,11 @@ FGameplayTag UCDAttackAbility::GetCooldownTag() const
 	return FGameplayTag();
 }
 
-void UCDAttackAbility::OnHitEvent(FGameplayEventData payload)
-{
-}
-
 void UCDAttackAbility::OnCompleteCallback()
 {
 	bCanCombo = false;
 	currentCombo = 1;
-	
+		
 	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
 

@@ -39,10 +39,6 @@ protected:
 	virtual FGameplayTag GetCooldownTag() const override;
 
 private:
-	/** Event.Montage.Hit 수신 */
-	UFUNCTION()
-	void OnHitEvent(FGameplayEventData payload);
-
 	/* 공격 종료 콜백 */
 	UFUNCTION()
 	void OnCompleteCallback();

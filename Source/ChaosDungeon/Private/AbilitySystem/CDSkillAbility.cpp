@@ -16,6 +16,9 @@ UCDSkillAbility::UCDSkillAbility()
 	ActivationBlockedTags.AddTag(CDTags::State_HitReact);
 	// 후딜 캔슬 시 이전 스킬 종료
 	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Skill);
+
+	// 10.22 Jun6 - 일반 공격 시 스킬 씹히는 현상 방어용
+ 	BlockAbilitiesWithTag.AddTag(CDTags::Ability_Attack);
 }
 
 void UCDSkillAbility::OnGiveAbility(const FGameplayAbilityActorInfo* actorInfo, const FGameplayAbilitySpec& spec)
@@ -27,29 +30,38 @@ void UCDSkillAbility::OnGiveAbility(const FGameplayAbilityActorInfo* actorInfo, 
 void UCDSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 	const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData* triggerEventData)
 {
-	if (!skillData)
+	const ACDCharacterBase* character = GetCDCharacter();
+	if (!skillData || nullptr == character)
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
 	}
 
-	//if (skillData->skillMode == ECDSkillMode::Instant)
-	if (skillData->reticleConfig.displayMode == ECDReticleDisplayMode::None)
+	// 시전자가 Monster일 경우
+	if (false == character->IsPlayer())
 	{
-		/* 10.13 Jun6 타겟팅 함수의 타겟 지정완료(2차 입력) 시 기존 Activate 활용 위해 기능 실행부 함수화  */
+		// 바로 몽타주 재생 -> Tag로 Reticle spawn 조절
 		ActivateSkillAbility();
 	}
 	else
 	{
-		FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
-		if (spec)
+		if (skillData->reticleConfig.displayMode == ECDReticleDisplayMode::None)
 		{
-			spec->GetDynamicSpecSourceTags().AddTag(CDTags::State_Targeting);
+			/* 10.13 Jun6 타겟팅 함수의 타겟 지정완료(2차 입력) 시 기존 Activate 활용 위해 기능 실행부 함수화  */
+			ActivateSkillAbility();
 		}
+		else
+		{
+			FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
+			if (spec)
+			{
+				spec->GetDynamicSpecSourceTags().AddTag(CDTags::State_Targeting);
+			}
 
-		UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData);
-		onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
-		manage->ReadyForActivation();
+			UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData, targetLocation);
+			onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
+			manage->ReadyForActivation();
+		}
 	}
 }
 
@@ -86,6 +98,8 @@ void UCDSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, const 
 	if (spec)
 	{
 		spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
+		onConfirmInput.ExecuteIfBound();
+		onConfirmInput.Unbind();
 	}
 
 	Super::EndAbility(handle, actorInfo, activationInfo, bReplicateEndAbility, bWasCancelled);
@@ -115,7 +129,7 @@ void UCDSkillAbility::ApplyHit()
 			origin = character->GetActorLocation();
 			break;
 		case ECDSkillOrigin::CastLocation:
-			origin = preLocation;
+			origin = skillCastLocation;
 			break;
 	}
 	const FVector forward = character->GetActorForwardVector();
@@ -172,12 +186,43 @@ void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 		else
 		{
 			ACDCharacterBase* character = GetCDCharacter();
-
-			if (tag == CDTags::Event_Montage_Land)
+			
+			if (tag == CDTags::Event_Montage_Targetable)
 			{
-				const float airOffset = character->GetActorLocation().Z - preLocation.Z;
+				UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+				abilitySystem->RemoveLooseGameplayTag(CDTags::State_Untargetable);
+			}
+			else if (tag == CDTags::Event_Montage_Untargetable)
+			{
+				UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+				abilitySystem->AddLooseGameplayTag(CDTags::State_Untargetable);
+			}
+			else if (tag == CDTags::Event_Montage_Land)
+			{
+				const float airOffset = character->GetActorLocation().Z - skillCastLocation.Z;
 				const float destinationZ = targetLocation.Z + character->GetSimpleCollisionHalfHeight() + airOffset;
 				character->SetActorLocation(FVector(targetLocation.X, targetLocation.Y, destinationZ));
+			}
+			else if (tag == CDTags::Event_Montage_ReticleOn)
+			{
+				FVector origin = FVector::Zero();
+
+				switch (skillData->origin)
+				{
+				case ECDSkillOrigin::Cursor:
+					origin = targetLocation;
+					break;
+				case ECDSkillOrigin::Self:
+					origin = GetCDCharacter()->GetActorLocation();
+					break;
+				case ECDSkillOrigin::CastLocation:
+					origin = skillCastLocation;
+					break;
+				}
+
+				UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData, origin);
+				onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
+				manage->ReadyForActivation();
 			}
 		}
 	}
@@ -201,7 +246,7 @@ void UCDSkillAbility::OnEventReceived(FGameplayEventData payload)
 					origin = GetCDCharacter()->GetActorLocation();
 					break;
 				case ECDSkillOrigin::CastLocation:
-					origin = preLocation;
+					origin = skillCastLocation;
 					break;
 				}
 
@@ -258,9 +303,9 @@ void UCDSkillAbility::ActivateSkillAbility()
 	}
 
 	const ACDCharacterBase* character = GetCDCharacter();
-	preLocation = character->GetActorLocation();
+	skillCastLocation = character->GetActorLocation();
 	const FVector aimLocation = character->GetAimLocation();
-	targetLocation = preLocation + (aimLocation - preLocation).GetClampedToMaxSize2D(skillData->maxRange);
+	targetLocation = skillCastLocation + (aimLocation - skillCastLocation).GetClampedToMaxSize2D(skillData->maxRange);
 
 	BeginCastTowards(aimLocation);
 	SetCasting(true);

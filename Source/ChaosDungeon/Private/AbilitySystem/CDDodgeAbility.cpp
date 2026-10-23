@@ -8,6 +8,7 @@ UCDDodgeAbility::UCDDodgeAbility()
 {
 	SetAssetTags(FGameplayTagContainer(CDTags::Ability_Dodge));
 	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Skill);
+	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Attack);
 	ActivationBlockedTags.AddTag(CDTags::State_HitReact);
 }
 

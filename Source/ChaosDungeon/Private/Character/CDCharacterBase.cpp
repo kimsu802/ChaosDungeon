@@ -66,6 +66,16 @@ void ACDCharacterBase::Revive(float invincibleTime)
 	}
 }
 
+bool ACDCharacterBase::IsPlayer() const
+{
+	return false;
+}
+
+bool ACDCharacterBase::CanBeTargeted() const
+{
+	return true;
+}
+
 void ACDCharacterBase::InitializeAbilitySystem(const FCDBaseStats& stats, float healthMultiplier, float attackMultiplier)
 {
 	abilitySystem->InitAbilityActorInfo(this, this);

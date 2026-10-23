@@ -24,6 +24,12 @@ public:
 	// ACDCharacterBase::GetAimLocation()
 	virtual FVector GetAimLocation() const override;
 
+	// ACSCharacterBase::IsPlayer()
+	virtual bool IsPlayer() const;
+
+	// ACSCharacterBase::CanBeTargeted()
+	virtual bool CanBeTargeted() const;
+
 protected:
 	// APawn::PossessedBy()
 	virtual void PossessedBy(AController* newController) override;
