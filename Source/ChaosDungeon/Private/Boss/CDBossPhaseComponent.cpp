@@ -25,9 +25,13 @@ void UCDBossPhaseComponent::ResetPhase()
 	ACDBossCharacter* boss = Cast<ACDBossCharacter>(GetOwner());
 	USkeletalMeshComponent* mesh = boss->GetMesh();
 
+	mesh->HideBoneByName(FName(TEXT("shoulderpad_l")), PBO_None);
+	mesh->HideBoneByName(FName(TEXT("shoulderpad_r")), PBO_None);
+
 	mesh->SetMorphTarget(FName(TEXT("geo_stage_2_Morph")), 0.f);
 	mesh->SetMorphTarget(FName(TEXT("geo_stage_2_spine_Morph")), 0.f);
 	mesh->SetMorphTarget(FName(TEXT("geo_stage_3_Morph")), 0.f);
+
 }
 
 void UCDBossPhaseComponent::EvaluateHealth()
@@ -91,6 +95,9 @@ void UCDBossPhaseComponent::EvaluateHealth()
 			return;
 		}
 
+		boss->GetMesh()->UnHideBoneByName(FName(TEXT("shoulderpad_l")));
+		boss->GetMesh()->UnHideBoneByName(FName(TEXT("shoulderpad_r")));
+
 		if (boss->PlayAnimMontage(montage) <= 0.f)
 		{
 			OnPhaseMontageEnded(montage, true);
@@ -121,20 +128,19 @@ void UCDBossPhaseComponent::OnPhaseMontageEnded(
 
 	if (bInterrupted)
 	{
-		// 재생 실패·중단 시 1페이즈로 복구
+		// 재생 실패, 중단 시 1페이즈로 복구
 		ResetPhase();
 	}
 	else
 	{
 		currentPhase = ECDBossPhase::Phase2;
 		phaseState = ECDBossPhaseState::Combat;
+		boss->EnterPhase2();
 	}
 
 	if (ACDBossAIController* ai =
 		boss->GetController<ACDBossAIController>())
 	{
-		USkeletalMeshComponent* mesh = boss->GetMesh();
-
 		ai->StartBossLogic();
 	}
 }

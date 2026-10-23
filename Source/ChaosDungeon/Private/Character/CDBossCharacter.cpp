@@ -2,10 +2,12 @@
 
 
 #include "Character/CDBossCharacter.h"
+#include "AbilitySystem/CDAbilitySystemComponent.h"
 #include <Boss/CDBossPhaseComponent.h>
 #include <AI/CDBossAIController.h>
 #include <Components/CapsuleComponent.h>
 #include <Data/CDMonsterData.h>
+#include "Data/CDSkillData.h"
 
 ACDBossCharacter::ACDBossCharacter()
 {
@@ -72,16 +74,52 @@ void ACDBossCharacter::ActivateFromPool(
         ai->StopBossLogic();
     }
 
+    // 이전 전환 몽타주의 종료 콜백이 스킬을 다시 추가하지 않도록 먼저 초기화한다.
+    ResetPhaseSkills();
+    phaseComponent->ResetPhase();
+
     /* 데이터(능력치스킬 부여)와 활성화 */
     Super::ActivateFromPool(data, difficulty, location);
-
-    phaseComponent->ResetPhase();
 
     /* 초기화 완료 후 AI 시작 */
     if (ACDBossAIController* ai = GetController<ACDBossAIController>())
     {
         ai->StartBossLogic();
     }
+}
+
+void ACDBossCharacter::EnterPhase2()
+{
+    if (!IsValid(bossData.Get()) || IsDead())
+    {
+        return;
+    }
+
+    for (UCDSkillData* skill : bossData->phase2Skill)
+    {
+        // 기본 공격과 겹치거나 전환 처리가 재호출되어도 중복 부여하지 않는다.
+        if (!IsValid(skill) || activeAttackSkills.Contains(skill))
+        {
+            continue;
+        }
+
+        const FGameplayAbilitySpecHandle handle = abilitySystem->GrantSkill(skill);
+        if (handle.IsValid())
+        {
+            phase2SkillHandles.Add(handle);
+            activeAttackSkills.Add(skill);
+        }
+    }
+}
+
+void ACDBossCharacter::ResetPhaseSkills()
+{
+    for (const FGameplayAbilitySpecHandle& handle : phase2SkillHandles)
+    {
+        abilitySystem->ClearAbility(handle);
+    }
+    phase2SkillHandles.Reset();
+    activeAttackSkills = bossData->attackSkills;
 }
 
 void ACDBossCharacter::DeactivateToPool()
