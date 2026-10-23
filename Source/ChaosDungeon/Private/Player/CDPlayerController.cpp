@@ -68,6 +68,7 @@ void ACDPlayerController::OnMoveStarted()
 	movePressedTime = 0.f;
 	if (UpdateMoveDestination() && CanMove())
 	{
+		UE_LOG(LogTemp, Log, TEXT("Can Move"));
 		// 누르는 즉시 반응: 짧은 클릭은 이 길찾기 이동으로 끝난다
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, moveDestination);
 	}

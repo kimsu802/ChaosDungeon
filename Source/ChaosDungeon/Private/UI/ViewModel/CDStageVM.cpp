@@ -11,6 +11,7 @@ void UCDStageVM::StartListening(UCDMessageSubsystem& messages)
 	handles.Add(messages.Listen(CDTags::Msg_Stage_Started, this, &ThisClass::HandleStageStarted));
 	handles.Add(messages.Listen(CDTags::Msg_Stage_Progress, this, &ThisClass::HandleStageProgress));
 	handles.Add(messages.Listen(CDTags::Msg_Run_DeathCount, this, &ThisClass::HandleDeathCount));
+	handles.Add(messages.Listen(CDTags::Msg_Run_Finished, this, &ThisClass::HandleRunFinished));
 	handles.Add(messages.Listen(CDTags::Msg_Combat_BossAppeared, this, &ThisClass::HandleBossAppeared));
 	handles.Add(messages.Listen(CDTags::Msg_Combat_Death, this, &ThisClass::HandleDeath));
 }
@@ -48,6 +49,14 @@ void UCDStageVM::HandleStageProgress(const FCDStageMessage& message)
 void UCDStageVM::HandleDeathCount(const FCDRunMessage& message)
 {
 	UE_MVVM_SET_PROPERTY_VALUE(remainingDeaths, message.remainingDeaths);
+}
+
+void UCDStageVM::HandleRunFinished(const FCDRunMessage& message)
+{
+	// 결과 화면 이후 허브로 돌아가도 true 로 남지 않도록 여기서 내린다 (다음 런의 Stage.Started 에서 다시 true)
+	UE_MVVM_SET_PROPERTY_VALUE(bIsInStage, false);
+	UE_MVVM_SET_PROPERTY_VALUE(bIsBossVisible, false);
+	currentBoss = nullptr;
 }
 
 void UCDStageVM::HandleBossAppeared(const FCDActorMessage& message)
