@@ -58,10 +58,18 @@ void UCDAbilityTask_ManageReticle::TickTask(float DeltaTime)
 	Super::TickTask(DeltaTime);
 
 	APlayerController* pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
-	if (nullptr == pc || nullptr == abilityOwner || nullptr == skillData || nullptr == spawnedReticle)
+
+	if (nullptr == pc||nullptr == abilityOwner || nullptr == skillData || nullptr == spawnedReticle)
 	{
 		return;
 	}
+
+	// Todo: 여기서 플레이어 컨트롤러 인 지 검사 후 monster 면 실행 -joonsik님 의견
+	//APlayerController* pc = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	//if (nullptr == pc)
+	//{
+	//	플레이어 로직을 넣고 아니라면 몬스터 로직을 넣어
+	//}
 
 	switch (skillData->skillMode)
 	{
