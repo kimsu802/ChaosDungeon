@@ -170,6 +170,51 @@ int32 UCDRunSubsystem::GetRemainingDeaths() const
 	return FMath::Max(0, maxDeaths - record.deaths);
 }
 
+bool UCDRunSubsystem::BeginTestRunForWorld(const UWorld* world, ECDDifficulty difficulty)
+{
+	// 정상적으로 StartRun 을 거쳐 들어온 경우
+	if (GetCurrentStage() != nullptr)
+	{
+		return true;
+	}
+
+	if (world == nullptr || dungeonData == nullptr)
+	{
+		return false;
+	}
+
+	// StartRun 과 같은 순서: 일반 스테이지 → 보스 스테이지
+	TArray<TObjectPtr<UCDStageData>> stages = dungeonData->stages;
+	if (dungeonData->bossStage)
+	{
+		stages.Add(dungeonData->bossStage);
+	}
+
+	// PIE 월드는 패키지 이름 앞에 "UEDPIE_0_" 가 붙으므로 떼고 비교
+	const FString worldPackage = UWorld::RemovePIEPrefix(world->GetPackage()->GetName());
+	const int32 foundIndex = stages.IndexOfByPredicate([&worldPackage](const UCDStageData* stage)
+		{
+			return stage && (stage->level.ToSoftObjectPath().GetLongPackageName() == worldPackage);
+		});
+
+	if (foundIndex == INDEX_NONE)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[TestRun] %s 레벨이 DA_Dungeon 의 stages / bossStage 에 없습니다."), *worldPackage);
+		return false;
+	}
+
+	runStages = MoveTemp(stages);
+	record = FCDRunRecord();
+	record.difficulty = difficulty;
+	stageIndex = foundIndex;
+	bRunFinished = false;
+	bNewBestRecord = false;
+	bHasPlayedRun = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("[TestRun] 런 없이 시작한 레벨 → 테스트 런 생성 (스테이지 %d / %d)"), foundIndex + 1, runStages.Num());
+	return true;
+}
+
 void UCDRunSubsystem::TravelToCurrentStage() const
 {
 	if (const UCDStageData* stage = GetCurrentStage())

@@ -99,6 +99,9 @@ public:
 	{
 		return bestRecords.Find(difficulty);
 	}
+	
+	// 해당 던전 내에서 플레이 하기 위한 크래시 방지 테스트 함수
+	bool BeginTestRunForWorld(const UWorld* world, ECDDifficulty difficulty = ECDDifficulty::Normal);
 
 private:
 	/** 현재 스테이지 레벨로 이동 */
