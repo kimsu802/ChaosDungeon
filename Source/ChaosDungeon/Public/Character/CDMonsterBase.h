@@ -82,6 +82,9 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<const UCDMonsterData> monsterData;
 
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<class UWidgetComponent> healthBarComponent;
+
 	/** 풀 반환 타이머 */
 	FTimerHandle releaseTimer;
 };
