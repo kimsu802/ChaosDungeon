@@ -72,7 +72,7 @@ private:
 
 	/** 몽타주 중단 */
 	UFUNCTION()
-	void OnMontageCancelled();
+	void OnMontageCancelled()	;
 
 	/** State.Casting 부여/해제 */
 	void SetCasting(bool bNewCasting);
