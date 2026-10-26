@@ -7,6 +7,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_2, "Input.Skill.2", "W");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_3, "Input.Skill.3", "E");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_4, "Input.Skill.4", "R");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Skill_Awakening, "Input.Skill.Awakening", "각성기(Z)");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Attack, "Input.Attack", "일반 공격");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Dodge, "Input.Dodge", "Space");
 	//UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Cancel, "Input.Cancel", "Escape, 스킬 발동 취소"); // 10.15 Jun6 - Pause 기능과 충돌되는 것 같아 잠시 보류
