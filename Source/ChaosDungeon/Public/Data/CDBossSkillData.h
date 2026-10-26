@@ -6,6 +6,8 @@
 #include "Data/CDSkillData.h"
 #include "CDBossSkillData.generated.h"
 
+class UCDMonsterData;
+
 /**
  * 
  */
@@ -26,4 +28,26 @@ public:
 	/* 공격 우선 순위 (큰 값부터 선택) */
 	UPROPERTY(EditDefaultsOnly, Category = BossAI)
 	int32 Priority = 0;
+
+	/* 10.25 추가 (안상범) */
+	/* 보스 소환 패턴 */
+	/* 소환 몹 데이터 */
+	UPROPERTY(EditDefaultsOnly, Category = "Spawn")
+	TObjectPtr<UCDMonsterData> summonMonsterData = nullptr;
+
+	/** 한 번에 소환할 수 */
+	UPROPERTY(EditDefaultsOnly, Category = "Spawn",
+		meta = (ClampMin = "1"))
+	int32 summonCount = 3;
+
+	/** 보스랑 떨어진 거리 */
+	UPROPERTY(EditDefaultsOnly, Category = "Spawn",
+		meta = (ClampMin = "0"))
+	float summonForwardDistance = 400.f;
+
+	/** 소환 몬스터 사이의 간격 */
+	UPROPERTY(EditDefaultsOnly, Category = "Spawn",
+		meta = (ClampMin = "1"))
+	float summonSpacing = 150.f;
+
 };

@@ -5,6 +5,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "NavigationSystem.h"
 #include "TimerManager.h"
+#include <Components/CapsuleComponent.h>
+#include "CollisionShape.h"
+#include <Engine/World.h>
 
 void UCDSpawnManagerComponent::Initialize(const TArray<FVector>& inSpawnPoints, const UCDStageData* inStage, const FCDDifficultySettings& inDifficulty)
 {
@@ -24,6 +27,72 @@ void UCDSpawnManagerComponent::StopSpawning()
 	GetWorld()->GetTimerManager().ClearTimer(spawnTimer);
 }
 
+ACDMonsterBase* UCDSpawnManagerComponent::SpawnMonsterAt(const UCDMonsterData* data, const FVector& groundLocation)
+{
+	UWorld* world = GetWorld();
+
+	if (!world || !IsValid(stage.Get()) || !IsValid(data) || !data->monsterClass)
+	{
+		return nullptr;
+	}
+
+	if (aliveCount >= stage->maxAlive)
+	{
+		return nullptr;
+	}
+
+	const ACDMonsterBase* defaults =
+		data->monsterClass->GetDefaultObject<ACDMonsterBase>();
+
+	const UCapsuleComponent* capsule =
+		defaults ? defaults->GetCapsuleComponent() : nullptr;
+
+	if (!capsule)
+	{
+		return nullptr;
+	}
+
+	const float radius = capsule->GetScaledCapsuleRadius();
+	const float halfHeight = capsule->GetScaledCapsuleHalfHeight();
+
+	const FVector capsuleCenter =
+		groundLocation + FVector(0.f, 0.f, halfHeight);
+
+	const FCollisionShape shape = FCollisionShape::MakeCapsule(
+		FMath::Max(1.f, radius - 1.f),
+		FMath::Max(1.f, halfHeight - 1.f));
+
+	if (world->OverlapBlockingTestByProfile(
+		capsuleCenter,
+		FQuat::Identity,
+		capsule->GetCollisionProfileName(),
+		shape))
+	{
+		return nullptr;
+	}
+
+	ACDMonsterBase* monster = AcquireMonster(data);
+
+	if (!IsValid(monster))
+	{
+		return nullptr;
+	}
+
+	// 기존 능력치·스킬·활성화 처리 사용
+	monster->ActivateFromPool(data, difficulty, groundLocation);
+
+	++aliveCount;
+	++spawnCounts.FindOrAdd(data);
+
+	if (IsValid(monster))
+	{
+		monster->onReleased.AddUObject(
+			this, &ThisClass::ReleaseMonster);
+	}
+
+	return monster;
+}
+
 void UCDSpawnManagerComponent::SpawnWave()
 {
 	const int32 waveSize = FMath::CeilToInt(stage->spawnPerWave * difficulty.spawnCountMultiplier);
@@ -38,10 +107,7 @@ void UCDSpawnManagerComponent::SpawnWave()
 			return;
 		}
 
-		ACDMonsterBase* monster = AcquireMonster(data);
-		monster->ActivateFromPool(data, difficulty, location);
-		++aliveCount;
-		++spawnCounts.FindOrAdd(data);
+		SpawnMonsterAt(data, location);
 	}
 }
 
