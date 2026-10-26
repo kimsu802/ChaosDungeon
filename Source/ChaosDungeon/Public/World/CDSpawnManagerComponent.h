@@ -45,6 +45,9 @@ public:
 		return aliveCount;
 	}
 
+	/* 10.25 보스 패턴용 추가 */
+	ACDMonsterBase* SpawnMonsterAt(const UCDMonsterData* data, const FVector& groundLocation);
+
 private:
 	/** 웨이브 1회 스폰 */
 	void SpawnWave();
