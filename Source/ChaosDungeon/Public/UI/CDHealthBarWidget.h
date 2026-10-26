@@ -24,6 +24,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HP")
 	void SetTargetPercent(float newPercent);
 
+	UFUNCTION(BlueprintCallable, Category = "HP")
+	void SnapToPercent(float newPercent);
+
 	// 현재 HP 바가 목표로 하는 비율
 	FORCEINLINE float GetTargetPercent() const { return targetPercent; }
 

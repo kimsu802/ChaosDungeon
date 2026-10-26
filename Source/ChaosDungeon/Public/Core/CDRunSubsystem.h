@@ -39,6 +39,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ReturnToHub();
 
+	/** 메인 메뉴(허브 레벨 + 타이틀 화면)로 돌아가기. 진행 중인 런은 기록 없이 버린다 */
+	UFUNCTION(BlueprintCallable)
+	void ReturnToMainMenu();
+
+	/** 다음 허브 진입 때 타이틀을 띄워야 하는가 (한 번 읽으면 꺼짐, CDHubGameMode 가 사용) */
+	bool ConsumeReturnToTitle();
+
 	/* 다음 스테이지 넘어가기 */
 	void AdvanceStage();
 
@@ -99,9 +106,9 @@ public:
 	{
 		return bestRecords.Find(difficulty);
 	}
-	
-	// 해당 던전 내에서 플레이 하기 위한 크래시 방지 테스트 함수
-	bool BeginTestRunForWorld(const UWorld* world, ECDDifficulty difficulty = ECDDifficulty::Normal);
+
+	// 테스트 함수
+	bool BeginTestRunForWorld(const UWorld* world, ECDDifficulty difficulty = ECDDifficulty());
 
 private:
 	/** 현재 스테이지 레벨로 이동 */
@@ -143,5 +150,8 @@ private:
 
 	/** 런을 시작한 적이 있는가 */
 	bool bHasPlayedRun = false;
+
+	/** 메인 메뉴로 돌아가는 중 (다음 허브 진입 때 타이틀 표시) */
+	bool bReturnToTitle = false;
 
 };

@@ -27,6 +27,16 @@ void UCDHealthBarWidget::SetTargetPercent(float newPercent)
 	RefreshVisuals();
 }
 
+void UCDHealthBarWidget::SnapToPercent(float newPercent)
+{
+	targetPercent = FMath::Clamp(newPercent, 0.f, 1.f);
+	delayedPercent = targetPercent;
+	holdRemaining = 0.f;
+
+	hpBar->SetPercent(targetPercent);
+	RefreshVisuals();
+}
+
 void UCDHealthBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

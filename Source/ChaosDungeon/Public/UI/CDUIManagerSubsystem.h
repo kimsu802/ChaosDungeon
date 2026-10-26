@@ -55,6 +55,12 @@ public:
 	/** 조작법 안내 열기/닫기 */
 	void ToggleGuide();
 
+	/** 옵션 화면 열기 (GameMenu 레이어, 일시정지 메뉴 위) */
+	void ShowOptions();
+
+	/** 옵션 화면이 지정돼 있는가 */
+	bool HasOptionsScreen() const;
+
 	/** 타이틀 화면 열기 */
 	void ShowTitle();
 

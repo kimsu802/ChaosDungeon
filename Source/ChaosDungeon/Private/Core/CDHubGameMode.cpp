@@ -17,7 +17,10 @@ void ACDHubGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	// 던전(결과 화면 "돌아가기")에서 돌아온 경우: 타이틀을 건너뛰고 바로 허브 HUD
-	if (GetGameInstance()->GetSubsystem<UCDRunSubsystem>()->HasPlayedRun())
+	// 단, 일시정지 메뉴의 "메인 메뉴"로 돌아온 경우는 타이틀을 띄운다
+	UCDRunSubsystem* run = GetGameInstance()->GetSubsystem<UCDRunSubsystem>();
+	const bool bReturnToTitle = run->ConsumeReturnToTitle();
+	if (run->HasPlayedRun() && (bReturnToTitle == false))
 	{
 		EnterHub(true);
 		return;

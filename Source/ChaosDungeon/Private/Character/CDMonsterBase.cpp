@@ -8,6 +8,7 @@
 #include "Core/CDMessageSubsystem.h"
 #include "Data/CDMonsterData.h"
 #include "TimerManager.h"
+#include "Components/WidgetComponent.h"
 
 ACDMonsterBase::ACDMonsterBase()
 {
@@ -15,6 +16,15 @@ ACDMonsterBase::ACDMonsterBase()
 
 	// 커서 호버 시에만 CustomDepth 를 켠다 (UCDCursorHighlightComponent)
 	GetMesh()->SetCustomDepthStencilValue(CDStencil::Monster);
+
+	healthBarComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	healthBarComponent->SetupAttachment(GetCapsuleComponent());
+	healthBarComponent->SetRelativeLocation(FVector(0.f, 0.f, 110.f));
+	healthBarComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	healthBarComponent->SetDrawAtDesiredSize(true);
+	healthBarComponent->SetPivot(FVector2D(0.5f, 1.f));		// 바 아래 가운데가 Z+110 지점
+	healthBarComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	healthBarComponent->SetGenerateOverlapEvents(false);
 }
 
 void ACDMonsterBase::ActivateFromPool(const UCDMonsterData* data, const FCDDifficultySettings& difficulty, const FVector& location)
@@ -40,6 +50,21 @@ void ACDMonsterBase::ActivateFromPool(const UCDMonsterData* data, const FCDDiffi
 	OnResetVisual();
 
 	SetPoolActive(true);
+
+	// 보스는 화면 위 보스 바를 쓰므로 머리 위 바는 끔
+	//const bool bShowHealthBar = (data->grade != ECDMonsterGrade::Boss);
+	//healthBarComponent->SetVisibility(bShowHealthBar);
+	//if (UCDMonsterHealthBarWidget* healthBar = GetHealthBar())
+	//{
+	//	if (bShowHealthBar)
+	//	{
+	//		healthBar->BindTo(abilitySystem);
+	//	}
+	//	else
+	//	{
+	//		healthBar->Unbind();
+	//	}
+	//}
 
 	if (data->grade == ECDMonsterGrade::Boss)
 	{
