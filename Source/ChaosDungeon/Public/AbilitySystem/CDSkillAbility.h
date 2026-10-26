@@ -5,8 +5,6 @@
 
 class UCDSkillData;
 
-DECLARE_DELEGATE(FOnConfirmInput);
-
 /**
  * 데이터 기반 스킬 (플레이어/몬스터 공용). 스킬 1종마다 클래스를 만들지 않는다.
  *
@@ -31,9 +29,6 @@ public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 		const FGameplayAbilityActivationInfo activationInfo, const FGameplayEventData* triggerEventData) override;
 
-	// UGameplayAbility::InputPressed()
-	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
-
 	// UGameplayAbility::EndAbility()
 	virtual void EndAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 		const FGameplayAbilityActivationInfo activationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
@@ -57,7 +52,6 @@ protected:
 	/** 대상에게 데미지 GE 적용 + 피격 이벤트 전송 */
 	void ApplyDamageTo(AActor* target) const;
 
-private:
 	/** Montage Tag 수신 - 10.12 Jun6 스킬 특수 기능 관련 처리를 위해 함수명 변경 */
 	UFUNCTION()
 	virtual void OnEventReceived(FGameplayEventData payload);
@@ -77,10 +71,7 @@ private:
 	/** State.Casting 부여/해제 */
 	void SetCasting(bool bNewCasting);
 
-	/** 기존 Activate 함수 별도 호출용 함수 */
-	void ActivateSkillAbility();
-
-private:
+protected:
 	/** 스킬 데이터 (Spec 의 SourceObject) */
 	UPROPERTY(Transient)
 	TObjectPtr<const UCDSkillData> skillData;
@@ -92,7 +83,4 @@ private:
 
 	/** State.Casting 을 들고 있는가 */
 	bool bIsCasting = false;
-
-	/** 2차 입력 스킬에 대한 확인 입력 시 Task에 정보 전달용 Delegate 변수 */
-	FOnConfirmInput onConfirmInput;
 };
