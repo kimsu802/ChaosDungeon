@@ -28,6 +28,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Screen")
 	TSoftClassPtr<UCommonActivatableWidget> pauseScreen;
 
+	/** 옵션 (일시정지 메뉴에서 열림. 비어 있으면 옵션 버튼 비활성) */
+	UPROPERTY(EditDefaultsOnly, Category = "Screen")
+	TSoftClassPtr<UCommonActivatableWidget> optionsScreen;
+
 	/** 조작법/목표 안내 */
 	UPROPERTY(EditDefaultsOnly, Category = "Screen")
 	TSoftClassPtr<UCommonActivatableWidget> guideScreen;

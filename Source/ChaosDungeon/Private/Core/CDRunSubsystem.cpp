@@ -108,6 +108,23 @@ void UCDRunSubsystem::ReturnToHub()
 	GetGameInstance()->GetSubsystem<UCDLevelTransitionSubsystem>()->TravelTo(dungeonData->hubLevel);
 }
 
+void UCDRunSubsystem::ReturnToMainMenu()
+{
+	// 이동이 거절되면(이미 이동 중) 플래그를 되돌린다
+	bReturnToTitle = true;
+	if (GetGameInstance()->GetSubsystem<UCDLevelTransitionSubsystem>()->TravelTo(dungeonData->hubLevel) == false)
+	{
+		bReturnToTitle = false;
+	}
+}
+
+bool UCDRunSubsystem::ConsumeReturnToTitle()
+{
+	const bool bResult = bReturnToTitle;
+	bReturnToTitle = false;
+	return bResult;
+}
+
 void UCDRunSubsystem::AdvanceStage()
 {
 	if (bRunFinished || !runStages.IsValidIndex(stageIndex + 1))
@@ -170,7 +187,8 @@ int32 UCDRunSubsystem::GetRemainingDeaths() const
 	return FMath::Max(0, maxDeaths - record.deaths);
 }
 
-bool UCDRunSubsystem::BeginTestRunForWorld(const UWorld* world, ECDDifficulty difficulty)
+
+bool UCDRunSubsystem::BeginTestRunForWorld(const UWorld * world, ECDDifficulty difficulty)
 {
 	// 정상적으로 StartRun 을 거쳐 들어온 경우
 	if (GetCurrentStage() != nullptr)
@@ -214,6 +232,7 @@ bool UCDRunSubsystem::BeginTestRunForWorld(const UWorld* world, ECDDifficulty di
 	UE_LOG(LogTemp, Warning, TEXT("[TestRun] 런 없이 시작한 레벨 → 테스트 런 생성 (스테이지 %d / %d)"), foundIndex + 1, runStages.Num());
 	return true;
 }
+
 
 void UCDRunSubsystem::TravelToCurrentStage() const
 {

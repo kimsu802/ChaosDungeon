@@ -114,6 +114,19 @@ void UCDUIManagerSubsystem::ToggleGuide()
 	ToggleScreen(CDTags::UI_Layer_GameMenu, screenSet->guideScreen);
 }
 
+void UCDUIManagerSubsystem::ShowOptions()
+{
+	if (HasOptionsScreen())
+	{
+		PushScreen(CDTags::UI_Layer_GameMenu, screenSet->optionsScreen);
+	}
+}
+
+bool UCDUIManagerSubsystem::HasOptionsScreen() const
+{
+	return screenSet && (screenSet->optionsScreen.IsNull() == false);
+}
+
 void UCDUIManagerSubsystem::ShowTitle()
 {
 	UCommonActivatableWidget* screen = PushScreen(CDTags::UI_Layer_Game, screenSet->titleScreen);
