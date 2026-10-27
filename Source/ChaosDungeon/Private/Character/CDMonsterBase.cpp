@@ -9,6 +9,7 @@
 #include "Data/CDMonsterData.h"
 #include "TimerManager.h"
 #include "Components/WidgetComponent.h"
+#include "UI/CDMonsterHealthBarWidget.h"
 
 ACDMonsterBase::ACDMonsterBase()
 {
@@ -52,19 +53,21 @@ void ACDMonsterBase::ActivateFromPool(const UCDMonsterData* data, const FCDDiffi
 	SetPoolActive(true);
 
 	// 보스는 화면 위 보스 바를 쓰므로 머리 위 바는 끔
-	//const bool bShowHealthBar = (data->grade != ECDMonsterGrade::Boss);
-	//healthBarComponent->SetVisibility(bShowHealthBar);
-	//if (UCDMonsterHealthBarWidget* healthBar = GetHealthBar())
-	//{
-	//	if (bShowHealthBar)
-	//	{
-	//		healthBar->BindTo(abilitySystem);
-	//	}
-	//	else
-	//	{
-	//		healthBar->Unbind();
-	//	}
-	//}
+	const bool bShowHealthBar = (data->grade != ECDMonsterGrade::Boss);
+	healthBarComponent->SetVisibility(bShowHealthBar);
+	if (UCDMonsterHealthBarWidget* healthBar = GetHealthBar())
+	{
+		if (bShowHealthBar)
+		{
+			// Revive 로 체력이 이미 최대 → BindTo 가 지연 연출 없이 가득 찬 상태로 맞춤
+			healthBar->SetGrade(data->grade);
+			healthBar->BindTo(abilitySystem);
+		}
+		else
+		{
+			healthBar->Unbind();
+		}
+	}
 
 	if (data->grade == ECDMonsterGrade::Boss)
 	{
@@ -115,6 +118,12 @@ void ACDMonsterBase::HandleDeath()
 	/* 죽음 처리 시 noiseTexture 재생 - yoonsang */ 
 	OnDeathVisual();
 
+	// 머리 위 HP 바: 빈 바를 잠깐 보여 준 뒤 사라짐 (hideAnim)
+	if (UCDMonsterHealthBarWidget* healthBar = GetHealthBar())
+	{
+		healthBar->HideBar(true);
+	}
+
 	GetWorldTimerManager().SetTimer(releaseTimer, this, &ThisClass::DeactivateToPool, corpseLifetime, false);
 }
 
@@ -128,6 +137,12 @@ void ACDMonsterBase::SetPoolActive(bool bActive)
 	{
 		monsterController->SetActorTickEnabled(bActive);
 		monsterController->StopMovement();
+	}
+
+	// 풀로 돌아갈 때 머리 위 바도 확실히 끔 (켜는 건 ActivateFromPool 에서 등급 확인 후)
+	if (bActive == false)
+	{
+		healthBarComponent->SetVisibility(false);
 	}
 }
 
@@ -164,4 +179,9 @@ FGameplayTagContainer ACDMonsterBase::GetImmunityTags(ECDMonsterGrade grade)
 	}
 	}
 	return tags;
+}
+
+UCDMonsterHealthBarWidget* ACDMonsterBase::GetHealthBar() const
+{
+	return Cast<UCDMonsterHealthBarWidget>(healthBarComponent->GetUserWidgetObject());
 }

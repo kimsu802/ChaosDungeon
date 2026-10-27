@@ -7,6 +7,8 @@
 
 class ACDMonsterBase;
 class UCDMonsterData;
+class UCDMonsterHealthBarWidget;
+class UWidgetComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FCDMonsterEvent, ACDMonsterBase*);
 
@@ -68,6 +70,9 @@ private:
 	/** 경직/넉백 규칙을 한 곳에서 결정: 일반 = 모두 적용, 정예 = 넉백 면역, 보스 = 모두 면역 */
 	static FGameplayTagContainer GetImmunityTags(ECDMonsterGrade grade);
 
+	/** 머리 위 HP 바 위젯 (Widget Class = WBP_MonsterHealthBar) */
+	UCDMonsterHealthBarWidget* GetHealthBar() const;
+
 public:
 	/** 풀로 반환될 때 */
 	FCDMonsterEvent onReleased;
@@ -82,8 +87,9 @@ private:
 	UPROPERTY(Transient)
 	TObjectPtr<const UCDMonsterData> monsterData;
 
+	/** 머리 위 HP 바 (Screen Space, 캡슐 중심 기준 Z +110). 보스는 숨김 */
 	UPROPERTY(VisibleAnywhere, Category = "UI")
-	TObjectPtr<class UWidgetComponent> healthBarComponent;
+	TObjectPtr<UWidgetComponent> healthBarComponent;
 
 	/** 풀 반환 타이머 */
 	FTimerHandle releaseTimer;
