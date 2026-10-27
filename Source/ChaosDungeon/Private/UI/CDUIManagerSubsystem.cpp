@@ -9,6 +9,8 @@
 #include "UI/CDPrimaryLayout.h"
 #include "UI/ViewModel/CDViewModelSubsystem.h"
 #include "Settings/CDDeveloperSettings.h"
+#include "Settings/CDGameUserSettings.h"
+#include "Engine/Engine.h"
 #include "UI/CDConfirmWidget.h"
 #include "Input/CommonUIActionRouterBase.h"
 #include "Engine/AssetManager.h"
@@ -36,6 +38,12 @@ void UCDUIManagerSubsystem::Initialize(FSubsystemCollectionBase& collection)
 	//ensureMsgf(screenSet, TEXT("DefaultGame.ini 에 screenSetAsset 을 지정하세요."));
 
 	runFinishedHandle = GetMessages()->Listen(CDTags::Msg_Run_Finished, this, &ThisClass::HandleRunFinished);
+
+	// 저장된 볼륨 옵션을 게임 시작 시 한 번 적용 (사운드 클래스 볼륨은 저장되지 않으므로)
+	if (const UCDGameUserSettings* userSettings = Cast<UCDGameUserSettings>(GEngine ? GEngine->GetGameUserSettings() : nullptr))
+	{
+		userSettings->ApplyVolumes();
+	}
 	worldCleanupHandle = FWorldDelegates::OnWorldCleanup.AddUObject(this, &ThisClass::HandleWorldCleanup);
 }
 

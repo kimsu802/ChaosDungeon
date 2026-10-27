@@ -10,6 +10,7 @@ class UCDFloatingTextWidget;
 class UCDDungeonData;
 class UCDUIScreenSet;
 class UUserWidget;
+class USoundClass;
 
 /**
  * 
@@ -47,5 +48,17 @@ public:
 	/** 페이드 오버레이 ZOrder. CommonUI 레이아웃(100)보다 커야 UI 까지 덮는다 */
 	UPROPERTY(Config, EditAnywhere, Category = "UI|Fade")
 	int32 fadeZOrder = 1000;
+
+	/** 옵션 "전체 볼륨" 이 적용될 사운드 클래스 (보통 Master) */
+	UPROPERTY(Config, EditAnywhere, Category = "Audio")
+	TSoftObjectPtr<USoundClass> masterSoundClass;
+
+	/** 옵션 "효과음" 이 적용될 사운드 클래스 (Master 의 자식 권장) */
+	UPROPERTY(Config, EditAnywhere, Category = "Audio")
+	TSoftObjectPtr<USoundClass> sfxSoundClass;
+
+	/** 옵션 "배경음" 이 적용될 사운드 클래스 (Master 의 자식 권장) */
+	UPROPERTY(Config, EditAnywhere, Category = "Audio")
+	TSoftObjectPtr<USoundClass> musicSoundClass;
 	
 };

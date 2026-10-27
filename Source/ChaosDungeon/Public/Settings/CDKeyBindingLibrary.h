@@ -25,6 +25,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Input|KeyBinding")
 	static FKey GetSlotKey(const APlayerController* playerController, UPARAM(meta = (Categories = "Input")) FGameplayTag slotTag);
 
+	/** 슬롯의 기본 키 (매핑 컨텍스트에 지정된 키. 옵션 화면 "기본값") */
+	UFUNCTION(BlueprintPure, Category = "Input|KeyBinding")
+	static FKey GetSlotDefaultKey(const APlayerController* playerController, UPARAM(meta = (Categories = "Input")) FGameplayTag slotTag);
+
 	/** 슬롯의 키 변경. 성공하면 true */
 	UFUNCTION(BlueprintCallable, Category = "Input|KeyBinding")
 	static bool RemapSlotKey(const APlayerController* playerController, UPARAM(meta = (Categories = "Input")) FGameplayTag slotTag, FKey newKey);

@@ -25,6 +25,10 @@ public:
 	void SetLabel(const FText& label);
 
 protected:
+	/* 텍스트 스타일이 바뀌었을 때,*/
+	virtual void NativeOnCurrentTextStyleChanged() override;
+
+protected:
 	/** 버튼 글자 */
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<UCommonTextBlock> labelText;
