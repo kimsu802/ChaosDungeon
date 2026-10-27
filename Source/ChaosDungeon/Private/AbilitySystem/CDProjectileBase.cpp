@@ -12,10 +12,5 @@ ACDProjectileBase::ACDProjectileBase()
 }
 
 
-// Called every frame
-void ACDProjectileBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
 

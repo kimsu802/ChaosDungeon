@@ -7,6 +7,7 @@
 #include "CDBossSkillData.generated.h"
 
 class UCDMonsterData;
+class UNiagaraSystem;
 
 /**
  * 
@@ -50,4 +51,23 @@ public:
 		meta = (ClampMin = "1"))
 	float summonSpacing = 150.f;
 
+	/* 번개 떨어지는 갯수*/
+	UPROPERTY(EditDefaultsOnly, Category = "Lightning", meta = (ClampMin = "1"))
+	int32 lightningCount = 10;
+
+	/* 범위 */
+	UPROPERTY(EditDefaultsOnly, Category = "Lightning", meta = (ClampMin = "1"))
+	float spawnRadius = 1200.f;
+
+	/* 번개간 간격*/
+	UPROPERTY(EditDefaultsOnly, Category = "Lightning", meta = (ClampMin = "1"))
+	float lightningSpacing = 100.f;
+
+	/* 이펙트 */
+	UPROPERTY(EditDefaultsOnly, Category = "Lightning")
+	TObjectPtr<UNiagaraSystem> lightningEffect;
+
+	/* 이펙트 바닥 반지름 */
+	UPROPERTY(EditDefaultsOnly, Category = "Lightning", meta = (ClampMin = "1"))
+	float effectBaseRadius = 100.f;
 };
