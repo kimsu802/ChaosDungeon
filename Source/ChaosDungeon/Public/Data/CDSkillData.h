@@ -10,23 +10,30 @@ class UAnimMontage;
 class UTexture2D;
 class UCDSkillAbility;
 
+/* 시전 방식 설정 */
+UENUM(BlueprintType)
+enum class ECDSkillCastPolicy : uint8
+{
+	Immediate,
+	ConfrimInput
+};
+
 /** 판정 기준점 */
 UENUM(BlueprintType)
 enum class ECDSkillOrigin : uint8
 {
-	Self,			// 시전자 기준 (원형/부채꼴/직선/돌진)
-	Cursor,			// 조준 위치 기준 (장판)
-	CastLocation	// 시전 위치 (10.20 Jun6 - 설치기 등 고정 위치 판정을 위해 추가)
+	Self,				// 시전자 기준 (원형/부채꼴/직선/돌진)
+	TargetLocation,		// 조준 위치 기준 (장판)
+	CastStartLocation	// 시전 위치 (10.20 Jun6 - 설치기 등 고정 위치 판정을 위해 추가)
 };
 
 /** 스킬 형태 - 10.18 Jun6 */
 UENUM(BlueprintType)
-enum class ECDSkillMode : uint8
+enum class ECDSkillTargetingType : uint8
 {
-	Instant,				// 즉발
-	AreaSection,			// 영역 선택 (like 레오나 R)
-	DirectionSelection,		// 방향 선택 (like 레오나 E)
-	Projectile				// 발사 (like 니달리 창)
+	None,			// 즉발
+	Direction,		// 방향 조준 (like 레오나 E)
+	Location,		// 위치 조준 (like 레오나 R)
 };
 
 /** 스킬 이펙트 종류 - 10.20 Jun6 */
@@ -87,9 +94,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TObjectPtr<UAnimMontage> montage;
 
-	/** 스킬 발동 형태 */
+	/** 스킬 조준 방식 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	ECDSkillMode skillMode;
+	ECDSkillCastPolicy castPolicy;
+
+	/** 스킬 조준 방식 */
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	ECDSkillTargetingType skillMode;
 
 	/** 판정 기준점 */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")

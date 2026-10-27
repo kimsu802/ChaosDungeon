@@ -3,6 +3,7 @@
 #include "AbilitySystem/CDAbilityTask_ManageReticle.h"
 #include "AbilitySystem/CDReticleActor.h"
 #include "Data/CDSkillData.h"
+#include "Player/CDPlayerController.h"
 
 UCDAbilityTask_ManageReticle::UCDAbilityTask_ManageReticle()
 {
@@ -39,12 +40,10 @@ void UCDAbilityTask_ManageReticle::Activate()
 	spawnedReticle = world->SpawnActor<ACDReticleActor>(reticleClass, abilityOwner->GetActorTransform());
 	if (IsValid(spawnedReticle))
 	{
-		UE_LOG(LogTemp, Log, TEXT("spawn Reticle"));
 		spawnedReticle->SetReticleConfig(*skillData);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Fail to spawn Reticle"));
 		EndTask();
 	}
 }
@@ -64,19 +63,17 @@ void UCDAbilityTask_ManageReticle::TickTask(float DeltaTime)
 	}
 
 	const APawn* caster = Cast<APawn>(abilityOwner);
-	APlayerController* pc = nullptr != caster ? Cast<APlayerController>(caster->GetController()) : nullptr;
+	ACDPlayerController* pc = nullptr != caster ? Cast<ACDPlayerController>(caster->GetController()) : nullptr;
 
 	if (nullptr == pc)
 	{
 		switch (skillData->skillMode)
 		{
-		case ECDSkillMode::Instant:
+			// [영역 지정]
+		case ECDSkillTargetingType::Location:
 			spawnedReticle->SetActorLocation(targetLocation);
 			break;
-		case ECDSkillMode::AreaSection:
-			// [영역 지정]
-			break;
-		case ECDSkillMode::DirectionSelection:
+		case ECDSkillTargetingType::Direction:
 		{
 			FHitResult result;
 			if (pc->GetHitResultUnderCursor(ECC_Visibility, false, result))
@@ -102,7 +99,7 @@ void UCDAbilityTask_ManageReticle::TickTask(float DeltaTime)
 	{
 		switch (skillData->skillMode)
 		{
-		case ECDSkillMode::AreaSection:
+		case ECDSkillTargetingType::Location:
 		{
 			// [영역 지정]
 			// 마우스 위치를 사거리 안으로 제한
@@ -111,29 +108,31 @@ void UCDAbilityTask_ManageReticle::TickTask(float DeltaTime)
 			{
 				const FVector mouse = result.ImpactPoint;
 				const FVector reticle = abilityOwner->GetActorLocation();
-
-				const float distSquare = FVector::DistSquared2D(reticle, mouse);
-				const float maxSquare = skillData->maxRange * skillData->maxRange;
-
-				FVector destination = FVector::Zero();
-
-				if (distSquare <= maxSquare)
-				{
-					destination = mouse;
-				}
-				else
-				{
-					FVector direction = (mouse - reticle).GetSafeNormal2D();
-					destination = reticle + direction * skillData->maxRange;
-				}
-
-				// 높이를 마우스 기준으로 변경
-				destination.Z = mouse.Z;
+			//
+			//	const float distSquare = FVector::DistSquared2D(reticle, mouse);
+			//	const float maxSquare = skillData->maxRange * skillData->maxRange;
+			//
+				FVector destination = mouse;
+			//
+			//	if (distSquare <= maxSquare)
+			//	{
+			//		destination = mouse;
+			//	}
+			//	else
+			//	{
+			//		FVector direction = (mouse - reticle).GetSafeNormal2D();
+			//		destination = reticle + direction * skillData->maxRange;
+			//	}
+			//	// 높이를 마우스 기준으로 변경
+			//	//destination.Z = mouse.Z;
+			//
 				spawnedReticle->SetActorLocation(destination);
+				spawnedReticle->SetValidColor(pc->GetNearestNavLocation(destination));
 			}
+
 		}
 			break;
-		case ECDSkillMode::DirectionSelection:
+		case ECDSkillTargetingType::Direction:
 		{
 			FHitResult result;
 			if (pc->GetHitResultUnderCursor(ECC_Visibility, false, result))

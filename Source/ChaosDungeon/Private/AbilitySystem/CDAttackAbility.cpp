@@ -30,6 +30,10 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 	const ACDCharacterBase* character = GetCDCharacter();
 	character->GetController()->StopMovement();
 
+	// 10.26 - Jun6 마우스 방향으로 회전
+	const FVector aimLocation = character->GetAimLocation();
+	BeginCastTowards(aimLocation);
+
 	UAbilityTask_PlayMontageAndWait* playAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
 	playAttackTask->OnCompleted.AddDynamic(this, &ThisClass::OnCompleteCallback);
 	playAttackTask->OnInterrupted.AddDynamic(this, &ThisClass::OnInterruptedCallback);
@@ -53,6 +57,11 @@ void UCDAttackAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, con
 		{
 			return;
 		}
+
+		// 10.26 - Jun6 마우스 방향으로 회전
+		const ACDCharacterBase* character = GetCDCharacter();
+		const FVector aimLocation = character->GetAimLocation();
+		BeginCastTowards(aimLocation);
 
 		currentCombo += 1;
 		FName nextSection = FName(*FString::Printf(TEXT("AM_Attack%d"), currentCombo));

@@ -29,6 +29,8 @@ public:
 		return inputConfig;
 	}
 
+	bool GetNearestNavLocation(FVector& outLocation);
+
 protected:
 	// AActor::BeginPlay()
 	virtual void BeginPlay() override;
