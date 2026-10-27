@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/CDSkillAbility.h"
+#include "CDMonsterSkillAbility.h"
 #include "CDBossSpawnAbility.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CHAOSDUNGEON_API UCDBossSpawnAbility : public UCDSkillAbility
+class CHAOSDUNGEON_API UCDBossSpawnAbility : public UCDMonsterSkillAbility
 {
 	GENERATED_BODY()
 	

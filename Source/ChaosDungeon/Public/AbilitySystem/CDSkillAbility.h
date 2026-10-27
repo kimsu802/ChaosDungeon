@@ -62,7 +62,7 @@ protected:
 
 	/** 몽타주 정상 종료 */
 	UFUNCTION()
-	void OnMontageFinished();
+	virtual void OnMontageFinished();
 
 	/** 몽타주 중단 */
 	UFUNCTION()
