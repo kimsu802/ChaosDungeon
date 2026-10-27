@@ -26,8 +26,11 @@ public:
 
 	/** 장판(Reticle) 크기 설정 함수 */
 	void SetReticleSize(const float newHorizontalSize, const float newVerticalSize);
+
 	/** 부채꼴 장판(Reticle) 크기 설정 함수 */
 	void SetConeReticleSize(const float radius, const float degree);
+
+	void SetValidColor(bool bIsValid);
 
 protected:
 	// AActor::BeginPlay()

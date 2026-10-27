@@ -66,11 +66,6 @@ void ACDCharacterBase::Revive(float invincibleTime)
 	}
 }
 
-bool ACDCharacterBase::IsPlayer() const
-{
-	return false;
-}
-
 bool ACDCharacterBase::CanBeTargeted() const
 {
 	return true;
@@ -136,8 +131,4 @@ void ACDCharacterBase::HandleDeath()
 	message.bIsPlayer = IsPlayerControlled();
 	message.contribution = GetKillContribution();
 	UCDMessageSubsystem::Get(this).Broadcast(CDTags::Msg_Combat_Death, message);
-}
-
-void ACDCharacterBase::DebugOnHitFunction(const AActor* attacker)
-{
 }

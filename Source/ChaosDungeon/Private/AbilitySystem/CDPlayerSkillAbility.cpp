@@ -29,10 +29,9 @@ void UCDPlayerSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle han
 		return;
 	}
 
-	
-	if (skillData->reticleConfig.displayMode == ECDReticleDisplayMode::None)
+	/* 10.27 Jun6 시전 방식 변수 설정 */
+	if (skillData->castPolicy == ECDSkillCastPolicy::Immediate)
 	{
-		/* 10.13 Jun6 타겟팅 함수의 타겟 지정완료(2차 입력) 시 기존 Activate 활용 위해 기능 실행부 함수화  */
 		ActivateSkillAbility();
 	}
 	else
@@ -56,19 +55,23 @@ void UCDPlayerSkillAbility::InputPressed(const FGameplayAbilitySpecHandle Handle
 	FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
 
 	// 즉발 스킬은 추가 입력 상황 자체가 말이 안되는 상황
-	if (skillData->skillMode == ECDSkillMode::Instant || nullptr == spec)
+	if (skillData->castPolicy == ECDSkillCastPolicy::Immediate || nullptr == spec)
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
 	}
 
-	// 조준 상태 종료 - 스킬 발사
-	if (spec->GetDynamicSpecSourceTags().HasTag(CDTags::State_Targeting))
+	// 유효한 지점인 곳에 한정하여 스킬 시전
+	if (CheckIsValidLocation())
 	{
-		spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
-		onConfirmInput.ExecuteIfBound();
-		ActivateSkillAbility();
-		onConfirmInput.Unbind();
+		// 조준 상태 종료 - 스킬 발사
+		if (spec->GetDynamicSpecSourceTags().HasTag(CDTags::State_Targeting))
+		{
+			spec->GetDynamicSpecSourceTags().RemoveTag(CDTags::State_Targeting);
+			onConfirmInput.ExecuteIfBound();
+			ActivateSkillAbility();
+			onConfirmInput.Unbind();
+		}
 	}
 }
 
@@ -85,6 +88,14 @@ void UCDPlayerSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, 
 	Super::EndAbility(handle, actorInfo, activationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+bool UCDPlayerSkillAbility::CheckIsValidLocation()
+{
+	const ACDCharacterBase* character = GetCDCharacter();
+	const FVector& location = character->GetAimLocation();
+	
+	return location != FVector::ZeroVector;
+}
+
 void UCDPlayerSkillAbility::ApplyHit()
 {
 	const ACDCharacterBase* character = GetCDCharacter();
@@ -92,13 +103,13 @@ void UCDPlayerSkillAbility::ApplyHit()
 
 	switch (skillData->origin)
 	{
-	case ECDSkillOrigin::Cursor:
+	case ECDSkillOrigin::TargetLocation:
 		origin = targetLocation;
 		break;
 	case ECDSkillOrigin::Self:
 		origin = character->GetActorLocation();
 		break;
-	case ECDSkillOrigin::CastLocation:
+	case ECDSkillOrigin::CastStartLocation:
 		origin = skillCastLocation;
 		break;
 	}
@@ -156,13 +167,13 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 
 				switch (skillData->origin)
 				{
-				case ECDSkillOrigin::Cursor:
+				case ECDSkillOrigin::TargetLocation:
 					origin = targetLocation;
 					break;
 				case ECDSkillOrigin::Self:
 					origin = GetCDCharacter()->GetActorLocation();
 					break;
-				case ECDSkillOrigin::CastLocation:
+				case ECDSkillOrigin::CastStartLocation:
 					origin = skillCastLocation;
 					break;
 				}
@@ -186,13 +197,13 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 
 				switch (skillData->origin)
 				{
-				case ECDSkillOrigin::Cursor:
+				case ECDSkillOrigin::TargetLocation:
 					origin = targetLocation;
 					break;
 				case ECDSkillOrigin::Self:
 					origin = GetCDCharacter()->GetActorLocation();
 					break;
-				case ECDSkillOrigin::CastLocation:
+				case ECDSkillOrigin::CastStartLocation:
 					origin = skillCastLocation;
 					break;
 				}

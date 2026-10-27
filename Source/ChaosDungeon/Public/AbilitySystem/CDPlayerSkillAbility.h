@@ -30,6 +30,8 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo,
 		const FGameplayAbilityActivationInfo activationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
+	bool CheckIsValidLocation();
+
 protected:
 	virtual void ApplyHit() override;
 

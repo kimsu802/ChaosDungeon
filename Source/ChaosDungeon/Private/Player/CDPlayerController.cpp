@@ -19,6 +19,34 @@ ACDPlayerController::ACDPlayerController()
 	cursorHighlight = CreateDefaultSubobject<UCDCursorHighlightComponent>(TEXT("CursorHighlight"));
 }
 
+bool ACDPlayerController::GetNearestNavLocation(FVector& outLocation)
+{
+	const APawn* controlledPawn = GetPawn();
+	FVector rayOrigin;
+	FVector rayDirection;
+	if (!controlledPawn || !DeprojectMousePositionToWorld(rayOrigin, rayDirection) || rayDirection.Z > -KINDA_SMALL_NUMBER)
+	{
+		return false;
+	}
+
+	// 커서 광선과 캐릭터 발 높이 평면의 교점. 벽이 화면을 가려도 그 뒤 바닥 지점을 얻는다
+	const float groundZ = controlledPawn->GetActorLocation().Z - controlledPawn->GetSimpleCollisionHalfHeight();
+	const FPlane groundPlane(FVector(0.f, 0.f, groundZ), FVector::UpVector);
+	const FVector planePoint = FMath::LinePlaneIntersection(rayOrigin, rayOrigin + rayDirection, groundPlane);
+
+	// 내비메시에 투영: 단차 보정 + 갈 수 없는 지점은 가장 가까운 이동 가능 지점으로
+	UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+	FNavLocation navLocation;
+	if (!navSystem || !navSystem->ProjectPointToNavigation(planePoint, navLocation))
+	{
+		return false;
+	}
+
+	outLocation = navLocation.Location;
+
+	return true;
+}
+
 void ACDPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -68,7 +96,6 @@ void ACDPlayerController::OnMoveStarted()
 	movePressedTime = 0.f;
 	if (UpdateMoveDestination() && CanMove())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Can Move"));
 		// 누르는 즉시 반응: 짧은 클릭은 이 길찾기 이동으로 끝난다
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, moveDestination);
 	}
@@ -116,27 +143,7 @@ void ACDPlayerController::OnMoveReleased()
 
 bool ACDPlayerController::UpdateMoveDestination()
 {
-	const APawn* controlledPawn = GetPawn();
-	FVector rayOrigin;
-	FVector rayDirection;
-	if (!controlledPawn || !DeprojectMousePositionToWorld(rayOrigin, rayDirection) || rayDirection.Z > -KINDA_SMALL_NUMBER)
-	{
-		return false;
-	}
-
-	// 커서 광선과 캐릭터 발 높이 평면의 교점. 벽이 화면을 가려도 그 뒤 바닥 지점을 얻는다
-	const float groundZ = controlledPawn->GetActorLocation().Z - controlledPawn->GetSimpleCollisionHalfHeight();
-	const FPlane groundPlane(FVector(0.f, 0.f, groundZ), FVector::UpVector);
-	const FVector planePoint = FMath::LinePlaneIntersection(rayOrigin, rayOrigin + rayDirection, groundPlane);
-
-	// 내비메시에 투영: 단차 보정 + 갈 수 없는 지점은 가장 가까운 이동 가능 지점으로
-	UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-	FNavLocation navLocation;
-	if (!navSystem || !navSystem->ProjectPointToNavigation(planePoint, navLocation))
-	{
-		return false;
-	}
-	moveDestination = navLocation.Location;
+	GetNearestNavLocation(moveDestination);
 
 	// 상호작용 대상은 커서 채널로 따로 확인 (NPC 캡슐이 Cursor 채널 Block)
 	FHitResult cursorHit;

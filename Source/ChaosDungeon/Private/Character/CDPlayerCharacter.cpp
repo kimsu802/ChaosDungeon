@@ -2,13 +2,13 @@
 #include "AbilitySystem/CDAbilitySystemComponent.h"
 #include "AbilitySystem/CDDodgeAbility.h"
 #include "AbilitySystem/CDAttackAbility.h"
-#include "Camera/CameraComponent.h"
 #include "Core/CDGameplayTags.h"
 #include "Core/CDSkillLoadoutSubsystem.h"
 #include "Core/CDTypes.h"
 #include "Data/CDCharacterClassData.h"
+#include "Player/CDPlayerController.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/GameInstance.h"
 #include "Player/CDOcclusionFadeComponent.h"
@@ -114,18 +114,21 @@ void ACDPlayerCharacter::HandleSkillLoadoutChanged()
 
 FVector ACDPlayerCharacter::GetAimLocation() const
 {
-	FHitResult hit;
-	const APlayerController* playerController = GetController<APlayerController>();
-	if (playerController && playerController->GetHitResultUnderCursor(ECC_Visibility, false, hit))
+	//FHitResult hit;
+	//const APlayerController* playerController = GetController<APlayerController>();
+	//if (playerController && playerController->GetHitResultUnderCursor(ECC_Visibility, false, hit))
+
+	ACDPlayerController* playerController = GetController<ACDPlayerController>();
+	if (playerController)
 	{
-		return hit.Location;
+		FVector aimLocation = FVector::ZeroVector;
+		playerController->GetNearestNavLocation(aimLocation);
+
+		UE_LOG(LogTemp, Log, TEXT("pc - x: %.2f, y: %.2f, z: %.2f"), aimLocation.X, aimLocation.Y, aimLocation.Z);
+
+		return aimLocation;
 	}
 	return Super::GetAimLocation();
-}
-
-bool ACDPlayerCharacter::IsPlayer() const
-{
-	return true;
 }
 
 bool ACDPlayerCharacter::CanBeTargeted() const

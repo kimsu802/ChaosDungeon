@@ -84,3 +84,8 @@ void ACDReticleActor::SetConeReticleSize(const float radius, const float degree)
 	skillReticle->DecalSize.Y = radius;
 	skillReticle->DecalSize.Z = radius;
 }
+
+void ACDReticleActor::SetValidColor(bool bIsValid)
+{
+	reticleMID->SetScalarParameterValue(FName("IsValid"), bIsValid ? 1.0f : 0.0f);
+}
