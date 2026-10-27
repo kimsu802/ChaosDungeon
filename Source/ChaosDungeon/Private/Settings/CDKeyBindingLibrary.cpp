@@ -13,6 +13,20 @@ FKey UCDKeyBindingLibrary::GetSlotKey(const APlayerController* playerController,
 	return FindMappedKey(userSettings, mappingName);
 }
 
+FKey UCDKeyBindingLibrary::GetSlotDefaultKey(const APlayerController* playerController, FGameplayTag slotTag)
+{
+	const UEnhancedInputUserSettings* userSettings = GetUserSettings(playerController);
+	const UCDInputConfig* inputConfig = GetInputConfig(playerController);
+	const FName mappingName = inputConfig ? inputConfig->FindMappingName(slotTag) : NAME_None;
+	if (!userSettings || mappingName.IsNone())
+	{
+		return EKeys::Invalid;
+	}
+
+	const FPlayerKeyMapping* mapping = userSettings->FindCurrentMappingForSlot(mappingName, EPlayerMappableKeySlot::First);
+	return mapping ? mapping->GetDefaultKey() : EKeys::Invalid;
+}
+
 bool UCDKeyBindingLibrary::RemapSlotKey(const APlayerController* playerController, FGameplayTag slotTag, FKey newKey)
 {
 	UEnhancedInputUserSettings* userSettings = GetUserSettings(playerController);

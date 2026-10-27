@@ -30,6 +30,9 @@ public:
 	DECLARE_GETTER_SETTER(float, MusicVolume);
 	DECLARE_GETTER_SETTER(FString, Difficulty);
 
+	/** 볼륨 3종을 사운드 클래스에 적용 (ChaosDungeon General Settings > Audio). 옵션 변경 · 게임 시작 시 호출 */
+	void ApplyVolumes() const;
+
 
 // 매크로 매개변수를 줄이기 위해 파스칼 표기법 사용.
 private:
