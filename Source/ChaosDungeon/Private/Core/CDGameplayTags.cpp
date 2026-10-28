@@ -62,4 +62,5 @@ namespace CDTags
 
 
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill, "GameplayCue.Skill");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitEffect, "GameplayCue.HitEffect");
 }

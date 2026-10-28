@@ -122,6 +122,13 @@ void UCDPlayerSkillAbility::ApplyHit()
 		if (character->IsHostileTo(actor))
 		{
 			ApplyDamageTo(actor);
+
+
+			// 데미지 입힘과 동시에 게임플레이 큐로 히트 이펙트 적용
+			UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+			FGameplayCueParameters params;
+			params.Location = actor->GetActorLocation();
+			abilitySystem->ExecuteGameplayCue(CDTags::GameplayCue_HitEffect, params);
 		}
 	}
 

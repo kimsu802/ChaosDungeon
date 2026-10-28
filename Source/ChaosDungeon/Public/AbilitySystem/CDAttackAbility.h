@@ -56,9 +56,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack/Montage")
 	TObjectPtr<UAnimMontage> montage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Attack/VFX")
+	TObjectPtr<class UNiagaraSystem> hitNiagara;
+
 	/** 일반 공격 범위 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-	FCDHitShape hitShape;;
+	FCDHitShape hitShape;
 
 	/** 일반 공격 계수 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")

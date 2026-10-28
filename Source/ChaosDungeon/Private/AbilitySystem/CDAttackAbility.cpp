@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "Core/CDGameplayTags.h"
 #include "Character/CDCharacterBase.h"
+#include "NiagaraFunctionLibrary.h"
 
 UCDAttackAbility::UCDAttackAbility()
 {
@@ -82,6 +83,7 @@ void UCDAttackAbility::ApplyHit()
 		if (character->IsHostileTo(actor))
 		{
 			ApplyDamageTo(actor);
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(actor, hitNiagara, actor->GetActorLocation(), actor->GetActorRotation());
 		}
 	}
 

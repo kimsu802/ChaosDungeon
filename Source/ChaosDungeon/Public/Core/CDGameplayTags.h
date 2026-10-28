@@ -75,4 +75,5 @@ namespace CDTags
 
 	// VFX (Skill 이펙트)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Skill);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_HitEffect);
 }
