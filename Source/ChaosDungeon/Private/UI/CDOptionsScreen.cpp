@@ -42,14 +42,15 @@ void UCDOptionsScreen::NativeOnActivated()
 	{
 		registry = NewObject<UCDOptionRegistry>(this);
 		registry->Build(GetOwningPlayer());
-		for (const FCDOptionTab& tab : registry->GetTabs())
-		{
-			tabList->RequestRegisterTab(tab.tabId, tab.displayName);
-		}
 	}
 	else
 	{
 		registry->RefreshAll();
+	}
+
+	for (const FCDOptionTab& tab : registry->GetTabs())
+	{
+		tabList->RequestRegisterTab(tab.tabId, tab.displayName);
 	}
 
 	// 마지막으로 보던 탭 (처음이면 첫 탭)
