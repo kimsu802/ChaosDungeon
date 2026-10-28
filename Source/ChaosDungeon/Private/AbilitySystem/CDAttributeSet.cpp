@@ -11,6 +11,8 @@ void UCDAttributeSet::InitFromStats(const FCDBaseStats& stats, float healthMulti
 	InitDefense(stats.defense);
 	InitCritChance(stats.critChance);
 	InitCritDamage(stats.critDamage);
+	InitMaxAwakenGauge(stats.maxAwakenGauge);
+	InitAwakenGauge(0.0f);
 }
 
 void UCDAttributeSet::PreAttributeChange(const FGameplayAttribute& attribute, float& newValue)
@@ -20,6 +22,11 @@ void UCDAttributeSet::PreAttributeChange(const FGameplayAttribute& attribute, fl
 	if (attribute == GetHealthAttribute())
 	{
 		newValue = FMath::Clamp(newValue, 0.f, GetMaxHealth());
+	}
+	// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
+	else if (attribute == GetAwakenGaugeAttribute())
+	{
+		newValue = FMath::Clamp(newValue, 0.f, GetMaxAwakenGauge());
 	}
 }
 
@@ -51,5 +58,10 @@ void UCDAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	{
 		// 회복 구슬 등
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	else if (data.EvaluatedData.Attribute == GetAwakenGaugeAttribute())
+	{
+		// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
+		SetAwakenGauge(FMath::Clamp(GetAwakenGauge(), 0.f, GetMaxAwakenGauge()));
 	}
 }

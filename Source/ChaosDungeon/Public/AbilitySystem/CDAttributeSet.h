@@ -55,6 +55,8 @@ public:
 	CD_ATTRIBUTE_ACCESSORS(UCDAttributeSet, defense, Defense)
 	CD_ATTRIBUTE_ACCESSORS(UCDAttributeSet, critChance, CritChance)
 	CD_ATTRIBUTE_ACCESSORS(UCDAttributeSet, critDamage, CritDamage)
+	CD_ATTRIBUTE_ACCESSORS(UCDAttributeSet, awakenGauge, AwakenGauge)
+	CD_ATTRIBUTE_ACCESSORS(UCDAttributeSet, maxAwakenGauge, MaxAwakenGauge)
 	CD_ATTRIBUTE_ACCESSORS(UCDAttributeSet, incomingDamage, IncomingDamage)
 
 	/** 스탯 초기화. 난이도 배율은 몬스터에만 적용 */
@@ -98,6 +100,13 @@ protected:
 	/** 치명타 피해 배율 */
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	FGameplayAttributeData critDamage;
+
+	/** 각성기 게이지 */
+	UPROPERTY(BlueprintReadOnly, Category = "Awakening")
+	FGameplayAttributeData awakenGauge;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Awakening")
+	FGameplayAttributeData maxAwakenGauge;
 
 	/** 메타 속성: 데미지 계산 결과를 잠깐 담는 용도 */
 	UPROPERTY(BlueprintReadOnly, Category = "Meta")

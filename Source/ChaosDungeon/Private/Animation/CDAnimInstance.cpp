@@ -25,8 +25,8 @@ void UCDAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	// 회전값
 	const FRotator rot = UKismetMathLibrary::NormalizedDeltaRotator(player->GetBaseAimRotation(), player->GetActorRotation());
-	roll = rot.Roll;
-	pitch = rot.Pitch;
+	//roll = rot.Roll;
+	//pitch = rot.Pitch;
 	yaw = rot.Yaw;
 
 	// 좌우 기울어짐 정도

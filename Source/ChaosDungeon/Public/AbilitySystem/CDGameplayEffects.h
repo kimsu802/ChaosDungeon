@@ -30,3 +30,25 @@ public:
 	/** HasDuration + SetByCaller 지속시간 설정 */
 	UCDCooldownEffect();
 };
+
+/** 버프스킬: 지속시간 = SetByCaller.Buff */
+UCLASS()
+class CHAOSDUNGEON_API UCDBuffEffect : public UGameplayEffect
+{
+	GENERATED_BODY()
+
+public:
+	/** HasDuration + SetByCaller 지속시간 설정 */
+	UCDBuffEffect();
+};
+
+/** 각성 게이지: SetByCaller.Awaken */
+UCLASS()
+class CHAOSDUNGEON_API UCDAwakenEffect : public UGameplayEffect
+{
+	GENERATED_BODY()
+
+public:
+	/** 공격 성공 시 고정 수치 + SetByCaller 설정 */
+	UCDAwakenEffect();
+};

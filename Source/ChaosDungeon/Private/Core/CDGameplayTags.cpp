@@ -13,6 +13,7 @@ namespace CDTags
 	//UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Cancel, "Input.Cancel", "Escape, 스킬 발동 취소"); // 10.15 Jun6 - Pause 기능과 충돌되는 것 같아 잠시 보류
 
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Skill, "Ability.Skill");
+	UE_DEFINE_GAMEPLAY_TAG(Ability_Skill_Awakening, "Ability.Skill.Awakening");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dodge, "Ability.Dodge");
 	UE_DEFINE_GAMEPLAY_TAG(Ability_HitReact, "Ability.HitReact");
 
@@ -31,6 +32,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage, "Event.Montage");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Hit, "Event.Montage.Hit");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Recovery, "Event.Montage.Recovery");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Move, "Event.Montage.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboStart, "Event.Montage.ComboStart");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ComboEnd, "Event.Montage.ComboEnd");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_ReticleOn, "Event.Montage.ReticleOn");
@@ -44,6 +46,9 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Cooldown, "SetByCaller.Cooldown");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Coefficient, "SetByCaller.Coefficient");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Critical, "SetByCaller.Critical");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Buff, "SetByCaller.Buff");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_BuffDuration, "SetByCaller.BuffDuration");
+	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Awakening, "SetByCaller.Awakening");
 
 	UE_DEFINE_GAMEPLAY_TAG(Msg_Combat_Damage, "Combat.Damage");
 	UE_DEFINE_GAMEPLAY_TAG(Msg_Combat_Death, "Combat.Death");

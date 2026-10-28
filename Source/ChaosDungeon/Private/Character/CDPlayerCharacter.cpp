@@ -124,8 +124,6 @@ FVector ACDPlayerCharacter::GetAimLocation() const
 		FVector aimLocation = FVector::ZeroVector;
 		playerController->GetNearestNavLocation(aimLocation);
 
-		UE_LOG(LogTemp, Log, TEXT("pc - x: %.2f, y: %.2f, z: %.2f"), aimLocation.X, aimLocation.Y, aimLocation.Z);
-
 		return aimLocation;
 	}
 	return Super::GetAimLocation();

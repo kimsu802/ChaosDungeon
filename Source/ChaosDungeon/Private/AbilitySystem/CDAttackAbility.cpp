@@ -83,6 +83,12 @@ void UCDAttackAbility::ApplyHit()
 		if (character->IsHostileTo(actor))
 		{
 			ApplyDamageTo(actor);
+
+			// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
+			const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
+			specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, 10.f);
+			GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
+
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(actor, hitNiagara, actor->GetActorLocation(), actor->GetActorRotation());
 		}
 	}

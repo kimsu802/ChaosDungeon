@@ -1,6 +1,8 @@
 
 #include "AbilitySystem/CDPlayerSkillAbility.h"
 #include "AbilitySystem/CDAbilityTask_ManageReticle.h"
+#include "AbilitySystem/CDGameplayEffects.h"
+#include "AbilitySystem/CDAttributeSet.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystemComponent.h"
@@ -123,12 +125,12 @@ void UCDPlayerSkillAbility::ApplyHit()
 		{
 			ApplyDamageTo(actor);
 
+			GatherAwakeningGauge();
 
 			// 데미지 입힘과 동시에 게임플레이 큐로 히트 이펙트 적용
-			UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
 			FGameplayCueParameters params;
 			params.Location = actor->GetActorLocation();
-			abilitySystem->ExecuteGameplayCue(CDTags::GameplayCue_HitEffect, params);
+			GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(CDTags::GameplayCue_HitEffect, params);
 		}
 	}
 
@@ -146,7 +148,18 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 	{
 		if (tag == CDTags::Event_Montage_Hit)
 		{
-			ApplyHit();
+			if (skillData->skillType == ECDSkillType::Buff)
+			{
+				// 추후 skill data에 enum 추가하여 분기 처리 - 임시로 데미지 계수에 buff 비율 적용, buff 지속 시간은 cooltime 보다 4초 적게(임시)
+				const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDBuffEffect::StaticClass(), GetAbilityLevel());
+				specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Buff, skillData->damageCoefficient);
+				specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_BuffDuration, skillData->cooldown - 4.0f);
+				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
+			}
+			else
+			{
+				ApplyHit();
+			}
 		}
 		else
 		{
@@ -189,6 +202,14 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 				onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
 				manage->ReadyForActivation();
 			}
+			else if (tag == CDTags::Event_Montage_Move)
+			{
+				// 스킬 시전 시 이동 거리 계산 및 이동 연출
+				if (skillData->dashDistance > 0.f)
+				{
+					StartDash(character->GetActorForwardVector(), skillData->dashDistance, skillData->dashDuration);
+				}
+			}
 		}
 	}
 	else
@@ -216,8 +237,17 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 				}
 
 				params.Location = origin;
-				abilitySystem->ExecuteGameplayCue(tag, params);
-				// Looping - AddGameplayCue / RemoveGameplayCue
+
+				if (vfx.effectType == ECDSkillVFXType::Burst)
+				{
+					abilitySystem->ExecuteGameplayCue(tag, params);
+				}
+				else
+				{
+					// Looping - AddGameplayCue / RemoveGameplayCue
+					// 몽타주와 별도로 생성이 필요한 경우(설치기 등)에 사용
+					// abilitySystem->AddGameplayCue(tag, params);
+				}
 
 				break;
 			}
@@ -227,10 +257,28 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 
 void UCDPlayerSkillAbility::ActivateSkillAbility()
 {
-	if (!CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo))
+	bool bCanStart = true;
+
+	if (skillData->skillIdTag == CDTags::Ability_Skill_Awakening)
+	{
+		UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+		const float awakenGauge = abilitySystem->GetNumericAttribute(UCDAttributeSet::GetAwakenGaugeAttribute());
+		const float maxAwakenGauge = abilitySystem->GetNumericAttribute(UCDAttributeSet::GetMaxAwakenGaugeAttribute());
+
+		bCanStart = (awakenGauge == maxAwakenGauge);
+	}
+		
+	if (!bCanStart || !CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo))
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
+	}
+
+	if (skillData->skillIdTag == CDTags::Ability_Skill_Awakening)
+	{
+		const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
+		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, -100.f);
+		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
 	}
 
 	const ACDCharacterBase* character = GetCDCharacter();
@@ -240,12 +288,6 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 
 	BeginCastTowards(aimLocation);
 	SetCasting(true);
-
-	// 스킬 시전 시 이동 거리 계산 및 이동 연출
-	if (skillData->dashDistance > 0.f)
-	{
-		StartDash(character->GetActorForwardVector(), skillData->dashDistance, skillData->dashDuration);
-	}
 
 	// 몽타주 내 공격 노티파이 수신 기능
 	UAbilityTask_WaitGameplayEvent* hitTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, CDTags::Event_Montage, nullptr, false, false);
@@ -272,4 +314,16 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 	montageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->ReadyForActivation();
+}
+
+void UCDPlayerSkillAbility::GatherAwakeningGauge()
+{
+	// 각성기가 아니면 각성기 게이지 습득
+	if (skillData->skillIdTag != CDTags::Ability_Skill_Awakening)
+	{
+		// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
+		const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
+		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, 10.f);
+		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
+	}
 }

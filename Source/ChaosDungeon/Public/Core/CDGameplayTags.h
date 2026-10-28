@@ -22,6 +22,7 @@ namespace CDTags
 
 	// 어빌리티 분류
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Skill);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Skill_Awakening);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Dodge);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Attack);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_HitReact);
@@ -42,6 +43,7 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Recovery);			// 애님 노티파이: 후딜 시작
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboStart);		// 애님 노티파이: 콤보 시작
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ComboEnd);			// 애님 노티파이: 콤보 종료
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Move);				// 애님 노티파이: 이동
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_ReticleOn);		// 애님 노티파이: 장판 On
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Targetable); 		// 애님 노티파이: 궁극기 발사 시 콜리전 복구용
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Untargetable);		// 애님 노티파이: 궁극기 발사 시 콜리전 제거용
@@ -55,6 +57,9 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Cooldown);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Coefficient);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Critical);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Buff);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_BuffDuration);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Awakening);
 
 	// 메시지 채널 (UCDMessageSubsystem) — 페이로드 구조체는 CDMessages.h
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Msg_Combat_Damage);       // FCDDamageMessage
