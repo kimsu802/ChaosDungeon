@@ -85,9 +85,9 @@ FVector UCDMonsterSkillAbility::GetSkillOrigin() const
 	}
 	switch (skillData->origin)
 	{
-	case ECDSkillOrigin::Cursor:
+	case ECDSkillOrigin::TargetLocation:
 		return targetLocation;
-	case ECDSkillOrigin::CastLocation:
+	case ECDSkillOrigin::CastStartLocation:
 		return skillCastLocation;
 	default:
 		return GetCDCharacter() ? GetCDCharacter()->GetActorLocation() : FVector::ZeroVector;
