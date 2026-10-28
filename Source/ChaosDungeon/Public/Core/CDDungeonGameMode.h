@@ -63,6 +63,18 @@ private:
 	/** Stage.PortalEntered: 다음 스테이지로 */
 	void HandlePortalEntered(const FCDStageMessage& message);
 
+	/* 생존 타이머와 폭탄 타이머 시작 - yoonsang */
+	void StartBombGame();
+
+	/* 떨어질 위치 정하고 폭탄 생성 - yoonsang */
+	void SpawnBomb();
+
+	/* 생존 시간 완료 및 ClearStage - yoonsang */
+	void CompleteBombGame();
+
+	/* 타이머 중단 및 폭탄 정리 - yoonsang */
+	void StopBombGame();
+
 	/** 레벨에 배치된 스폰 포인트 위치 수집 */
 	TArray<FVector> GatherSpawnPoints() const;
 
@@ -105,4 +117,17 @@ private:
 
 	/** 클리어 중복 처리 방지 */
 	bool bStageCleared = false;
+
+	/* 폭탄 생성 주기 관리 - yoonsang */
+	FTimerHandle bombSpawnTimer;
+
+	/* 생존 시간 관리 - yoonsang */
+	FTimerHandle bombCompleteTimer;
+
+	/* bomb 미니 게임 실행 - yoonsang */
+	bool bIsBombGameActive = false;
+
+	/* 폭탄 제거 목록 - yoonsang */
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<AActor>> spawnedBombs;
 };

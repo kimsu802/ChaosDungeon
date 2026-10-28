@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/DataAsset.h"
+#include "Core/CDTypes.h"
 #include "CDStageData.generated.h"
 
 class UCDMonsterData;
@@ -60,4 +61,21 @@ public:
 	/** 웨이브당 스폰 수 (난이도 배율 적용 전) */
 	UPROPERTY(EditDefaultsOnly, Category = "Spawn")
 	int32 spawnPerWave = 4;
+
+	/* 미니 게임 스테이지 - 스테이지 타입 - yoonsang */
+	UPROPERTY(EditDefaultsOnly, Category = "StageTypes")
+	ECDGameModeType gameModeType = ECDGameModeType::DungeonGameMode;
+
+	/* 미니 게임 스테이지 - 생존 목표 시간 - yoonsang */
+	UPROPERTY(EditDefaultsOnly, Category = "DurationTime")
+	int32 durationTime = 30;
+
+	/* 미니 게임 스테이지 - 폭탄 생성 간격- yoonsang */
+	UPROPERTY(EditDefaultsOnly, Category = "BombSpawnInterval")
+	float bombSpawnInterval = 2.0f;
+
+	/* 미니 게임 스테이지 - 생성할 폭탄 BP - yoonsang */
+	UPROPERTY(EditDefaultsOnly, Category = "bombClass")
+	TSubclassOf<AActor> bombClass;
+
 };
