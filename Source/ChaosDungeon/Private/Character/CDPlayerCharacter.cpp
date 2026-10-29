@@ -12,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/GameInstance.h"
 #include "Player/CDOcclusionFadeComponent.h"
+#include "Player/CDAwakenDirectorComponent.h"
 
 ACDPlayerCharacter::ACDPlayerCharacter()
 {
@@ -36,6 +37,7 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 	camera->bUsePawnControlRotation = false;
 
 	occlusionFade = CreateDefaultSubobject<UCDOcclusionFadeComponent>(TEXT("OcclusionFade"));
+	awakenDirector = CreateDefaultSubobject<UCDAwakenDirectorComponent>(TEXT("AwakenDirector"));
 
 	// 벽 뒤 실루엣: 항상 CustomDepth 렌더 (포스트프로세스 머티리얼에서 처리)
 	GetMesh()->SetRenderCustomDepth(false);

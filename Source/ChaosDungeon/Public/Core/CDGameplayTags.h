@@ -48,6 +48,7 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Targetable); 		// 애님 노티파이: 궁극기 발사 시 콜리전 복구용
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Untargetable);		// 애님 노티파이: 궁극기 발사 시 콜리전 제거용
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Land);				// 애님 노티파이: 궁극기 착지 시 위치 이동용
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_AwakenFreeze);		// 애님 노티파이: 각성기 돌진 도착 (정적 · 히트스톱 시작)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Hit);						// 피격 리액션 트리거
 
 	// 쿨다운
@@ -72,6 +73,7 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Msg_Run_DeathCount);      // FCDRunMessage
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Msg_Run_Finished);        // FCDRunMessage
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Msg_UI_FloatingText);     // FCDWorldTextMessage
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Msg_Awaken_Phase);        // FCDAwakenPhaseMessage
 
 	// UI 레이어 (UCDPrimaryLayout)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(UI_Layer_Game);
@@ -80,5 +82,7 @@ namespace CDTags
 
 	// VFX (Skill 이펙트)
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Skill);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Skill_AwakenCharge);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Skill_AwakenSlash);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_HitEffect);
 }

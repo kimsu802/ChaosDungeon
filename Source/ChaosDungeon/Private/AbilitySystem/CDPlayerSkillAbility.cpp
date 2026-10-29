@@ -9,6 +9,7 @@
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
+#include "Player/CDAwakenDirectorComponent.h"
 
 
 UCDPlayerSkillAbility::UCDPlayerSkillAbility()
@@ -106,6 +107,12 @@ void UCDPlayerSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, 
 		onConfirmInput.Unbind();
 	}
 
+	// 10.29 각성기 연출: 취소면 즉시 복귀, 정상 종료면 남은 연출(지연 베기 · 복귀)은 끝까지
+	if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
+	{
+		director->NotifyAbilityEnded(bWasCancelled);
+	}
+
 	Super::EndAbility(handle, actorInfo, activationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -177,6 +184,11 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 			}
 			else
 			{
+				// 10.29 각성기 연출: 지연 베기 (피격 이펙트가 Impact 화면 위에 나오도록 ApplyHit 보다 먼저)
+				if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
+				{
+					director->EnterPhase(ECDAwakenPhase::Impact);
+				}
 				ApplyHit();
 			}
 		}
@@ -199,6 +211,14 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 				const float airOffset = character->GetActorLocation().Z - skillCastLocation.Z;
 				const float destinationZ = targetLocation.Z + character->GetSimpleCollisionHalfHeight() + airOffset;
 				character->SetActorLocation(FVector(targetLocation.X, targetLocation.Y, destinationZ));
+			}
+			else if (tag == CDTags::Event_Montage_AwakenFreeze)
+			{
+				// 10.29 각성기 연출: 도착 후 정적 (전부 멈춤 → 다음 Hit 노티파이가 늦게 온다)
+				if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
+				{
+					director->EnterPhase(ECDAwakenPhase::Freeze);
+				}
 			}
 			else if (tag == CDTags::Event_Montage_ReticleOn)
 			{
@@ -223,6 +243,12 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 			}
 			else if (tag == CDTags::Event_Montage_Move)
 			{
+				// 10.29 각성기 연출: 돌진 (시간 복귀 · 줌 펀치)
+				if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
+				{
+					director->EnterPhase(ECDAwakenPhase::Release);
+				}
+
 				// 스킬 시전 시 이동 거리 계산 및 이동 연출
 				if (skillData->dashDistance > 0.f)
 				{
@@ -256,6 +282,8 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 				}
 
 				params.Location = origin;
+				// 10.29 이펙트 방향 = 시전자 정면 (각성기 참격선처럼 돌진 방향을 따라야 하는 이펙트용, GCN 스폰 회전에 사용)
+				params.Normal = GetCDCharacter()->GetActorForwardVector();
 
 				if (vfx.effectType == ECDSkillVFXType::Burst)
 				{
@@ -287,6 +315,12 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 		const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
 		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, -100.f);
 		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
+
+		// 10.29 각성기 연출: 기 모으기 (세상 느려짐, 플레이어는 정상 속도)
+		if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
+		{
+			director->EnterPhase(ECDAwakenPhase::Charge);
+		}
 	}
 
 	const ACDCharacterBase* character = GetCDCharacter();
@@ -322,6 +356,17 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 	montageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->ReadyForActivation();
+}
+
+UCDAwakenDirectorComponent* UCDPlayerSkillAbility::GetAwakenDirector() const
+{
+	if ((skillData == nullptr) || (skillData->skillIdTag != CDTags::Ability_Skill_Awakening))
+	{
+		return nullptr;
+	}
+
+	const AActor* avatar = GetAvatarActorFromActorInfo();
+	return avatar ? avatar->FindComponentByClass<UCDAwakenDirectorComponent>() : nullptr;
 }
 
 void UCDPlayerSkillAbility::GatherAwakeningGauge()
