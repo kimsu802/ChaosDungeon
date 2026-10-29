@@ -39,6 +39,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Targetable, "Event.Montage.Targetable");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Untargetable, "Event.Montage.UnTargetable");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Land, "Event.Montage.Land");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_AwakenFreeze, "Event.Montage.AwakenFreeze");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Hit, "Event.Hit");
 
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dodge, "Cooldown.Dodge");
@@ -60,6 +61,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Msg_Run_DeathCount, "Run.DeathCount");
 	UE_DEFINE_GAMEPLAY_TAG(Msg_Run_Finished, "Run.Finished");
 	UE_DEFINE_GAMEPLAY_TAG(Msg_UI_FloatingText, "UI.FloatingText");
+	UE_DEFINE_GAMEPLAY_TAG(Msg_Awaken_Phase, "Awaken.Phase");
 
 	UE_DEFINE_GAMEPLAY_TAG(UI_Layer_Game, "UI.Layer.Game");
 	UE_DEFINE_GAMEPLAY_TAG(UI_Layer_GameMenu, "UI.Layer.GameMenu");
@@ -67,5 +69,7 @@ namespace CDTags
 
 
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill, "GameplayCue.Skill");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill_AwakenCharge, "GameplayCue.Skill.AwakenCharge");
+	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill_AwakenSlash, "GameplayCue.Skill.AwakenSlash");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitEffect, "GameplayCue.HitEffect");
 }

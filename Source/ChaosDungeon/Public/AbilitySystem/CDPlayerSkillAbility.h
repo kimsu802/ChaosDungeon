@@ -8,6 +8,8 @@
 
 DECLARE_DELEGATE(FOnConfirmInput);
 
+class UCDAwakenDirectorComponent;
+
 /**
  * 
  */
@@ -42,6 +44,9 @@ protected:
 
 private:
 	void GatherAwakeningGauge();
+
+	/** 각성기일 때만 시전자의 연출 감독 (아니면 null) */
+	UCDAwakenDirectorComponent* GetAwakenDirector() const;
 
 private:
 	/** 2차 입력 스킬에 대한 확인 입력 시 Task에 정보 전달용 Delegate 변수 */

@@ -29,6 +29,18 @@ enum class ECDConfirmResult : uint8
 	Closed      // 버튼 없이 닫힘 (Esc/Back, 띄우기 실패)
 };
 
+/** 각성기 연출 단계 (UCDAwakenDirectorComponent → Msg.Awaken.Phase) */
+UENUM(BlueprintType)
+enum class ECDAwakenPhase : uint8
+{
+	None,		// 연출 없음
+	Charge,		// 기 모으기 (세상 느려짐)
+	Release,	// 돌진
+	Freeze,		// 도착 후 정적 (히트스톱)
+	Impact,		// 지연 베기
+	Recover		// 복귀
+};
+
 /** 떠오르는 텍스트 종류 (색/연출은 위젯 BP 에서 결정) */
 UENUM(BlueprintType)
 enum class ECDFloatingTextStyle : uint8

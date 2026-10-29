@@ -109,6 +109,25 @@ struct CHAOSDUNGEON_API FCDRunMessage
 	bool bNewRecord = false;
 };
 
+/** Awaken.Phase */
+USTRUCT(BlueprintType)
+struct CHAOSDUNGEON_API FCDAwakenPhaseMessage
+{
+	GENERATED_BODY()
+
+	/** 새 단계 */
+	UPROPERTY(BlueprintReadOnly)
+	ECDAwakenPhase phase = ECDAwakenPhase::None;
+
+	/** 시전자 정면(돌진 방향)의 화면 각도 (도, 화면 오른쪽 = 0, 시계 방향 +). 속도선 회전용 */
+	UPROPERTY(BlueprintReadOnly)
+	float screenAngle = 0.f;
+
+	/** 시전자 */
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<AActor> instigator;
+};
+
 /** UI.FloatingText */
 USTRUCT(BlueprintType)
 struct CHAOSDUNGEON_API FCDWorldTextMessage

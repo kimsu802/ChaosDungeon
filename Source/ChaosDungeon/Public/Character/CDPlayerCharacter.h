@@ -7,6 +7,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UCDCharacterClassData;
 class UCDOcclusionFadeComponent;
+class UCDAwakenDirectorComponent;
 
 /**
  * 플레이어 캐릭터: 쿼터뷰 카메라 + 직업 데이터로 스킬 구성
@@ -53,6 +54,10 @@ protected:
 	/** 카메라를 가리는 벽 반투명 처리 */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCDOcclusionFadeComponent> occlusionFade;
+
+	/** 각성기 연출 (카메라 · PP · TimeDilation). 커브 테이블 등은 BP 에서 지정 */
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	TObjectPtr<UCDAwakenDirectorComponent> awakenDirector;
 
 	/** 직업 데이터 (스탯, 기본 스킬, 회피) */
 	UPROPERTY(EditDefaultsOnly, Category = "Class")
