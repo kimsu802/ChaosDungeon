@@ -8,6 +8,7 @@
 class APawn;
 class APlayerController;
 class UCDHealthVM;
+class UCDAwakenGaugeVM;
 class UCDStageVM;
 class UCDSkillSlotVM;
 class UCDRunResultVM;
@@ -17,7 +18,7 @@ struct FCDActorMessage;
  * ViewModel 생성 · 등록 · 연결 담당. (VM 은 로컬 플레이어 수명 → 레벨이 바뀌어도 유지)
  * - 모든 VM 을 MVVM Global Viewmodel Collection 에 이름으로 등록한다.
  *   View(위젯 BP)는 Creation Type = Global Viewmodel Collection, 이름만 지정하면 된다.
- *     PlayerHealth, BossHealth, Stage, RunResult
+ *     PlayerHealth, BossHealth, Stage, RunResult, AwakenGauge
  * - 스킬 슬롯 VM 은 슬롯마다 다르므로 GetSkillSlot(inputTag) 로 조회 (UCDSkillSlotWidget)
  * - 폰이 바뀌면 ASC 에 다시 연결
  */
@@ -43,7 +44,7 @@ public:
 	}
 
 private:
-	/** 폰 변경 → HP/슬롯 VM 을 새 ASC 에 연결 */
+	/** 폰 변경 → HP/각성/슬롯 VM 을 새 ASC 에 연결 */
 	UFUNCTION()
 	void HandlePawnChanged(APawn* oldPawn, APawn* newPawn);
 
@@ -76,6 +77,10 @@ private:
 	/** 결과 화면 */
 	UPROPERTY(Transient)
 	TObjectPtr<UCDRunResultVM> runResult;
+
+	/** 각성 게이지 */
+	UPROPERTY(Transient)
+	TObjectPtr<UCDAwakenGaugeVM> awakenGauge;
 
 	/** 입력 태그별 슬롯 VM */
 	UPROPERTY(Transient)

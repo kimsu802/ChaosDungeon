@@ -10,6 +10,7 @@
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
 #include "Player/CDAwakenDirectorComponent.h"
+#include "Player/CDSpeechBubbleComponent.h"
 
 
 UCDPlayerSkillAbility::UCDPlayerSkillAbility()
@@ -112,6 +113,9 @@ void UCDPlayerSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, 
 	{
 		director->NotifyAbilityEnded(bWasCancelled);
 	}
+
+	// 10.29 시전 대사: 스킬이 끝나면(정상 · 취소 모두) 내림
+	HideCastLine();
 
 	Super::EndAbility(handle, actorInfo, activationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -349,6 +353,9 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 	vfxTask->EventReceived.AddDynamic(this, &ThisClass::OnEventReceived);
 	vfxTask->ReadyForActivation();
 
+	// 10.29 시전 대사: 몽타주(= 보이스 노티파이)와 같은 순간에 표시
+	ShowCastLine();
+
 	// 스킬 몽타주 재생
 	UAbilityTask_PlayMontageAndWait* montageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, skillData->montage);
 	montageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -367,6 +374,36 @@ UCDAwakenDirectorComponent* UCDPlayerSkillAbility::GetAwakenDirector() const
 
 	const AActor* avatar = GetAvatarActorFromActorInfo();
 	return avatar ? avatar->FindComponentByClass<UCDAwakenDirectorComponent>() : nullptr;
+}
+
+void UCDPlayerSkillAbility::ShowCastLine()
+{
+	if ((skillData == nullptr) || skillData->castLine.IsEmpty())
+	{
+		return;
+	}
+
+	const AActor* avatar = GetAvatarActorFromActorInfo();
+	if (UCDSpeechBubbleComponent* speech = avatar ? avatar->FindComponentByClass<UCDSpeechBubbleComponent>() : nullptr)
+	{
+		castLineId = speech->ShowSpeech(skillData->castLine);
+	}
+}
+
+void UCDPlayerSkillAbility::HideCastLine()
+{
+	if (castLineId == INDEX_NONE)
+	{
+		return;
+	}
+
+	const AActor* avatar = GetAvatarActorFromActorInfo();
+	if (UCDSpeechBubbleComponent* speech = avatar ? avatar->FindComponentByClass<UCDSpeechBubbleComponent>() : nullptr)
+	{
+		// 그 사이 다른 대사로 바뀌었으면 컴포넌트가 무시한다
+		speech->HideSpeech(castLineId);
+	}
+	castLineId = INDEX_NONE;
 }
 
 void UCDPlayerSkillAbility::GatherAwakeningGauge()

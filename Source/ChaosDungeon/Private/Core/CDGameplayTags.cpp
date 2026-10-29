@@ -69,7 +69,5 @@ namespace CDTags
 
 
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill, "GameplayCue.Skill");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill_AwakenCharge, "GameplayCue.Skill.AwakenCharge");
-	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Skill_AwakenSlash, "GameplayCue.Skill.AwakenSlash");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_HitEffect, "GameplayCue.HitEffect");
 }

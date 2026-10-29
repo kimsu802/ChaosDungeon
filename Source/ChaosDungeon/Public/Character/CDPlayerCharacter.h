@@ -8,6 +8,7 @@ class USpringArmComponent;
 class UCDCharacterClassData;
 class UCDOcclusionFadeComponent;
 class UCDAwakenDirectorComponent;
+class UCDSpeechBubbleComponent;
 
 /**
  * 플레이어 캐릭터: 쿼터뷰 카메라 + 직업 데이터로 스킬 구성
@@ -58,6 +59,10 @@ protected:
 	/** 각성기 연출 (카메라 · PP · TimeDilation). 커브 테이블 등은 BP 에서 지정 */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCDAwakenDirectorComponent> awakenDirector;
+
+	/** 머리 위 대사창 (BP 에서 Parent Socket = head, Widget Class = WBP_SpeechBubble 지정) */
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<UCDSpeechBubbleComponent> speechBubble;
 
 	/** 직업 데이터 (스탯, 기본 스킬, 회피) */
 	UPROPERTY(EditDefaultsOnly, Category = "Class")

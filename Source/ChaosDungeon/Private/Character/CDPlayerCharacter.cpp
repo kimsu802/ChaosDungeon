@@ -13,6 +13,7 @@
 #include "Engine/GameInstance.h"
 #include "Player/CDOcclusionFadeComponent.h"
 #include "Player/CDAwakenDirectorComponent.h"
+#include "Player/CDSpeechBubbleComponent.h"
 
 ACDPlayerCharacter::ACDPlayerCharacter()
 {
@@ -38,6 +39,10 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 
 	occlusionFade = CreateDefaultSubobject<UCDOcclusionFadeComponent>(TEXT("OcclusionFade"));
 	awakenDirector = CreateDefaultSubobject<UCDAwakenDirectorComponent>(TEXT("AwakenDirector"));
+
+	// 머리 위 대사창: 메시의 head 소켓 (소켓 이름이 다르면 BP 에서 Parent Socket 변경)
+	speechBubble = CreateDefaultSubobject<UCDSpeechBubbleComponent>(TEXT("SpeechBubble"));
+	speechBubble->SetupAttachment(GetMesh(), TEXT("head"));
 
 	// 벽 뒤 실루엣: 항상 CustomDepth 렌더 (포스트프로세스 머티리얼에서 처리)
 	GetMesh()->SetRenderCustomDepth(false);
