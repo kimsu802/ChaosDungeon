@@ -89,6 +89,10 @@ struct CHAOSDUNGEON_API FCDBaseStats
 	/** 치명타 피해 배율 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float critDamage = 1.5f;
+
+	/** 최대 각성기 게이지 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float maxAwakenGauge = 100.f;
 };
 
 /** 난이도별 배율. 몬스터 스폰 시 스탯에 곱해진다. */

@@ -10,6 +10,14 @@ class UAnimMontage;
 class UTexture2D;
 class UCDSkillAbility;
 
+/* 스킬 기능 구분 */
+UENUM(BlueprintType)
+enum class ECDSkillType : uint8
+{
+	Attack,
+	Buff,
+};
+
 /* 시전 방식 설정 */
 UENUM(BlueprintType)
 enum class ECDSkillCastPolicy : uint8
@@ -40,7 +48,7 @@ enum class ECDSkillTargetingType : uint8
 UENUM(BlueprintType)
 enum class ECDSkillVFXType : uint8
 {
-	Burst,				// 즉발
+	Burst,				// 단발
 	Looping,			// 반복 실행
 };
 
@@ -93,6 +101,10 @@ public:
 	/** 타격 시점에 Event.Montage.Hit, 후딜 시작에 Event.Montage.Recovery 노티파이를 넣는다 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	TObjectPtr<UAnimMontage> montage;
+
+	/** 스킬 기능 */
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	ECDSkillType skillType;
 
 	/** 스킬 조준 방식 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
