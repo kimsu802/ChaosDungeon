@@ -90,6 +90,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<UTexture2D> icon;
 
+	/** 시전 대사 (비우면 없음). 시전 확정(몽타주 시작) ~ 스킬 종료(EndAbility) 동안 머리 위에 표시. 보이스는 몽타주 Play Sound 노티파이로 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	FText castLine;
+
 	/** 스킬 구분자 태그 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	FGameplayTag skillIdTag;

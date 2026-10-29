@@ -1,0 +1,114 @@
+#include "UI/ViewModel/CDViewModelSubsystem.h"
+#include "AbilitySystem/CDAbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Core/CDGameplayTags.h"
+#include "Core/CDMessages.h"
+#include "Data/CDInputConfig.h"
+#include "EnhancedInputSubsystems.h"
+#include "Engine/GameInstance.h"
+#include "Engine/LocalPlayer.h"
+#include "GameFramework/PlayerController.h"
+#include "MVVMGameSubsystem.h"
+#include "Player/CDPlayerController.h"
+#include "Types/MVVMViewModelCollection.h"
+#include "UI/ViewModel/CDAwakenGaugeVM.h"
+#include "UI/ViewModel/CDHealthVM.h"
+#include "UI/ViewModel/CDRunResultVM.h"
+#include "UI/ViewModel/CDSkillSlotVM.h"
+#include "UI/ViewModel/CDStageVM.h"
+
+template <typename TViewModel>
+TViewModel* UCDViewModelSubsystem::CreateGlobalViewModel(FName name)
+{
+	TViewModel* viewModel = NewObject<TViewModel>(this);
+
+	FMVVMViewModelContext context;
+	context.ContextClass = TViewModel::StaticClass();
+	context.ContextName = name;
+
+	UMVVMGameSubsystem* mvvm = GetLocalPlayer()->GetGameInstance()->GetSubsystem<UMVVMGameSubsystem>();
+	mvvm->GetViewModelCollection()->AddViewModelInstance(context, viewModel);
+	return viewModel;
+}
+
+void UCDViewModelSubsystem::Initialize(FSubsystemCollectionBase& collection)
+{
+	Super::Initialize(collection);
+
+	playerHealth = CreateGlobalViewModel<UCDHealthVM>(TEXT("PlayerHealth"));
+	bossHealth = CreateGlobalViewModel<UCDHealthVM>(TEXT("BossHealth"));
+	stage = CreateGlobalViewModel<UCDStageVM>(TEXT("Stage"));
+	runResult = CreateGlobalViewModel<UCDRunResultVM>(TEXT("RunResult"));
+	awakenGauge = CreateGlobalViewModel<UCDAwakenGaugeVM>(TEXT("AwakenGauge"));
+
+	const TArray<FGameplayTag> slotTags = { CDTags::Input_Skill_1, CDTags::Input_Skill_2, CDTags::Input_Skill_3, CDTags::Input_Skill_4, CDTags::Input_Dodge };
+	for (const FGameplayTag& slotTag : slotTags)
+	{
+		skillSlots.Add(slotTag, NewObject<UCDSkillSlotVM>(this));
+	}
+
+	UCDMessageSubsystem& messages = GetMessages();
+	stage->StartListening(messages);
+	runResult->StartListening(messages);
+	bossHandle = messages.Listen(CDTags::Msg_Combat_BossAppeared, this, &ThisClass::HandleBossAppeared);
+}
+
+void UCDViewModelSubsystem::Deinitialize()
+{
+	UCDMessageSubsystem& messages = GetMessages();
+	stage->StopListening(messages);
+	runResult->StopListening(messages);
+	messages.Unlisten(bossHandle);
+	Super::Deinitialize();
+}
+
+void UCDViewModelSubsystem::BindPlayer(APlayerController* playerController)
+{
+	playerController->OnPossessedPawnChanged.AddUniqueDynamic(this, &ThisClass::HandlePawnChanged);
+	// 이미 빙의된 경우
+	HandlePawnChanged(nullptr, playerController->GetPawn());
+	BindSlotKeys(playerController);
+}
+
+void UCDViewModelSubsystem::BindSlotKeys(const APlayerController* playerController)
+{
+	const ACDPlayerController* cdController = Cast<ACDPlayerController>(playerController);
+	const UCDInputConfig* inputConfig = cdController ? cdController->GetInputConfig() : nullptr;
+	const UEnhancedInputLocalPlayerSubsystem* inputSubsystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	UEnhancedInputUserSettings* userSettings = inputSubsystem ? inputSubsystem->GetUserSettings() : nullptr;
+	if (!inputConfig || !userSettings)
+	{
+		return;
+	}
+
+	for (const TPair<FGameplayTag, TObjectPtr<UCDSkillSlotVM>>& slot : skillSlots)
+	{
+		slot.Value->BindKey(userSettings, inputConfig->FindMappingName(slot.Key));
+	}
+
+	// 각성기는 슬롯 VM 이 아니라 게이지 VM 이 키 표시를 맡는다
+	awakenGauge->BindKey(userSettings, inputConfig->FindMappingName(CDTags::Input_Skill_Awakening));
+}
+
+void UCDViewModelSubsystem::HandlePawnChanged(APawn* oldPawn, APawn* newPawn)
+{
+	UAbilitySystemComponent* abilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(newPawn);
+	playerHealth->BindTo(abilitySystem);
+	awakenGauge->BindTo(abilitySystem);
+
+	UCDAbilitySystemComponent* cdAbilitySystem = Cast<UCDAbilitySystemComponent>(abilitySystem);
+	for (const TPair<FGameplayTag, TObjectPtr<UCDSkillSlotVM>>& slot : skillSlots)
+	{
+		slot.Value->BindTo(cdAbilitySystem, slot.Key);
+	}
+}
+
+void UCDViewModelSubsystem::HandleBossAppeared(const FCDActorMessage& message)
+{
+	bossHealth->BindTo(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(message.actor));
+}
+
+UCDMessageSubsystem& UCDViewModelSubsystem::GetMessages() const
+{
+	return *GetLocalPlayer()->GetGameInstance()->GetSubsystem<UCDMessageSubsystem>();
+}

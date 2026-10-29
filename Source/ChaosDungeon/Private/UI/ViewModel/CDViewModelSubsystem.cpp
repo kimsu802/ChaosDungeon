@@ -11,6 +11,7 @@
 #include "MVVMGameSubsystem.h"
 #include "Player/CDPlayerController.h"
 #include "Types/MVVMViewModelCollection.h"
+#include "UI/ViewModel/CDAwakenGaugeVM.h"
 #include "UI/ViewModel/CDHealthVM.h"
 #include "UI/ViewModel/CDRunResultVM.h"
 #include "UI/ViewModel/CDSkillSlotVM.h"
@@ -38,8 +39,9 @@ void UCDViewModelSubsystem::Initialize(FSubsystemCollectionBase& collection)
 	bossHealth = CreateGlobalViewModel<UCDHealthVM>(TEXT("BossHealth"));
 	stage = CreateGlobalViewModel<UCDStageVM>(TEXT("Stage"));
 	runResult = CreateGlobalViewModel<UCDRunResultVM>(TEXT("RunResult"));
+	awakenGauge = CreateGlobalViewModel<UCDAwakenGaugeVM>(TEXT("AwakenGauge"));
 
-	const TArray<FGameplayTag> slotTags = { CDTags::Input_Skill_1, CDTags::Input_Skill_2, CDTags::Input_Skill_3, CDTags::Input_Skill_4, CDTags::Input_Dodge };
+	const TArray<FGameplayTag> slotTags = { CDTags::Input_Skill_1, CDTags::Input_Skill_2, CDTags::Input_Skill_3, CDTags::Input_Skill_4, CDTags::Input_Skill_Awakening, CDTags::Input_Dodge };
 	for (const FGameplayTag& slotTag : slotTags)
 	{
 		skillSlots.Add(slotTag, NewObject<UCDSkillSlotVM>(this));
@@ -83,12 +85,16 @@ void UCDViewModelSubsystem::BindSlotKeys(const APlayerController* playerControll
 	{
 		slot.Value->BindKey(userSettings, inputConfig->FindMappingName(slot.Key));
 	}
+
+	// 각성기는 슬롯 VM 이 아니라 게이지 VM 이 키 표시를 맡는다
+	awakenGauge->BindKey(userSettings, inputConfig->FindMappingName(CDTags::Input_Skill_Awakening));
 }
 
 void UCDViewModelSubsystem::HandlePawnChanged(APawn* oldPawn, APawn* newPawn)
 {
 	UAbilitySystemComponent* abilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(newPawn);
 	playerHealth->BindTo(abilitySystem);
+	awakenGauge->BindTo(abilitySystem);
 
 	UCDAbilitySystemComponent* cdAbilitySystem = Cast<UCDAbilitySystemComponent>(abilitySystem);
 	for (const TPair<FGameplayTag, TObjectPtr<UCDSkillSlotVM>>& slot : skillSlots)

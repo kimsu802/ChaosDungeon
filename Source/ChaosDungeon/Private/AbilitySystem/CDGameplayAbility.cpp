@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("일반 공격 및 스킬 판정 범위를 그린다"));
 
@@ -64,6 +65,15 @@ void UCDGameplayAbility::BeginCastTowards(const FVector& location) const
 	{
 		controller->StopMovement();
 	}
+
+	// 10.29 남은 속도 + 이번 프레임에 쌓인 이동 입력까지 제거
+	// (남아 있으면 OrientRotationToMovement 가 다음 Tick 에 원래 이동 방향으로 되돌린다. 각성기는 플레이어 ×5 라 더 크게 보임)
+	if (UCharacterMovementComponent* movement = character->GetCharacterMovement())
+	{
+		movement->StopMovementImmediately();
+		movement->ConsumeInputVector();
+	}
+
 	const FVector toTarget = location - character->GetActorLocation();
 	if (!toTarget.IsNearlyZero())
 	{

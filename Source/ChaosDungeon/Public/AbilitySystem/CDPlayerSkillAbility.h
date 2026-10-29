@@ -48,7 +48,16 @@ private:
 	/** 각성기일 때만 시전자의 연출 감독 (아니면 null) */
 	UCDAwakenDirectorComponent* GetAwakenDirector() const;
 
+	/** 시전 대사 표시 (skillData->castLine) */
+	void ShowCastLine();
+
+	/** 이 스킬이 띄운 시전 대사만 내림 */
+	void HideCastLine();
+
 private:
 	/** 2차 입력 스킬에 대한 확인 입력 시 Task에 정보 전달용 Delegate 변수 */
 	FOnConfirmInput onConfirmInput;
+
+	/** 이 스킬이 띄운 시전 대사 번호 (INDEX_NONE = 없음) */
+	int32 castLineId = INDEX_NONE;
 };
