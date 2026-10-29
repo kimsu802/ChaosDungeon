@@ -62,14 +62,29 @@ void ACDDungeonGameMode::AbandonRun()
 
 void ACDDungeonGameMode::BeginStage()
 {
+	const UCDStageData* stage = GetRun()->GetCurrentStage();
+
 	stageStartTime = GetWorld()->GetTimeSeconds();
 	BroadcastStage(CDTags::Msg_Stage_Started);
 
-	 spawnManager->StartSpawning();
+	/* 현재 실행중인 게임 타입이 미닉 게임이면 스타트 - yoonsang */
+	if (stage->gameModeType == ECDGameModeType::MiniGameMode)
+	{
+		StartBombGame();
+	}
+	else
+	{
+		spawnManager->StartSpawning();
+	}
 }
 
 void ACDDungeonGameMode::ClearStage()
 {
+	if (bIsBombGameActive)
+	{
+		StopBombGame();
+	}
+
 	bStageCleared = true;
 	spawnManager->StopSpawning();
 	CommitStageTime();
@@ -123,6 +138,7 @@ void ACDDungeonGameMode::BroadcastStage(FGameplayTag channel) const
 		message.stageName = stage->displayName;
 	}
 	message.progress = targetProgress > 0.f ? FMath::Min(progress / targetProgress, 1.f) : 0.f;
+
 	message.remainingDeaths = GetRun()->GetRemainingDeaths();
 	UCDMessageSubsystem::Get(this).Broadcast(channel, message);
 }
@@ -180,6 +196,84 @@ void ACDDungeonGameMode::HandleDeath(const FCDDeathMessage& message)
 void ACDDungeonGameMode::HandlePortalEntered(const FCDStageMessage& message)
 {
 	GetRun()->AdvanceStage();
+}
+
+void ACDDungeonGameMode::StartBombGame()
+{
+	const UCDStageData* stage = GetRun()->GetCurrentStage();
+
+	if (bIsBombGameActive)
+	{
+		return;
+	}
+
+	bIsBombGameActive = true;
+
+	GetWorldTimerManager().SetTimer(
+        bombSpawnTimer,
+        this,
+        &ThisClass::SpawnBomb,
+        stage->bombSpawnInterval,
+        true);
+
+    GetWorldTimerManager().SetTimer(
+        bombCompleteTimer,
+        this,
+        &ThisClass::CompleteBombGame,
+        static_cast<float>(stage->durationTime),
+        false);
+}
+
+void ACDDungeonGameMode::SpawnBomb()
+{
+	if (!bIsBombGameActive)
+	{
+		return;
+	}
+
+	const UCDStageData* stage = GetRun()->GetCurrentStage();
+	APawn* player = UGameplayStatics::GetPlayerPawn(this, 0);
+
+	FVector spawnLocation = player->GetActorLocation();
+	spawnLocation.Z += 1000.0f;
+
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* bomb = GetWorld()->SpawnActor<AActor>(
+		stage->bombClass,
+		spawnLocation,
+		FRotator::ZeroRotator,
+		spawnParameters);
+
+	if (IsValid(bomb))
+	{
+		spawnedBombs.Add(bomb);
+	}
+}
+
+void ACDDungeonGameMode::CompleteBombGame()
+{
+	ClearStage();
+}
+
+void ACDDungeonGameMode::StopBombGame()
+{
+	bIsBombGameActive = false;
+
+
+	GetWorldTimerManager().ClearTimer(bombSpawnTimer);
+	GetWorldTimerManager().ClearTimer(bombCompleteTimer);
+
+	for (AActor* bomb : spawnedBombs)
+	{
+		if (IsValid(bomb))
+		{
+			bomb->Destroy();
+		}
+	}
+
+	spawnedBombs.Empty();
 }
 
 TArray<FVector> ACDDungeonGameMode::GatherSpawnPoints() const

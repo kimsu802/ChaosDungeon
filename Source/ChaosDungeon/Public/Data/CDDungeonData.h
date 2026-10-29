@@ -37,7 +37,7 @@ public:
 	/** 난이도별 배율 */
 	UPROPERTY(EditDefaultsOnly)
 	TMap<ECDDifficulty, FCDDifficultySettings> difficulties;
-
+	
 	/** 허브 레벨 */
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> hubLevel;

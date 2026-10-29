@@ -47,6 +47,14 @@ enum class ECDPortalType : uint8
 	NextStage UMETA(DisplayName = "Next Stage")
 };
 
+/* 게임 분기를 나누기 - yoonsang */
+UENUM(BlueprintType)
+enum class ECDGameModeType: uint8
+{
+	DungeonGameMode UMETA(DisplayName = "DungeonGameMode"),
+	MiniGameMode UMETA(DisplayName = "MiniGameMode")
+};
+
 /** 몬스터 등급 (경직/넉백 면역 규칙의 기준) */
 UENUM(BlueprintType)
 enum class ECDMonsterGrade : uint8
