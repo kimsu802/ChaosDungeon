@@ -27,7 +27,7 @@ void UCDPlayerSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle han
 	const ACDCharacterBase* character = GetCDCharacter();
 	if (!skillData || nullptr == character)
 	{
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+		EndAbility(handle, actorInfo, CurrentActivationInfo, true, true);
 		return;
 	}
 
@@ -38,15 +38,34 @@ void UCDPlayerSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle han
 	}
 	else
 	{
-		FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
-		if (spec)
+		bool bCanActivate = true;
+
+		if (skillData->skillIdTag == CDTags::Ability_Skill_Awakening)
 		{
-			spec->GetDynamicSpecSourceTags().AddTag(CDTags::State_Targeting);
+			UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+			const float awakenGauge = abilitySystem->GetNumericAttribute(UCDAttributeSet::GetAwakenGaugeAttribute());
+			const float maxAwakenGauge = abilitySystem->GetNumericAttribute(UCDAttributeSet::GetMaxAwakenGaugeAttribute());
+
+			bCanActivate = (awakenGauge == maxAwakenGauge);
 		}
 
-		UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData, targetLocation);
-		onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
-		manage->ReadyForActivation();
+		if (bCanActivate)
+		{
+			FGameplayAbilitySpec* spec = GetCurrentAbilitySpec();
+			if (spec)
+			{
+				spec->GetDynamicSpecSourceTags().AddTag(CDTags::State_Targeting);
+			}
+
+			UCDAbilityTask_ManageReticle* manage = UCDAbilityTask_ManageReticle::ManageReticle(this, skillData, targetLocation);
+			onConfirmInput.BindUObject(manage, &UCDAbilityTask_ManageReticle::TerminateTask);
+			manage->ReadyForActivation();
+		}
+		else
+		{
+			EndAbility(handle, actorInfo, CurrentActivationInfo, true, true);
+			return;
+		}
 	}
 }
 
@@ -256,19 +275,8 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 }
 
 void UCDPlayerSkillAbility::ActivateSkillAbility()
-{
-	bool bCanStart = true;
-
-	if (skillData->skillIdTag == CDTags::Ability_Skill_Awakening)
-	{
-		UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
-		const float awakenGauge = abilitySystem->GetNumericAttribute(UCDAttributeSet::GetAwakenGaugeAttribute());
-		const float maxAwakenGauge = abilitySystem->GetNumericAttribute(UCDAttributeSet::GetMaxAwakenGaugeAttribute());
-
-		bCanStart = (awakenGauge == maxAwakenGauge);
-	}
-		
-	if (!bCanStart || !CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo))
+{	
+	if (!CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo))
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;

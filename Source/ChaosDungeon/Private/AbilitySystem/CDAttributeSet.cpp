@@ -12,7 +12,7 @@ void UCDAttributeSet::InitFromStats(const FCDBaseStats& stats, float healthMulti
 	InitCritChance(stats.critChance);
 	InitCritDamage(stats.critDamage);
 	InitMaxAwakenGauge(stats.maxAwakenGauge);
-	InitAwakenGauge(0.0f);
+	InitAwakenGauge(100.0f);
 }
 
 void UCDAttributeSet::PreAttributeChange(const FGameplayAttribute& attribute, float& newValue)
