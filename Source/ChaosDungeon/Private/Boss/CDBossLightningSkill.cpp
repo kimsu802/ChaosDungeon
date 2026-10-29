@@ -1,42 +1,102 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Boss/CDBossLightningSkill.h"
-#include <Data/CDBossSkillData.h>
-#include <Character/CDBossCharacter.h>
-#include <Engine/World.h>
-#include "NiagaraSystem.h"
-#include "NiagaraFunctionLibrary.h"
 #include "NavigationSystem.h"
+#include <AbilitySystem/CDReticleActor.h>
+#include <AbilitySystemComponent.h>
+#include <Character/CDBossCharacter.h>
+#include <Core/CDGameplayTags.h>
+#include <Data/CDBossSkillData.h>
+#include <Engine/World.h>
 
 
-void UCDBossLightningSkill::ApplyHit()
+void UCDBossLightningSkill::EndAbility(const FGameplayAbilitySpecHandle handle, const FGameplayAbilityActorInfo* actorInfo, const FGameplayAbilityActivationInfo activationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	if (!IsEndAbilityValid(handle, actorInfo))
+	{
+		return;
+	}
+
+	if (UWorld* world = GetWorld())
+	{
+		world->GetTimerManager().ClearTimer(LightningTimers);
+	}
+
+	lightningLocations.Reset();
+	bLightningScheduled = false;
+
+	// 부모 EndAbility()가 ClearReticle()을 호출한다.
+	Super::EndAbility(
+		handle,
+		actorInfo,
+		activationInfo,
+		bReplicateEndAbility,
+		bWasCancelled);
 }
 
+
 void UCDBossLightningSkill::OnMontageFinished()
+{
+	if (!IsActive() || bLightningScheduled)
+	{
+		return;
+	}
+
+	UWorld* world = GetWorld();
+
+	if (!world || lightningDelay <= 0.f
+		|| lightningLocations.IsEmpty()
+		|| spawnedReticle.Num() != lightningLocations.Num())
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+
+		return;
+	}
+
+	bLightningScheduled = true;
+
+	world->GetTimerManager().SetTimer(LightningTimers, this, &ThisClass::LightningTimer, lightningDelay, false);
+}
+
+void UCDBossLightningSkill::OnEventReceived(FGameplayEventData payload)
 {
 	if (!IsActive())
 	{
 		return;
 	}
 
-	if (!StrikeLightning())
+	const FGameplayTag tag = payload.EventTag;
+
+	if (tag == CDTags::Event_Montage_Hit)
 	{
-		EndAbility(
-			CurrentSpecHandle,
-			CurrentActorInfo,
-			CurrentActivationInfo,
-			true,
-			true);
 		return;
 	}
 
-	Super::OnMontageFinished();
+	if (tag == CDTags::Event_Montage_ReticleOn)
+	{
+		if (bLightningScheduled || !lightningLocations.IsEmpty())
+		{
+			return;
+		}
+
+		if (!LightningLocation() || !SpawnLightning())
+		{
+			EndAbility(
+				CurrentSpecHandle,
+				CurrentActorInfo,
+				CurrentActivationInfo,
+				true,
+				true);
+		}
+		return;
+	}
+	Super::OnEventReceived(payload);
 }
 
-bool UCDBossLightningSkill::StrikeLightning()
+bool UCDBossLightningSkill::LightningLocation()
 {
+	lightningLocations.Reset();
+
 	const UCDBossSkillData* data = Cast<UCDBossSkillData>(GetSkillData());
 
 	ACDBossCharacter* boss = Cast<ACDBossCharacter>(GetCDCharacter());
@@ -44,8 +104,7 @@ bool UCDBossLightningSkill::StrikeLightning()
 	UWorld* world = GetWorld();
 
 	if (!world || !IsValid(data) || !IsValid(boss)
-		|| boss->IsDead()
-		|| !IsValid(data->lightningEffect.Get()))
+		|| boss->IsDead())
 	{
 		return false;
 	}
@@ -118,30 +177,93 @@ bool UCDBossLightningSkill::StrikeLightning()
 		}
 	}
 
-	// 설정 개수를 확보하지 못하면 이번 낙뢰는 실행하지 않는다.
 	if (locations.Num() != count)
 	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("Lightning placement failed: %d / %d. "
-				"Increase spawn radius or reduce size/count."),
-			locations.Num(), count);
+		return false;
+	}
 
+	lightningLocations = locations;
+
+	return true;
+}
+
+bool UCDBossLightningSkill::SpawnLightning()
+{
+	const UCDBossSkillData* data = Cast<UCDBossSkillData>(GetSkillData());
+
+	ACDBossCharacter* boss = Cast<ACDBossCharacter>(GetCDCharacter());
+
+	UWorld* world = GetWorld();
+
+	if (!world || !IsValid(data) || !IsValid(boss) ||
+		boss->IsDead() || !reticleClass || lightningLocations.IsEmpty() ||
+		data->hitShape.type != ECDHitShapeType::Cone ||
+		data->reticleConfig.displayMode == ECDReticleDisplayMode::None)
+	{
+		return false;
+	}
+
+	ClearReticle();
+
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = boss;
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	for (const FVector& location : lightningLocations)
+	{
+		ACDReticleActor* reticle = world->SpawnActor<ACDReticleActor>(reticleClass, location, FRotator::ZeroRotator, spawnParams);
+
+		if (!IsValid(reticle))
+		{
+			ClearReticle();
+			return false;
+		}
+
+		// 부모가 제거할 수 있도록 부모 배열에 등록
+		spawnedReticle.Add(reticle);
+
+		reticle->SetReticleConfig(*data);
+	}
+
+	return true;
+}
+
+bool UCDBossLightningSkill::StrikeLightning()
+{
+	const UCDBossSkillData* data = Cast<UCDBossSkillData>(GetSkillData());
+
+	ACDBossCharacter* boss = Cast<ACDBossCharacter>(GetCDCharacter());
+
+	UWorld* world = GetWorld();
+
+	UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+
+
+	if (!world || !IsValid(data) || !IsValid(boss)
+		|| !IsValid(abilitySystem) || boss->IsDead()
+		|| lightningLocations.IsEmpty()
+		|| data->effectBaseRadius <= 0.f)
+	{
 		return false;
 	}
 
 	FCDHitShape hitShape = data->hitShape;
-	hitShape.type = ECDHitShapeType::Circle;
 
+	const float radius = hitShape.radius;
 	const float effectScale = radius / data->effectBaseRadius;
 
-	for (const FVector& location : locations)
+	const FGameplayTag tag = FGameplayTag::RequestGameplayTag(
+		FName(TEXT("GameplayCue.Boss.Lightning")));
+	
+	for (const FVector& location : lightningLocations)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			world,
-			data->lightningEffect.Get(),
-			location,
-			FRotator::ZeroRotator,
-			FVector(effectScale));
+		FGameplayCueParameters params;
+		params.Location = location;
+		params.RawMagnitude = effectScale;
+		params.Instigator = boss;
+		params.EffectCauser = boss;
+
+		abilitySystem->ExecuteGameplayCue(tag, params);
 
 		TArray<AActor*> hitActors;
 
@@ -161,4 +283,26 @@ bool UCDBossLightningSkill::StrikeLightning()
 	}
 
 	return true;
+}
+
+void UCDBossLightningSkill::LightningTimer()
+{
+	if (!IsActive() || !bLightningScheduled)
+	{
+		return;
+	}
+
+	// 프레임 지연으로 두 타이머가 같은 프레임에 처리되어도
+	// 실제 타격보다 먼저 Reticle이 제거되도록 한다.
+	ClearReticle();
+
+	// 낙뢰 실행
+	const bool bSucceeded = StrikeLightning();
+
+	EndAbility(
+		CurrentSpecHandle,
+		CurrentActorInfo,
+		CurrentActivationInfo,
+		true,
+		!bSucceeded);
 }
