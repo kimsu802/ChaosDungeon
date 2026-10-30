@@ -170,6 +170,8 @@ void UCDMonsterSkillAbility::ShowReticle()
 {
 	ClearReticle();
 	ACDCharacterBase* character = GetCDCharacter();
+	UWorld* world = GetWorld();
+
 	if (!skillData || !IsValid(character) || !GetWorld() || !reticleClass
 		|| skillData->reticleConfig.displayMode == ECDReticleDisplayMode::None)
 	{
@@ -184,24 +186,33 @@ void UCDMonsterSkillAbility::ShowReticle()
 	FActorSpawnParameters spawnParams;
 	spawnParams.Owner = character;
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	spawnedReticle = GetWorld()->SpawnActor<ACDReticleActor>(reticleClass, location, character->GetActorRotation(), spawnParams);
-	if (IsValid(spawnedReticle))
+
+	ACDReticleActor* reticle = world->SpawnActor<ACDReticleActor>(reticleClass, location, character->GetActorRotation(), spawnParams);
+	if (!IsValid(reticle))
 	{
-		spawnedReticle->SetReticleConfig(*skillData);
-		if (skillData->origin == ECDSkillOrigin::Self)
-		{
-			spawnedReticle->AttachToActor(character, FAttachmentTransformRules::KeepWorldTransform);
-		}
+		return;
+	}
+
+	spawnedReticle.Add(reticle);
+
+	reticle->SetReticleConfig(*skillData);
+
+	if (skillData->origin == ECDSkillOrigin::Self)
+	{
+		reticle->AttachToActor(character, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 
 void UCDMonsterSkillAbility::ClearReticle()
 {
-	if (IsValid(spawnedReticle))
+	for (const auto& reticle : spawnedReticle)
 	{
-		spawnedReticle->Destroy();
+		if (IsValid(reticle.Get()))
+		{
+			reticle->Destroy();
+		}
 	}
-	spawnedReticle = nullptr;
+		spawnedReticle.Reset();
 }
 
 void UCDMonsterSkillAbility::SetUntargetable(bool bNewUntargetable)
