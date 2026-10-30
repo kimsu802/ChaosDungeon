@@ -7,12 +7,23 @@ UCDBootScreen::UCDBootScreen(const FObjectInitializer& objectInitializer)
 	SetIsFocusable(true);
 }
 
+void UCDBootScreen::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	if (sceneNotice != nullptr)
+	{
+		noticeVisibility = sceneNotice->GetVisibility();
+	}
+}
+
 void UCDBootScreen::NativeOnActivated()
 {
 	Super::NativeOnActivated();
 
 	// 풀에서 다시 꺼내 쓰는 경우에 대비해 상태 초기화
 	bFinished = false;
+	SetNoticeSceneVisible(true);
 	PlayAnimation(sequenceAnim);
 }
 
@@ -60,6 +71,9 @@ void UCDBootScreen::HandleSkip()
 	// ① 주의 안내 중 → ② 시작 지점으로
 	if (current < secondSceneTime)
 	{
+		// 점프는 사이 구간을 평가하지 않는다 → ① 의 페이드 아웃 키를 건너뛰어 불투명한 채로 남을 수 있음
+		// Visibility 는 애니메이션이 건드리지 않으므로 여기서 숨기면 끝까지 유지된다
+		SetNoticeSceneVisible(false);
 		SetAnimationCurrentTime(sequenceAnim, secondSceneTime);
 		return;
 	}
@@ -78,4 +92,14 @@ void UCDBootScreen::Finish()
 	bFinished = true;
 	bootFinished.Broadcast();
 	DeactivateWidget();
+}
+
+void UCDBootScreen::SetNoticeSceneVisible(bool bVisible)
+{
+	if (sceneNotice == nullptr)
+	{
+		return;
+	}
+
+	sceneNotice->SetVisibility(bVisible ? noticeVisibility : ESlateVisibility::Collapsed);
 }

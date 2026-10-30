@@ -3,6 +3,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "CDHubGameMode.generated.h"
 
+class UCDCharacterClassData;
+
 /**
  * 타이틀 + 허브 (같은 레벨)
  * - 처음 진입: 캐릭터 전신 카메라 + 타이틀 화면 (UIManager 에 요청)
@@ -21,6 +23,13 @@ public:
 	/** 타이틀 → 허브 카메라 전환 */
 	UFUNCTION(BlueprintCallable)
 	void EnterHub(bool bSkipBlend = false);
+
+	/**
+	 * 직업 교체: 선택 저장 → 기존 폰 삭제 → 같은 자리에 새 폰 스폰 · 빙의
+	 * 새 폰은 빙의될 때 UCDPlayerClassSubsystem 에서 직업을 읽는다. 보고 있던 카메라(타이틀 카메라)는 유지
+	 */
+	UFUNCTION(BlueprintCallable)
+	void RespawnPlayerAsClass(APlayerController* playerController, UCDCharacterClassData* newClass);
 
 protected:
 	// AActor::BeginPlay()

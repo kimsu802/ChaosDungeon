@@ -1,5 +1,8 @@
 #include "Core/CDHubGameMode.h"
 #include "Core/CDRunSubsystem.h"
+#include "Core/CDPlayerClassSubsystem.h"
+#include "Data/CDCharacterClassData.h"
+#include "GameFramework/Pawn.h"
 #include "Player/CDPlayerController.h"
 #include "UI/CDUIManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
@@ -67,4 +70,44 @@ void ACDHubGameMode::EnterHub(bool bSkipBlend)
 	}
 
 
+}
+
+void ACDHubGameMode::RespawnPlayerAsClass(APlayerController* playerController, UCDCharacterClassData* newClass)
+{
+	if ((playerController == nullptr) || (newClass == nullptr))
+	{
+		return;
+	}
+
+	UCDPlayerClassSubsystem* classSubsystem = GetGameInstance()->GetSubsystem<UCDPlayerClassSubsystem>();
+	if (classSubsystem->GetSelectedClass() == newClass)
+	{
+		return;
+	}
+
+	// 새 캐릭터는 빙의될 때(PossessedBy) 여기서 직업을 읽는다
+	classSubsystem->SelectClass(newClass);
+
+	APawn* oldPawn = playerController->GetPawn();
+	AActor* oldViewTarget = playerController->GetViewTarget();
+
+	if (oldPawn == nullptr)
+	{
+		RestartPlayer(playerController);
+	}
+	else
+	{
+		const FTransform spawnTransform = oldPawn->GetActorTransform();
+		playerController->UnPossess();
+		oldPawn->Destroy();
+
+		// DefaultPawnClass(BP_CDPlayer) 를 같은 자리에 스폰 → 빙의
+		RestartPlayerAtTransform(playerController, spawnTransform);
+	}
+
+	// 빙의하면 뷰 타겟이 새 폰으로 바뀐다 → 타이틀 카메라를 보고 있었다면 블렌드 없이 되돌림
+	if ((oldViewTarget != nullptr) && (oldViewTarget != oldPawn))
+	{
+		playerController->SetViewTarget(oldViewTarget);
+	}
 }
