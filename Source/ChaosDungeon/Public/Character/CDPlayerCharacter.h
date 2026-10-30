@@ -43,6 +43,9 @@ private:
 	/** ASC 의 슬롯 배치 변경 → 레벨 이동에도 유지되도록 저장 */
 	void HandleSkillLoadoutChanged();
 
+	/** 선택한 직업 반영: classData 교체 + 메시 · AnimClass 적용 (어빌리티 지급 전에 호출) */
+	void ApplySelectedClass();
+
 protected:
 	/** 카메라 암 (회전 고정) */
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
@@ -64,7 +67,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TObjectPtr<UCDSpeechBubbleComponent> speechBubble;
 
-	/** 직업 데이터 (스탯, 기본 스킬, 회피) */
+	/** 직업 데이터 (스탯, 기본 스킬, 회피). 기본 직업이며, 직업을 고른 뒤에는 UCDPlayerClassSubsystem 값으로 바뀐다 */
 	UPROPERTY(EditDefaultsOnly, Category = "Class")
 	TObjectPtr<UCDCharacterClassData> classData;
 };

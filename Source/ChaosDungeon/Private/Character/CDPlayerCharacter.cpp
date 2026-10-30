@@ -4,6 +4,7 @@
 #include "AbilitySystem/CDAttackAbility.h"
 #include "Core/CDGameplayTags.h"
 #include "Core/CDSkillLoadoutSubsystem.h"
+#include "Core/CDPlayerClassSubsystem.h"
 #include "Core/CDTypes.h"
 #include "Data/CDCharacterClassData.h"
 #include "Player/CDPlayerController.h"
@@ -11,6 +12,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/GameInstance.h"
+#include "Engine/SkeletalMesh.h"
+#include "Animation/AnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Player/CDOcclusionFadeComponent.h"
 #include "Player/CDAwakenDirectorComponent.h"
 #include "Player/CDSpeechBubbleComponent.h"
@@ -60,6 +64,9 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 void ACDPlayerCharacter::PossessedBy(AController* newController)
 {
 	Super::PossessedBy(newController);
+
+	// 10.30 - 직업 선택: 어빌리티 · 스탯을 만들기 전에 직업부터 확정
+	ApplySelectedClass();
 
 	check(classData);
 	InitializeAbilitySystem(classData->stats);
@@ -116,6 +123,39 @@ void ACDPlayerCharacter::HandleSkillLoadoutChanged()
 	if (UCDSkillLoadoutSubsystem* loadout = gameInstance ? gameInstance->GetSubsystem<UCDSkillLoadoutSubsystem>() : nullptr)
 	{
 		loadout->SaveLoadout(abilitySystem->GetSkillLoadout());
+	}
+}
+
+void ACDPlayerCharacter::ApplySelectedClass()
+{
+	const UGameInstance* gameInstance = GetGameInstance();
+	UCDPlayerClassSubsystem* classSubsystem = gameInstance ? gameInstance->GetSubsystem<UCDPlayerClassSubsystem>() : nullptr;
+	if (classSubsystem != nullptr)
+	{
+		// 처음이면 BP 기본 직업을 등록, 이미 고른 직업이 있으면 그 직업으로 교체
+		classSubsystem->RegisterDefaultClass(classData);
+		if (classSubsystem->GetSelectedClass() != nullptr)
+		{
+			classData = classSubsystem->GetSelectedClass();
+		}
+	}
+
+	if (classData == nullptr)
+	{
+		return;
+	}
+
+	// 메시를 먼저 바꾼 뒤 AnimClass 를 지정 (스켈레톤이 맞아야 애님 인스턴스가 정상 생성됨)
+	USkeletalMeshComponent* meshComponent = GetMesh();
+	if (classData->skeletalMesh != nullptr)
+	{
+		meshComponent->SetSkeletalMeshAsset(classData->skeletalMesh);
+	}
+
+	if (classData->animClass != nullptr)
+	{
+		meshComponent->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		meshComponent->SetAnimInstanceClass(classData->animClass);
 	}
 }
 

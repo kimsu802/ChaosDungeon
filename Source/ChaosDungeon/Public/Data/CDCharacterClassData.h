@@ -8,6 +8,9 @@
 class UCDSkillData;
 class UCDDodgeAbility;
 class UCDAttackAbility;
+class UTexture2D;
+class USkeletalMesh;
+class UAnimInstance;
 
 /** 기본 스킬 배치 1칸 */
 USTRUCT(BlueprintType)
@@ -37,6 +40,41 @@ public:
 	/** 직업 이름 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText className;
+
+	// 영어 직업 이름
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText englishClassName;
+
+	/** 직업 선택 화면 초상화 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Display")
+	TObjectPtr<UTexture2D> portrait;
+
+	/** 직업 선택 화면 설명 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Display", meta = (MultiLine = true))
+	FText description;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Display|Tags")
+	TArray<FText> classTags;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Display|Percentage", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float mobilityPercentage = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Display|Percentage", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float attackPercentage = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Display|Percentage", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float defensePercentage = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Display|Percentage", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float difficultyPercentage = 0.f;
+
+	/** 캐릭터 메시 (비우면 캐릭터 BP 의 메시 유지) */
+	UPROPERTY(EditDefaultsOnly, Category = "Appearance")
+	TObjectPtr<USkeletalMesh> skeletalMesh;
+
+	/** 애님 블루프린트 (비우면 기본 ABP_CDPlayer) */
+	UPROPERTY(EditDefaultsOnly, Category = "Appearance")
+	TSubclassOf<UAnimInstance> animClass;
 
 	/** 기본 스탯 */
 	UPROPERTY(EditDefaultsOnly)

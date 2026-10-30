@@ -29,6 +29,9 @@ public:
 	}
 
 protected:
+	// UUserWidget::NativeOnInitialized()
+	virtual void NativeOnInitialized() override;
+
 	// UCommonActivatableWidget::NativeOnActivated()
 	virtual void NativeOnActivated() override;
 
@@ -51,10 +54,17 @@ private:
 	/** 종료 알림 + 비활성화 (한 번만) */
 	void Finish();
 
+	/** ① 장면 표시 / 숨김 */
+	void SetNoticeSceneVisible(bool bVisible);
+
 protected:
 	/** 전체 연출 (① + ②). 이름이 정확히 sequenceAnim 이어야 한다 */
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	TObjectPtr<UWidgetAnimation> sequenceAnim;
+
+	/** ① 장면 패널. 건너뛰기로 ② 로 점프하면 ① 트랙이 마지막 값(불투명)에 멈출 수 있어 직접 숨긴다 */
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional))
+	TObjectPtr<UWidget> sceneNotice;
 
 	/** ② 장면이 시작되는 시간 (sequenceAnim 기준 초) */
 	UPROPERTY(EditDefaultsOnly, Category = "Boot")
@@ -74,4 +84,7 @@ private:
 
 	/** 이미 끝났는가 */
 	bool bFinished = false;
+
+	/** 디자이너에서 정한 ① 장면 Visibility (다시 활성화될 때 복구) */
+	ESlateVisibility noticeVisibility = ESlateVisibility::SelfHitTestInvisible;
 };
