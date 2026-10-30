@@ -12,6 +12,7 @@
 #include "Settings/CDGameUserSettings.h"
 #include "Engine/Engine.h"
 #include "UI/CDConfirmWidget.h"
+#include "UI/CDBootScreen.h"
 #include "Input/CommonUIActionRouterBase.h"
 #include "Engine/AssetManager.h"
 #include "Engine/World.h"
@@ -137,6 +138,27 @@ bool UCDUIManagerSubsystem::HasOptionsScreen() const
 
 void UCDUIManagerSubsystem::ShowTitle()
 {
+	// 10.29 실행 후 처음 한 번은 부트 화면(주의 안내 · 제작 안내)을 먼저. 끝나면 이 함수를 다시 불러 타이틀
+	if ((bBootShown == false) && screenSet && (screenSet->bootScreen.IsNull() == false))
+	{
+		bBootShown = true;
+		const bool bSkipInEditor = GIsEditor && screenSet->bSkipBootInEditor;
+		if (bSkipInEditor == false)
+		{
+			PushScreenAsync(CDTags::UI_Layer_Modal, screenSet->bootScreen, [this](UCommonActivatableWidget& screen)
+				{
+					if (UCDBootScreen* boot = Cast<UCDBootScreen>(&screen))
+					{
+						boot->OnBootFinished().AddWeakLambda(this, [this]()
+							{
+								ShowTitle();
+							});
+					}
+				});
+			return;
+		}
+	}
+
 	UCommonActivatableWidget* screen = PushScreen(CDTags::UI_Layer_Game, screenSet->titleScreen);
 	UCommonUIActionRouterBase* actionRouter = GetLocalPlayer()->GetSubsystem<UCommonUIActionRouterBase>();
 	const TOptional<FUIInputConfig> desiredConfig = screen ? screen->GetDesiredInputConfig() : TOptional<FUIInputConfig>();
