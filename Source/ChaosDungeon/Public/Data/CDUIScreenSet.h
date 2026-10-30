@@ -44,6 +44,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Screen")
 	TSoftClassPtr<UCommonActivatableWidget> titleScreen;
 
+	/** 부트 화면 (실행 후 첫 타이틀 전에 한 번). 비워 두면 생략 */
+	UPROPERTY(EditDefaultsOnly, Category = "Screen")
+	TSoftClassPtr<UCommonActivatableWidget> bootScreen;
+
+	/** 에디터(PIE)에서는 부트 화면 생략 (패키지 빌드는 항상 재생) */
+	UPROPERTY(EditDefaultsOnly, Category = "Screen")
+	bool bSkipBootInEditor = true;
+
 	/** 컨펌 화면 */
 	UPROPERTY(EditDefaultsOnly, Category = "Screen")
 	TSoftClassPtr<UCommonActivatableWidget> confirmScreen;

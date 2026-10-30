@@ -61,7 +61,7 @@ public:
 	/** 옵션 화면이 지정돼 있는가 */
 	bool HasOptionsScreen() const;
 
-	/** 타이틀 화면 열기 */
+	/** 타이틀 화면 열기. 실행 후 첫 호출이면 부트 화면을 먼저 보여 주고, 끝나면 타이틀 */
 	void ShowTitle();
 
 	/** 게임 화면 열기 **/
@@ -100,4 +100,7 @@ private:
 
 	/** FWorldDelegates::OnWorldCleanup 핸들 */
 	FDelegateHandle worldCleanupHandle;
+
+	/** 부트 화면을 이미 보여 줬는가 (LocalPlayer 수명 = 실행 동안 유지 → 메인 메뉴 복귀 시엔 다시 안 나옴) */
+	bool bBootShown = false;
 };
