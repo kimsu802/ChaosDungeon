@@ -88,8 +88,8 @@ void ACDPlayerCharacter::GrantOwnedAbilities()
 			abilitySystem->GrantSkill(skill.Value, skill.Key);
 		}
 
-		abilitySystem->GrantAbility(classData->dodgeAbility, CDTags::Input_Dodge);
-		abilitySystem->GrantAbility(classData->attackAbility, CDTags::Input_Attack);
+		abilitySystem->GrantAbility(dodgeAbility, CDTags::Input_Dodge);
+		abilitySystem->GrantAbility(attackAbility, CDTags::Input_Attack);
 
 		// 10.02 - Jun6 스킬 Tag로 등록된 GA에 Input Tag 추가
 		// 10.08 - 레벨 이동 전 슬롯 배치 유지 (저장된 배치 우선)

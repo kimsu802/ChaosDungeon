@@ -70,4 +70,13 @@ protected:
 	/** 직업 데이터 (스탯, 기본 스킬, 회피). 기본 직업이며, 직업을 고른 뒤에는 UCDPlayerClassSubsystem 값으로 바뀐다 */
 	UPROPERTY(EditDefaultsOnly, Category = "Class")
 	TObjectPtr<UCDCharacterClassData> classData;
+
+	/** 기본 공격 어빌리티 (직업별 몽타주/수치는 BP 자식) */
+	UPROPERTY(EditDefaultsOnly, Category = "Class")
+	TSubclassOf<class UCDAttackAbility> attackAbility;
+
+	/** 회피 어빌리티 (직업별 몽타주/수치는 BP 자식) */
+	UPROPERTY(EditDefaultsOnly, Category = "Class")
+	TSubclassOf<class UCDDodgeAbility> dodgeAbility;
+
 };
