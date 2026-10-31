@@ -81,6 +81,9 @@ private:
 	/** 런 서브시스템 */
 	UCDRunSubsystem* GetRun() const;
 
+	/* 미니게임 레벨 진행도 갱신 - yoonsang */
+	void UpdateBombProgress();
+
 protected:
 	/** 몬스터 스폰/풀링 */
 	UPROPERTY(VisibleAnywhere)
@@ -130,4 +133,7 @@ private:
 	/* 폭탄 제거 목록 - yoonsang */
 	UPROPERTY(Transient)
 	TArray<TObjectPtr<AActor>> spawnedBombs;
+
+	/* 진행도 갱신 주기 관리 - yoonsang */
+	FTimerHandle bombProgressTimer;
 };
