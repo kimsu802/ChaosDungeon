@@ -209,19 +209,17 @@ void ACDDungeonGameMode::StartBombGame()
 
 	bIsBombGameActive = true;
 
-	GetWorldTimerManager().SetTimer(
-        bombSpawnTimer,
-        this,
-        &ThisClass::SpawnBomb,
-        stage->bombSpawnInterval,
-        true);
+	progress = 0.0f;
 
-    GetWorldTimerManager().SetTimer(
-        bombCompleteTimer,
-        this,
-        &ThisClass::CompleteBombGame,
-        static_cast<float>(stage->durationTime),
-        false);
+	targetProgress = static_cast<float>(stage->durationTime);
+
+	BroadcastStage(CDTags::Msg_Stage_Progress);
+
+	GetWorldTimerManager().SetTimer(bombSpawnTimer, this, &ThisClass::SpawnBomb, stage->bombSpawnInterval, true);
+
+    GetWorldTimerManager().SetTimer(bombCompleteTimer, this, &ThisClass::CompleteBombGame, targetProgress, false);
+
+	GetWorldTimerManager().SetTimer(bombProgressTimer, this, &ThisClass::UpdateBombProgress, 0.1f, true);
 }
 
 void ACDDungeonGameMode::SpawnBomb()
@@ -234,8 +232,12 @@ void ACDDungeonGameMode::SpawnBomb()
 	const UCDStageData* stage = GetRun()->GetCurrentStage();
 	APawn* player = UGameplayStatics::GetPlayerPawn(this, 0);
 
+	const float spawnRange = 600.0f;
+
 	FVector spawnLocation = player->GetActorLocation();
-	spawnLocation.Z += 1000.0f;
+	spawnLocation.X += FMath::FRandRange(-spawnRange, spawnRange);
+	spawnLocation.Y += FMath::FRandRange(-spawnRange, spawnRange);
+	spawnLocation.Z += 1500.0f;
 
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -264,6 +266,7 @@ void ACDDungeonGameMode::StopBombGame()
 
 	GetWorldTimerManager().ClearTimer(bombSpawnTimer);
 	GetWorldTimerManager().ClearTimer(bombCompleteTimer);
+	GetWorldTimerManager().ClearTimer(bombProgressTimer);
 
 	for (AActor* bomb : spawnedBombs)
 	{
@@ -289,4 +292,18 @@ TArray<FVector> ACDDungeonGameMode::GatherSpawnPoints() const
 UCDRunSubsystem* ACDDungeonGameMode::GetRun() const
 {
 	return GetGameInstance()->GetSubsystem<UCDRunSubsystem>();
+}
+
+void ACDDungeonGameMode::UpdateBombProgress()
+{
+	if (!bIsBombGameActive)
+	{
+		return;
+	}
+
+	const float elapsedTime = GetWorldTimerManager().GetTimerElapsed(bombCompleteTimer);
+
+	progress = FMath::Clamp(elapsedTime, 0.0f, targetProgress);
+
+	BroadcastStage(CDTags::Msg_Stage_Progress);
 }
