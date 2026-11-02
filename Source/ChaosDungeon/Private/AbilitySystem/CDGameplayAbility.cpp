@@ -4,6 +4,8 @@
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
+#include "Character/CDPlayerCharacter.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("일반 공격 및 스킬 판정 범위를 그린다"));
@@ -81,10 +83,28 @@ void UCDGameplayAbility::BeginCastTowards(const FVector& location) const
 	}
 }
 
+void UCDGameplayAbility::OnDashFinished()
+{
+	ACDPlayerCharacter* playerCharacter = Cast<ACDPlayerCharacter>(GetAvatarActorFromActorInfo());
+	if (playerCharacter && playerCharacter->GetCapsuleComponent())
+	{
+		playerCharacter->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	}	
+}
+
 void UCDGameplayAbility::StartDash(const FVector& direction, float distance, float duration)
 {
+	ACDPlayerCharacter* playerCharacter = Cast<ACDPlayerCharacter>(GetAvatarActorFromActorInfo());
+
+	if (playerCharacter)
+	{
+		playerCharacter->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	}
+	
 	UAbilityTask_ApplyRootMotionConstantForce* task = UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
 		this, NAME_None, direction.GetSafeNormal2D(), distance / duration, duration,
 		false, nullptr, ERootMotionFinishVelocityMode::SetVelocity, FVector::ZeroVector, 0.f, false);
+
+	task->OnFinish.AddDynamic(this, &ThisClass::OnDashFinished);
 	task->ReadyForActivation();
 }
