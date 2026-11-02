@@ -63,9 +63,9 @@ void ACDMinigameBomb::CreateWarning()
 
 	if (materialInstance)
 	{
-		materialInstance->SetVectorParameterValue(
-			TEXT("BaseColor"),
-			warningColor);
+		materialInstance->SetScalarParameterValue(TEXT("ConeAngle"), 360.0f);
+		
+		materialInstance->SetVectorParameterValue(TEXT("BaseColor"), warningColor);
 	}
 }
 
@@ -144,10 +144,12 @@ void ACDMinigameBomb::Explode(FVector impactLocation)
 	bHasExploded = true;
 
 	SetActorEnableCollision(false);
-
+	
 	if (explosionEffect)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, explosionEffect, impactLocation);
+		FVector Scale(5.0f);
+
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, explosionEffect, impactLocation, FRotator::ZeroRotator, Scale);
 	}
 
 	if (HasAuthority())

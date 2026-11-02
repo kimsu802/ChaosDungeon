@@ -232,19 +232,23 @@ void ACDDungeonGameMode::SpawnBomb()
 	const UCDStageData* stage = GetRun()->GetCurrentStage();
 	APawn* player = UGameplayStatics::GetPlayerPawn(this, 0);
 
-	const float spawnRange = 600.0f;
+	//const float spawnRange = 600.0f;
 
-	FVector spawnLocation = player->GetActorLocation();
-	spawnLocation.X += FMath::FRandRange(-spawnRange, spawnRange);
-	spawnLocation.Y += FMath::FRandRange(-spawnRange, spawnRange);
-	spawnLocation.Z += 1500.0f;
+	// Todo: 맵 패턴 개념으로 수정
+	//FVector spawnLocation = player->GetActorLocation();
+	//spawnLocation.X += FMath::FRandRange(-spawnRange, spawnRange);
+	//spawnLocation.Y += FMath::FRandRange(-spawnRange, spawnRange);
+	//spawnLocation.Z += 1500.0f;
+
+	FVector spawnHugeBombLocation(0.0f, 0.0f, 1500.0f);
+
 
 	FActorSpawnParameters spawnParameters;
 	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	AActor* bomb = GetWorld()->SpawnActor<AActor>(
 		stage->bombClass,
-		spawnLocation,
+		spawnHugeBombLocation,
 		FRotator::ZeroRotator,
 		spawnParameters);
 
