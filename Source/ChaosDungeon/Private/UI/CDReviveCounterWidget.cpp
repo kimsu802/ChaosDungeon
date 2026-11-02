@@ -32,8 +32,8 @@ void UCDReviveCounterWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// 바인딩이 오기 전엔 숨김 (Stage.IsInStage 가 true 면 곧바로 다시 켜짐)
-	SetVisibility(ESlateVisibility::Collapsed);
+	//// 바인딩이 오기 전엔 숨김 (Stage.IsInStage 가 true 면 곧바로 다시 켜짐)
+	//SetVisibility(ESlateVisibility::Collapsed);
 	RefreshVisuals();
 }
 

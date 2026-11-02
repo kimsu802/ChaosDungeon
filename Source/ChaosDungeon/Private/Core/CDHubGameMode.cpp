@@ -30,11 +30,18 @@ void ACDHubGameMode::BeginPlay()
 	}
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
-	TArray<AActor*> cameras;
-	UGameplayStatics::GetAllActorsWithTag(this, titleCameraTag, cameras);
-	if (playerController && cameras.Num() > 0)
+	// 타이틀(부트 화면 포함)이 뜨기 전 · 뜬 동안 게임 입력 차단 (광클 시 공격 방지). EnterHub 에서 다시 허용
+	if (playerController)
 	{
-		playerController->SetViewTarget(cameras[0]);
+		playerController->DisableInput(playerController);
+
+		TArray<AActor*> cameras;
+		UGameplayStatics::GetAllActorsWithTag(this, titleCameraTag, cameras);
+		if (playerController && cameras.Num() > 0)
+		{
+			playerController->SetViewTarget(cameras[0]);
+		}
+
 	}
 
 	// 타이틀 화면의 '시작' 버튼 → 화면 닫기 + EnterHub
@@ -55,6 +62,7 @@ void ACDHubGameMode::EnterHub(bool bSkipBlend)
 	const float blendTime = bSkipBlend ? 0.f : cameraBlendTime;
 	if (APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0))
 	{
+		playerController->EnableInput(playerController);
 		playerController->SetViewTargetWithBlend(playerController->GetPawn(), blendTime, VTBlend_Cubic);
 
 		if (UCDUIManagerSubsystem* uiManager = UCDUIManagerSubsystem::Get(playerController))
@@ -65,7 +73,7 @@ void ACDHubGameMode::EnterHub(bool bSkipBlend)
 				return;
 			}
 
-			uiManager->ShowGameHud();
+			uiManager->ShowGameHud();	
 		}
 	}
 
