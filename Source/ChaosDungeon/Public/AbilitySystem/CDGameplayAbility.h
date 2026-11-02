@@ -46,6 +46,9 @@ protected:
 	/** 돌진/회피 공용 이동. 어빌리티가 끝나면 이동도 끝난다 */
 	void StartDash(const FVector& direction, float distance, float duration);
 
+	UFUNCTION()
+	void OnDashFinished();
+
 protected:
 	/* 쿨타임 태크 - 10.01 Jun6 Ability별 쿨타임 변수를 갖도록 선언*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Cooldown")
