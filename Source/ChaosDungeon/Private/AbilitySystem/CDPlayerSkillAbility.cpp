@@ -108,6 +108,12 @@ void UCDPlayerSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, 
 		onConfirmInput.Unbind();
 	}
 
+	if (skillData->bIsBlockHitReact)
+	{
+		UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+		abilitySystem->RemoveLooseGameplayTag(CDTags::State_Immune_Stagger);
+	}
+
 	// 10.29 각성기 연출: 취소면 즉시 복귀, 정상 종료면 남은 연출(지연 베기 · 복귀)은 끝까지
 	if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
 	{
@@ -331,6 +337,12 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 	skillCastLocation = character->GetActorLocation();
 	const FVector aimLocation = character->GetAimLocation();
 	targetLocation = skillCastLocation + (aimLocation - skillCastLocation).GetClampedToMaxSize2D(skillData->maxRange);
+
+	if (skillData->bIsBlockHitReact)
+	{
+		UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+		abilitySystem->AddLooseGameplayTag(CDTags::State_Immune_Stagger);
+	}
 
 	BeginCastTowards(aimLocation);
 	SetCasting(true);
