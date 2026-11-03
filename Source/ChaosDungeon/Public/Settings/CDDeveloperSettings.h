@@ -60,5 +60,13 @@ public:
 	/** 옵션 "배경음" 이 적용될 사운드 클래스 (Master 의 자식 권장) */
 	UPROPERTY(Config, EditAnywhere, Category = "Audio")
 	TSoftObjectPtr<USoundClass> musicSoundClass;
+
+	/** 데미지 편차 최소 배율 (최종 데미지 × [min, max] 사이 무작위) */
+	UPROPERTY(Config, EditAnywhere, Category = "Combat", meta = (ClampMin = 0))
+	float damageVarianceMin = 0.85f;
+
+	/** 데미지 편차 최대 배율 */
+	UPROPERTY(Config, EditAnywhere, Category = "Combat", meta = (ClampMin = 0))
+	float damageVarianceMax = 1.2f;
 	
 };
