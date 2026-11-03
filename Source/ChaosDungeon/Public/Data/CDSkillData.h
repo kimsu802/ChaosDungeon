@@ -62,14 +62,11 @@ struct CHAOSDUNGEON_API FCDSkillVFX
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "GameplayCue"))
 	FGameplayTag VFXCueTag;
 
 	UPROPERTY(EditDefaultsOnly)
 	ECDSkillVFXType effectType = ECDSkillVFXType::Burst;
-
-	UPROPERTY(EditDefaultsOnly)
-	float VFXScale = 1.0f;
 };
 
 /**
@@ -118,6 +115,10 @@ public:
 	/** 스킬 조준 방식 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	ECDSkillTargetingType skillMode;
+
+	/** 스킬 시전 시 경직 면역 */
+	UPROPERTY(EditDefaultsOnly, Category = "Ability")
+	bool bIsBlockHitReact = false;
 
 	/** 판정 기준점 */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
