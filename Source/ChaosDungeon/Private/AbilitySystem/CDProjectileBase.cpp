@@ -2,13 +2,274 @@
 
 
 #include "AbilitySystem/CDProjectileBase.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "Core/CDGameplayTags.h"
+#include <Components/SphereComponent.h>
+#include <Components/StaticMeshComponent.h>
+#include <Character/CDCharacterBase.h>
+#include "Engine/World.h"
+#include "Engine/HitResult.h"
+#include <GameFramework/ProjectileMovementComponent.h>
+#include "NiagaraComponent.h"
+#include <Kismet/GameplayStatics.h>
+
 
 // Sets default values
 ACDProjectileBase::ACDProjectileBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	sphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("sphereComp"));
+	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("meshComp"));
+	niagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("niagaraComp"));
+	projectileMove = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("projectileMove"));
+
+	SetRootComponent(sphereComp);
+	meshComp->SetupAttachment(sphereComp);
+	niagaraComp->SetupAttachment(sphereComp);
+	projectileMove->SetUpdatedComponent(sphereComp);
+	sphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	meshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	meshComp->SetSimulatePhysics(false);
+	projectileMove->SetAutoActivate(false);
+	niagaraComp->SetAutoActivate(false);
+}
+
+void ACDProjectileBase::InitializeProjectile(const FCDProjectileBaseData& inData)
+{
+	projectileData = inData;
+
+	SetActorLocation(projectileData.launchLocation);
+
+	sphereComp->SetSphereRadius(projectileData.hitRadius, true);
+
+	SetLifeSpan(projectileData.lifeTime);
+
+	if (!ConfigureMovement())
+	{
+		Destroy();
+		return;
+	}
+
+	sphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	sphereComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	sphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	previousLocation = GetActorLocation();
+	bTraceEnabled = true;
+
+	projectileMove->Activate();
+	niagaraComp->Activate();
+}
+
+bool ACDProjectileBase::ConfigureMovement()
+{
+	const FVector startLocation = GetActorLocation();
+	const FVector toTarget = projectileData.targetPoint - startLocation;
+	const float speed = projectileData.speed;
+
+	if (speed <= 0.f || toTarget.IsNearlyZero())
+	{
+		return false;
+	}
+
+	projectileMove->InitialSpeed = speed;
+	projectileMove->bInitialVelocityInLocalSpace = false;
+	projectileMove->bRotationFollowsVelocity = true;
+	projectileMove->bShouldBounce = false;
+	projectileMove->bIsHomingProjectile = false;
+
+	FVector launchVelocity = FVector::ZeroVector;
+
+	switch (projectileData.projectileType)
+	{
+	case ECDProjectileType::Straight:
+	{
+		// 중력 없이 목표 방향으로 직진
+		projectileMove->ProjectileGravityScale = 0.f;
+		projectileMove->MaxSpeed = speed;
+
+		launchVelocity = toTarget.GetSafeNormal() * speed;
+		break;
+	}
+
+	case ECDProjectileType::Parabolic:
+	{
+		projectileMove->ProjectileGravityScale =
+			projectileData.ProjectileGravityScale;
+
+		// 이동 컴포넌트가 실제 적용하는 중력과 동일하게 계산
+		const float gravityZ = projectileMove->GetGravityZ();
+
+		if (gravityZ >= -KINDA_SMALL_NUMBER)
+		{
+			return false;
+		}
+
+		UGameplayStatics::FSuggestProjectileVelocityParameters params(
+			this,
+			startLocation,
+			projectileData.targetPoint,
+			speed
+		);
+
+		params.bFavorHighArc = true;
+		params.OverrideGravityZ = gravityZ;
+		params.CollisionRadius = projectileData.hitRadius;
+		params.TraceOption = ESuggestProjVelocityTraceOption::DoNotTrace;
+
+		if (!UGameplayStatics::SuggestProjectileVelocity(
+			params, launchVelocity))
+		{
+			return false;
+		}
+
+		// 하강 중 중력에 의해 속도가 증가할 수 있도록 제한 해제
+		projectileMove->MaxSpeed = 0.f;
+		break;
+	}
+
+	default:
+		return false;
+	}
+
+	projectileMove->Velocity = launchVelocity;
+	SetActorRotation(launchVelocity.Rotation());
+
+	return true;
+}
+
+void ACDProjectileBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 이동 컴포넌트가 위치를 갱신한 다음 Actor의 Tick 실행
+	AddTickPrerequisiteComponent(projectileMove);
+
+	// 이동 중단 이벤트 
+	projectileMove->OnProjectileStop.AddDynamic(this, &ACDProjectileBase::OnProjectileStop);
+}
+
+void ACDProjectileBase::Tick(float deltaSeconds)
+{
+	Super::Tick(deltaSeconds);
+
+	if (!bTraceEnabled)
+	{
+		return;
+	}
+
+	const FVector currentLocation = GetActorLocation();
+
+	TraceHit(previousLocation, currentLocation);
+
+	// 다음 프레임에서 사용할 위치 저장
+	previousLocation = currentLocation;
+}
+
+void ACDProjectileBase::TraceHit(const FVector& start, const FVector& end)
+{
+	const ACDCharacterBase* sourceCharacter = Cast<ACDCharacterBase>(projectileData.sourceActor.Get());
+
+	if (!IsValid(sourceCharacter))
+	{
+		return;
+	}
+
+	// 검사에서 투사체 자신과 발사자를 제외
+	FCollisionQueryParams queryParams(
+		SCENE_QUERY_STAT(ProjectileTrace),
+		false,
+		this
+	);
+
+	queryParams.AddIgnoredActor(sourceCharacter);
+
+	TArray<FHitResult> hitResults;
+
+	// 투사체의 실제 Sphere 크기로 Pawn을 검사
+	GetWorld()->SweepMultiByObjectType(
+		hitResults,
+		start,
+		end,
+		FQuat::Identity,
+		FCollisionObjectQueryParams(ECC_Pawn),
+		FCollisionShape::MakeSphere(
+			sphereComp->GetScaledSphereRadius()),
+		queryParams
+	);
+
+	for (const FHitResult& hit : hitResults)
+	{
+		AActor* target = hit.GetActor();
+
+		if (!IsValid(target) || !sourceCharacter->IsHostileTo(target))
+		{
+			continue;
+		}
+
+		// 기본 동작은 한 발당 적 한 명만 명중
+		bTraceEnabled = false;
+
+		OnTargetHit(hit);
+		return;
+	}
+}
+
+void ACDProjectileBase::OnTargetHit(const FHitResult& hit)
+{
+	AActor* target = hit.GetActor();
+
+	UAbilitySystemComponent* sourceASC = projectileData.sourceASC.Get();
+
+	UAbilitySystemComponent* targetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(target);
+
+	if (!IsValid(target) ||
+		!IsValid(sourceASC) ||
+		!IsValid(targetASC) ||
+		!projectileData.damageSpec.IsValid())
+	{
+		Destroy();
+		return;
+	}
+
+	// 데미지 적용
+	sourceASC->ApplyGameplayEffectSpecToTarget(*projectileData.damageSpec.Data, targetASC);
+
+	// 데미지 적용 후 피격 이벤트 전송
+	AActor* sourceActor = projectileData.sourceActor.Get();
+
+	if (projectileData.bCausesHitReact &&
+		IsValid(sourceActor) &&
+		IsValid(target))
+	{
+		FGameplayEventData payload;
+		payload.Instigator = sourceActor;
+		payload.Target = target;
+		payload.EventMagnitude = projectileData.knockbackStrength;
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(target, CDTags::Event_Hit, payload);
+	}
+
+	Destroy();
+}
+
+void ACDProjectileBase::OnProjectileStop(const FHitResult& hit)
+{
+	if (bTraceEnabled)
+	{
+		TraceHit(previousLocation, GetActorLocation());
+
+		// 앞에 있던 적을 맞혀 이미 제거 중이라면 종료
+		if (IsActorBeingDestroyed())
+		{
+			return;
+		}
+	}
+
+	bTraceEnabled = false;
+	Destroy();
 }
 
 

@@ -8,6 +8,7 @@
 #include <Character/CDBossCharacter.h>
 #include <Data/CDMonsterData.h>
 #include <Data/CDBossSkillData.h>
+#include <Data/CDBossData.h>
 #include <AbilitySystem/CDAbilitySystemComponent.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -20,23 +21,33 @@ void ACDBossAIController::StartBossLogic()
 
     const ACDBossCharacter* boss = GetPawn<ACDBossCharacter>();
 
-    /* 스폰 데이터가 적용된 뒤에만 시작 */
+    // 보스 데이터 초기화가 완료된 뒤에 시작
     if (!IsValid(boss) || boss->IsDead() ||
         !IsValid(boss->GetMonsterData()))
     {
         return;
     }
 
-    if (!bossBehaviorTree || !bossBehaviorTree->BlackboardAsset)
+    const UCDBossData* data = boss->GetBossData();
+    if (!IsValid(data))
+    {
+        return;
+    }
+
+    // 현재 보스의 데이터에 지정된 BT 사용
+    UBehaviorTree* selectedTree = data->behaviorTree.Get();
+
+    if (!IsValid(selectedTree) || !selectedTree->BlackboardAsset)
     {
         UE_LOG(LogTemp, Warning,
-            TEXT("Boss Behavior Tree or Blackboard is missing."));
+            TEXT("Boss Behavior Tree or Blackboard is missing: %s"),
+            *GetNameSafe(data));
         return;
     }
 
     UBlackboardComponent* bb = nullptr;
 
-    if (!UseBlackboard(bossBehaviorTree->BlackboardAsset, bb))
+    if (!UseBlackboard(selectedTree->BlackboardAsset, bb))
     {
         return;
     }
@@ -47,7 +58,7 @@ void ACDBossAIController::StartBossLogic()
     RefreshTarget();
     RefreshBlackBoard();
 
-    if (!RunBehaviorTree(bossBehaviorTree.Get()))
+    if (!RunBehaviorTree(selectedTree))
     {
         StopBossLogic();
     }

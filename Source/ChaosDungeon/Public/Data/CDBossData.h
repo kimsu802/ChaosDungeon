@@ -10,6 +10,9 @@
  * 보스 전용 데이터. 일반 몬스터 데이터에 보스 HP 바 표시 정보를 더한다.
  * 보스 등장 시 UCDStageVM 이 읽어 보스 HP 바(이름 · 줄 수)에 반영한다.
  */
+
+class UBehaviorTree;
+
 UCLASS()
 class CHAOSDUNGEON_API UCDBossData : public UCDMonsterData
 {
@@ -31,6 +34,9 @@ public:
 	/* 2페이즈 전환 완료 시 기존 attackSkills에 추가할 스킬 */
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	TArray<TObjectPtr<UCDSkillData>> phase2Skill;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	TObjectPtr<UBehaviorTree> behaviorTree;
 
 	/** 보스 HP 바에 표시할 이름 */
 	UPROPERTY(EditDefaultsOnly, Category = "Boss|UI")

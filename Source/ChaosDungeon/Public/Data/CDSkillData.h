@@ -4,6 +4,7 @@
 #include "GameplayTagContainer.h"
 #include "Data/CDHitShape.h"
 #include "Data/CDReticleData.h"
+#include "CDProjectileData.h"
 #include "CDSkillData.generated.h"
 
 class UAnimMontage;
@@ -169,4 +170,7 @@ public:
 	/** 스킬 VFX 목록 */
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	TArray<FCDSkillVFX> skillEffects;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	FCDProjectileBaseData projectileData;
 };

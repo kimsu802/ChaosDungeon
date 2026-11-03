@@ -11,7 +11,6 @@
 
 
 class UCDAbilitySystemComponent;
-class UBehaviorTree;
 class UCDBossSkillData;
 /**
  * 
@@ -70,11 +69,6 @@ private:
 
 	/* 공격 상태 정리 */
 	void FinishPattern(bool bSucceeded);
-
-protected:
-	/* behavior tree */
-	UPROPERTY(EditDefaultsOnly, Category = BossAI)
-	TObjectPtr<UBehaviorTree> bossBehaviorTree;
 
 private:
 	/* 추적할 플레이어 */

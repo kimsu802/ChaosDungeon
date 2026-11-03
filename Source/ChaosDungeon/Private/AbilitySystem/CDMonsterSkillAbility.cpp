@@ -1,4 +1,6 @@
+#include "AIController.h"
 #include "AbilitySystem/CDMonsterSkillAbility.h"
+#include "AbilitySystem/CDProjectileBase.h"
 #include "AbilitySystem/CDReticleActor.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -97,15 +99,27 @@ FVector UCDMonsterSkillAbility::GetSkillOrigin() const
 void UCDMonsterSkillAbility::ApplyHit()
 {
 	const ACDCharacterBase* character = GetCDCharacter();
+
 	if (!IsValid(skillData) || !IsValid(character) || !GetWorld())
 	{
 		return;
 	}
 
+	// 투사체 스킬
+	if (skillData->projectileData.projectileClass)
+	{
+		FireProjectile();
+		return;
+	}
+
+	// 기존 범위 공격
 	const FVector origin = GetSkillOrigin();
 	const FVector forward = character->GetActorForwardVector();
+
 	TArray<AActor*> hitActors;
-	skillData->hitShape.FindActors(GetWorld(), origin, forward, hitActors);
+	skillData->hitShape.FindActors(GetWorld(), origin, forward, hitActors
+	);
+
 	for (AActor* actor : hitActors)
 	{
 		if (character->IsHostileTo(actor))
@@ -113,9 +127,11 @@ void UCDMonsterSkillAbility::ApplyHit()
 			ApplyDamageTo(actor);
 		}
 	}
+
 	if (CVarDebugHitShape.GetValueOnGameThread())
 	{
-		skillData->hitShape.DrawDebug(GetWorld(), origin, forward, FColor::Red, 1.f);
+		skillData->hitShape.DrawDebug(GetWorld(), origin, forward, FColor::Red, 1.f
+		);
 	}
 }
 
@@ -213,6 +229,35 @@ void UCDMonsterSkillAbility::ClearReticle()
 		}
 	}
 		spawnedReticle.Reset();
+}
+
+void UCDMonsterSkillAbility::FireProjectile()
+{
+	const ACDCharacterBase* character = GetCDCharacter();
+
+	if (!IsValid(skillData) || !IsValid(character))
+	{
+		return;
+	}
+
+	// 에셋의 설정을 이번 발사용 데이터로 복사
+	FCDProjectileBaseData launchData = skillData->projectileData;
+
+	// 피격 설정 전달
+	launchData.bCausesHitReact = skillData->bCausesHitReact;
+	launchData.knockbackStrength = skillData->knockbackStrength;
+
+	// 발사 위치와 시전 시점에 확정한 조준점
+	launchData.launchLocation = character->GetActorLocation();
+	launchData.targetPoint = targetLocation;
+
+	// 이후 방향 전환 패턴에서 사용할 대상 Actor
+	const AAIController* aiController = character->GetController<AAIController>();
+
+	launchData.targetActor = aiController ? aiController->GetFocusActor() : nullptr;
+
+	// 발사자 ASC와 데미지 Spec은 공통 함수에서 설정
+	SpawnProjectile(launchData, skillData->damageCoefficient);
 }
 
 void UCDMonsterSkillAbility::SetUntargetable(bool bNewUntargetable)

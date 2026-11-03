@@ -5,6 +5,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/CDProjectileBase.h"
 #include "Core/CDGameplayTags.h"
 #include "Character/CDCharacterBase.h"
 #include "NiagaraFunctionLibrary.h"
@@ -75,6 +76,34 @@ void UCDAttackAbility::ApplyHit()
 	const ACDCharacterBase* character = GetCDCharacter();
 	const FVector origin = character->GetActorLocation();
 	const FVector forward = character->GetActorForwardVector();
+
+	// 투사체 BP가 설정된 기본 공격
+	if (projectileData.projectileClass)
+	{
+		const FVector direction = forward.GetSafeNormal2D();
+
+		if (direction.IsNearlyZero())
+		{
+			return;
+		}
+
+		FCDProjectileBaseData launchData = projectileData;
+
+		// 플레이어 기본 공격은 직선형
+		launchData.projectileType = ECDProjectileType::Straight;
+
+		launchData.launchLocation =
+			origin + direction * projectileSpawnDistance;
+
+		// 직선형은 이 지점으로부터 진행 방향을 계산
+		launchData.targetPoint =
+			launchData.launchLocation + direction * 1000.f;
+
+		SpawnProjectile(launchData, damageCoefficient);
+
+		// 기존 즉발 타격 처리는 실행하지 않음
+		return;
+	}
 
 	TArray<AActor*> hitActors;
 	hitShape.FindActors(GetWorld(), origin, forward, hitActors);
