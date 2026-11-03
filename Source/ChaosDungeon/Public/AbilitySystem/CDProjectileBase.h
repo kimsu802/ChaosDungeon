@@ -19,6 +19,7 @@ class USphereComponent;
 class UProjectileMovementComponent;
 class UStaticMeshComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class CHAOSDUNGEON_API ACDProjectileBase : public AActor
@@ -61,6 +62,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile | Component")
 	TObjectPtr<UNiagaraComponent> niagaraComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile | Component")
+	TObjectPtr<UNiagaraSystem> hitComp;
 
 	UPROPERTY(Transient)
 	FCDProjectileBaseData projectileData;
