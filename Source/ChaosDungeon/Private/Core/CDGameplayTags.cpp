@@ -43,6 +43,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Hit, "Event.Hit");
 
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dodge, "Cooldown.Dodge");
+	UE_DEFINE_GAMEPLAY_TAG(Cooldown_RangedAttack, "Cooldown.RangedAttack");
 
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Cooldown, "SetByCaller.Cooldown");
 	UE_DEFINE_GAMEPLAY_TAG(SetByCaller_Coefficient, "SetByCaller.Coefficient");
