@@ -12,6 +12,7 @@
 #include "Engine/HitResult.h"
 #include <GameFramework/ProjectileMovementComponent.h>
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include <Kismet/GameplayStatics.h>
 
 
@@ -252,6 +253,12 @@ void ACDProjectileBase::OnTargetHit(const FHitResult& hit)
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(target, CDTags::Event_Hit, payload);
 	}
 
+
+	if (hitComp)
+	{
+		// 피격 나이아가라 생성 (자동 제거)
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, hitComp, hit.ImpactPoint, FRotator::ZeroRotator, FVector(1, 1, 1), true);
+	}
 	Destroy();
 }
 

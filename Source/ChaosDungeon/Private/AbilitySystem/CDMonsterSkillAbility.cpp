@@ -1,5 +1,5 @@
-#include "AIController.h"
 #include "AbilitySystem/CDMonsterSkillAbility.h"
+#include "AIController.h"
 #include "AbilitySystem/CDProjectileBase.h"
 #include "AbilitySystem/CDReticleActor.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -108,7 +108,12 @@ void UCDMonsterSkillAbility::ApplyHit()
 	// 투사체 스킬
 	if (skillData->projectileData.projectileClass)
 	{
-		FireProjectile();
+		int32 projectileCount = skillData->projectileData.bossData.projectileCount;
+
+		for (int ix = 0; ix < projectileCount; ++ix)
+		{
+			FireProjectile();
+		}
 		return;
 	}
 
