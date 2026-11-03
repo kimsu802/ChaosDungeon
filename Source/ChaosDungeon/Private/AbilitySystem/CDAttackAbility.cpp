@@ -74,7 +74,6 @@ void UCDAttackAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, con
 void UCDAttackAbility::ApplyHit()
 {
 	const ACDCharacterBase* character = GetCDCharacter();
-	const FVector origin = character->GetActorLocation();
 	const FVector forward = character->GetActorForwardVector();
 
 	// 투사체 BP가 설정된 기본 공격
@@ -88,16 +87,13 @@ void UCDAttackAbility::ApplyHit()
 		}
 
 		FCDProjectileBaseData launchData = projectileData;
+		int muzzleIndex = ((currentCombo + 1) % 2) + 1;
+		const FVector origin = character->GetMesh()->GetSocketLocation(FName(*FString::Printf(TEXT("Muzzle_0%d"), muzzleIndex)));
 
-		// 플레이어 기본 공격은 직선형
-		launchData.projectileType = ECDProjectileType::Straight;
-
-		launchData.launchLocation =
-			origin + direction * projectileSpawnDistance;
+		launchData.launchLocation =	origin + direction * projectileSpawnDistance;
 
 		// 직선형은 이 지점으로부터 진행 방향을 계산
-		launchData.targetPoint =
-			launchData.launchLocation + direction * 1000.f;
+		launchData.targetPoint = launchData.launchLocation + direction * 1000.f;
 
 		SpawnProjectile(launchData, damageCoefficient);
 
@@ -105,6 +101,7 @@ void UCDAttackAbility::ApplyHit()
 		return;
 	}
 
+	const FVector origin = character->GetActorLocation();
 	TArray<AActor*> hitActors;
 	hitShape.FindActors(GetWorld(), origin, forward, hitActors);
 	for (AActor* actor : hitActors)

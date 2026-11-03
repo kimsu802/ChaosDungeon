@@ -76,6 +76,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Appearance")
 	TSubclassOf<UAnimInstance> animClass;
 
+
+	/** 기본 공격 어빌리티 (직업별 몽타주/수치는 BP 자식) */
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+	TSubclassOf<class UCDAttackAbility> attackAbility;
+
 	/** 기본 스탯 */
 	UPROPERTY(EditDefaultsOnly)
 	FCDBaseStats stats;

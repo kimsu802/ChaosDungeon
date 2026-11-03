@@ -71,10 +71,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Class")
 	TObjectPtr<UCDCharacterClassData> classData;
 
-	/** 기본 공격 어빌리티 (직업별 몽타주/수치는 BP 자식) */
-	UPROPERTY(EditDefaultsOnly, Category = "Class")
-	TSubclassOf<class UCDAttackAbility> attackAbility;
-
 	/** 회피 어빌리티 (직업별 몽타주/수치는 BP 자식) */
 	UPROPERTY(EditDefaultsOnly, Category = "Class")
 	TSubclassOf<class UCDDodgeAbility> dodgeAbility;

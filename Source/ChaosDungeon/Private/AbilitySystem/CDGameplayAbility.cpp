@@ -124,8 +124,7 @@ ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseDa
     AActor* sourceActor = GetAvatarActorFromActorInfo();
     UAbilitySystemComponent* sourceASC = GetAbilitySystemComponentFromActorInfo();
 
-    if (!world || !IsValid(sourceActor) ||
-        !IsValid(sourceASC) || !inData.projectileClass)
+    if (!world || !IsValid(sourceActor) || !IsValid(sourceASC) || !inData.projectileClass)
     {
         return nullptr;
     }
