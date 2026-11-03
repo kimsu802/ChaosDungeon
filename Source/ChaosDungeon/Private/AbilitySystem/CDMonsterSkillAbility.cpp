@@ -6,8 +6,10 @@
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
+#include "Character/CDMonsterBase.h"
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
+#include "Data/CDMonsterData.h"
 #include "Engine/World.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -98,11 +100,23 @@ FVector UCDMonsterSkillAbility::GetSkillOrigin() const
 
 void UCDMonsterSkillAbility::ApplyHit()
 {
-	const ACDCharacterBase* character = GetCDCharacter();
+	ACDCharacterBase* character = GetCDCharacter();
 
 	if (!IsValid(skillData) || !IsValid(character) || !GetWorld())
 	{
 		return;
+	}
+
+	/* Temp */
+	const ACDMonsterBase* monster = Cast<ACDMonsterBase>(character);
+
+	const UCDMonsterData* monsterData = monster ? monster->GetMonsterData() : nullptr;
+
+	const bool bIsBombMonster = monsterData && monsterData->grade == ECDMonsterGrade::Bomb;
+
+	if (bIsBombMonster)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Bomb"));
 	}
 
 	// 투사체 스킬
@@ -137,6 +151,13 @@ void UCDMonsterSkillAbility::ApplyHit()
 	{
 		skillData->hitShape.DrawDebug(GetWorld(), origin, forward, FColor::Red, 1.f
 		);
+	}
+
+	if (bIsBombMonster)
+	{
+		/* 폭발 끝 - yoonsang */
+		EndBombExplosion();
+		UE_LOG(LogTemp, Log, TEXT("Bomb Finished"));
 	}
 }
 
@@ -281,4 +302,15 @@ void UCDMonsterSkillAbility::SetUntargetable(bool bNewUntargetable)
 	{
 		abilitySystem->RemoveLooseGameplayTag(CDTags::State_Untargetable);
 	}
+}
+
+void UCDMonsterSkillAbility::EndBombExplosion()
+{
+	ACDCharacterBase* character = GetCDCharacter();
+
+	ACDMonsterBase* monster = Cast<ACDMonsterBase>(character);
+
+	monster->DeactivateToPool();
+
+	UE_LOG(LogTemp, Log, TEXT("Bomb InBombExplosion"));
 }
