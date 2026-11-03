@@ -5,6 +5,8 @@
 #include "CDGameplayAbility.generated.h"
 
 class ACDCharacterBase;
+class ACDProjectileBase;
+struct FCDProjectileBaseData;
 
 // 일반 공격 및 스킬의 타격 판정 범위 디버그 출력 설정
 extern TAutoConsoleVariable<bool> CVarDebugHitShape;
@@ -48,6 +50,10 @@ protected:
 
 	UFUNCTION()
 	void OnDashFinished();
+
+	/** 투사체 한 발 생성 및 초기화 */
+	ACDProjectileBase* SpawnProjectile(const FCDProjectileBaseData& inData, float damageCoefficient = 1.f) const;
+
 
 protected:
 	/* 쿨타임 태크 - 10.01 Jun6 Ability별 쿨타임 변수를 갖도록 선언*/

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/CDGameplayAbility.h"
 #include "Data/CDHitShape.h"
+#include "Data/CDProjectileData.h"
 #include "CDAttackAbility.generated.h"
 
 /**
@@ -66,6 +67,15 @@ private:
 	/** 일반 공격 계수 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack")
 	float damageCoefficient;
+
+	/** 기본 공격 투사체 설정 */
+	UPROPERTY(EditDefaultsOnly, Category = "Attack | Projectile")
+	FCDProjectileBaseData projectileData;
+
+	/** 캐릭터 앞쪽으로 떨어진 발사 거리 */
+	UPROPERTY(EditDefaultsOnly, Category = "Attack | Projectile",
+		meta = (ClampMin = "0.0"))
+	float projectileSpawnDistance = 80.f;
 
 	/* 현재 콤보 카운트 */
 	int32 currentCombo = 1;

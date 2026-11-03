@@ -1,11 +1,15 @@
 #include "AbilitySystem/CDGameplayAbility.h"
 #include "AbilitySystem/CDGameplayEffects.h"
+#include "AbilitySystem/CDProjectileBase.h"
 #include "Abilities/Tasks/AbilityTask_ApplyRootMotionConstantForce.h"
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
 #include "Character/CDPlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
+#include "Data/CDProjectileData.h"
+#include "Engine/World.h"
+#include "GameFramework/Pawn.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("일반 공격 및 스킬 판정 범위를 그린다"));
@@ -107,4 +111,62 @@ void UCDGameplayAbility::StartDash(const FVector& direction, float distance, flo
 
 	task->OnFinish.AddDynamic(this, &ThisClass::OnDashFinished);
 	task->ReadyForActivation();
+}
+
+ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseData& inData, float damageCoefficient) const
+{
+    if (!GetCurrentActorInfo())
+    {
+        return nullptr;
+    }
+
+    UWorld* world = GetWorld();
+    AActor* sourceActor = GetAvatarActorFromActorInfo();
+    UAbilitySystemComponent* sourceASC = GetAbilitySystemComponentFromActorInfo();
+
+    if (!world || !IsValid(sourceActor) ||
+        !IsValid(sourceASC) || !inData.projectileClass)
+    {
+        return nullptr;
+    }
+
+    // 원본 설정을 복사하고 이번 발사의 정보 입력
+    FCDProjectileBaseData launchData = inData;
+    launchData.sourceActor = sourceActor;
+    launchData.sourceASC = sourceASC;
+
+    // 현재 Ability의 발사자를 기준으로 데미지 Spec 생성
+    launchData.damageSpec = MakeOutgoingGameplayEffectSpec( UCDDamageEffect::StaticClass(), GetAbilityLevel());
+
+    if (!launchData.damageSpec.IsValid())
+    {
+        return nullptr;
+    }
+
+    launchData.damageSpec.Data->SetSetByCallerMagnitude( CDTags::SetByCaller_Coefficient, damageCoefficient);
+
+    FActorSpawnParameters spawnParams;
+    spawnParams.Owner = sourceActor;
+    spawnParams.Instigator = Cast<APawn>(sourceActor);
+    spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+    const FRotator launchRotation = (launchData.targetPoint - launchData.launchLocation).Rotation();
+
+    ACDProjectileBase* projectile = world->SpawnActor<ACDProjectileBase>(launchData.projectileClass, launchData.launchLocation, launchRotation, spawnParams);
+
+    if (!IsValid(projectile))
+    {
+        return nullptr;
+    }
+
+    // BP 구성까지 완료된 Actor에 발사 데이터 전달
+    projectile->InitializeProjectile(launchData);
+
+    // 이동 설정 실패로 초기화 중 제거된 경우
+    if (!IsValid(projectile) || projectile->IsActorBeingDestroyed())
+    {
+        return nullptr;
+    }
+
+    return projectile;
 }
