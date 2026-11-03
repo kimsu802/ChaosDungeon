@@ -72,10 +72,10 @@ void ACDDungeonGameMode::BeginStage()
 	{
 		StartBombGame();
 	}
-	else
-	{
-		spawnManager->StartSpawning();
-	}
+
+	/* 기존 방향의 변경으로 미니 게임에 몬스터도 스폰되도록 조정 - yoonsang */
+	spawnManager->StartSpawning();
+	
 }
 
 void ACDDungeonGameMode::ClearStage()
@@ -230,11 +230,11 @@ void ACDDungeonGameMode::SpawnBomb()
 	}
 
 	const UCDStageData* stage = GetRun()->GetCurrentStage();
-	APawn* player = UGameplayStatics::GetPlayerPawn(this, 0);
+	//APawn* player = UGameplayStatics::GetPlayerPawn(this, 0);
 
 	//const float spawnRange = 600.0f;
 
-	// Todo: 맵 패턴 개념으로 수정
+	// Todo: 맵 패턴 개념으로 수정 - yoonsang 
 	//FVector spawnLocation = player->GetActorLocation();
 	//spawnLocation.X += FMath::FRandRange(-spawnRange, spawnRange);
 	//spawnLocation.Y += FMath::FRandRange(-spawnRange, spawnRange);
@@ -254,6 +254,10 @@ void ACDDungeonGameMode::SpawnBomb()
 
 	if (IsValid(bomb))
 	{
+		FVector Scale(30.f);
+
+		bomb->SetActorScale3D(Scale);
+
 		spawnedBombs.Add(bomb);
 	}
 }

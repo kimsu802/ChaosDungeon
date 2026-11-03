@@ -73,7 +73,8 @@ enum class ECDMonsterGrade : uint8
 {
 	Normal,
 	Elite,
-	Boss
+	Boss,
+	Bomb
 };
 
 /** 커서 호버 외곽선용 스텐실 값 (포스트프로세스 머티리얼과 값을 맞출 것) */

@@ -7,6 +7,7 @@
 #include "CDMonsterSkillAbility.generated.h"
 
 class ACDReticleActor;
+class UCDMonsterData;
 
 /** 몬스터 스킬의 시전, 타격 판정 및 이벤트 처리 */
 UCLASS()
@@ -47,6 +48,9 @@ private:
 	void SetUntargetable(bool bNewUntargetable);
 
 	bool bOwnsUntargetableTag = false;
+
+	/* BombMonster 폭발 끝 - yoonsang */
+	void EndBombExplosion();
 
 protected:
 	/** 플레이어의 마우스 조준 Task 없이 AI가 확정한 위치에 표시 */
