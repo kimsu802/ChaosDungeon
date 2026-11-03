@@ -85,11 +85,21 @@ void UCDSkillAbility::OnRecoveryEvent(FGameplayEventData payload)
 
 void UCDSkillAbility::OnMontageFinished()
 {
+	if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(CDTags::State_Untargetable))
+	{
+		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(CDTags::State_Untargetable);
+	}
+
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 void UCDSkillAbility::OnMontageCancelled()
 {
+	if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(CDTags::State_Untargetable))
+	{
+		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(CDTags::State_Untargetable);
+	}
+
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
 

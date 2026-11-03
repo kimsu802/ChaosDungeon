@@ -1,6 +1,8 @@
 #include "AbilitySystem/CDDamageExecution.h"
 #include "AbilitySystem/CDAttributeSet.h"
 #include "Core/CDGameplayTags.h"
+#include "Settings/CDDeveloperSettings.h"
+
 
 namespace
 {
@@ -68,6 +70,11 @@ void UCDDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	const float coefficient = spec.GetSetByCallerMagnitude(CDTags::SetByCaller_Coefficient, false, 1.f);
 	const float defense = FMath::Clamp(Capture(DamageStatics().defense), 0.f, 0.9f);
 	float damage = Capture(DamageStatics().attackPower) * coefficient * (1.f - defense);
+
+	const UCDDeveloperSettings* settings = GetDefault<UCDDeveloperSettings>();
+	const float varianceMin = FMath::Min(settings->damageVarianceMin, settings->damageVarianceMax);
+	const float varianceMax = FMath::Max(settings->damageVarianceMin, settings->damageVarianceMax);
+	damage *= FMath::FRandRange(varianceMin, varianceMax);
 
 	if (FMath::FRand() < Capture(DamageStatics().critChance))
 	{
