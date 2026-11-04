@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include <Data/CDProjectileData.h>
+#include "GameplayTagContainer.h"
 #include "CDProjectileBase.generated.h"
 
 
@@ -20,6 +21,7 @@ class UProjectileMovementComponent;
 class UStaticMeshComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
+class ACDReticleActor;
 
 UCLASS()
 class CHAOSDUNGEON_API ACDProjectileBase : public AActor
@@ -34,17 +36,24 @@ public:
 	// ProjectileBaseData 초기화
 	void InitializeProjectile(const FCDProjectileBaseData& inData);
 
+	/** 이 투사체의 착탄 표시 등록 */
+	void SetLandingReticle(ACDReticleActor* reticle);
+
 protected:
 	// 투사체 움직임 
 	virtual bool ConfigureMovement();
 
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
+
 	// 이전 위치부터 현재 위치까지 명중 검사
 	void TraceHit(const FVector& start, const FVector& end);
 
 	// 맞혔을 때 실행
 	virtual void OnTargetHit(const FHitResult& hit);
+
+	void ApplyImpactDamage();
 
 protected:
 	// 충돌로 투사체 이동이 멈췄을 때 실행
@@ -69,7 +78,14 @@ protected:
 	UPROPERTY(Transient)
 	FCDProjectileBaseData projectileData;
 
+	UPROPERTY(EditAnywhere, Category  = "Projectile | Impact", meta = (Categories = "GameplayCue"))
+	FGameplayTag impactCueTag;
+
 private:
+	/** 투사체가 사라질 때 함께 제거할 착탄 표시 */
+	UPROPERTY(Transient)
+	TObjectPtr<ACDReticleActor> landingReticle = nullptr;
+
 	// 이전 프레임의 투사체 위치
 	FVector previousLocation = FVector::ZeroVector;
 
