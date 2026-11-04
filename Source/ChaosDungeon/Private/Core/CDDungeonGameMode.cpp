@@ -13,6 +13,8 @@
 #include "TimerManager.h"
 #include "UI/CDUIManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/TargetPoint.h"
+#include "World/CDMiniGameBomb.h"
 
 
 ACDDungeonGameMode::ACDDungeonGameMode()
@@ -117,8 +119,12 @@ void ACDDungeonGameMode::ClearStage()
 
 void ACDDungeonGameMode::FailRun()
 {
+	StopBombGame();
+
 	spawnManager->StopSpawning();
+
 	CommitStageTime();
+
 	GetRun()->FinishRun(false);
 }
 
@@ -202,14 +208,59 @@ void ACDDungeonGameMode::StartBombGame()
 {
 	const UCDStageData* stage = GetRun()->GetCurrentStage();
 
-	if (bIsBombGameActive)
+	ATargetPoint* centerPoint = nullptr;
+	ATargetPoint* upperLeftPoint = nullptr;
+	ATargetPoint* upperRightPoint = nullptr;
+	ATargetPoint* lowerLeftPoint = nullptr;
+	ATargetPoint* lowerRightPoint = nullptr;
+
+	/* TargetPoint 찾기 */
+	for (TActorIterator<ATargetPoint> it(GetWorld()); it; ++it)
 	{
+		if (it->ActorHasTag(FName(TEXT("BombPatternCenter"))))
+		{
+			centerPoint = *it;
+		}
+
+		if (it->ActorHasTag(FName(TEXT("BombUpperLeft"))))
+		{
+			upperLeftPoint = *it;
+		}
+
+		if (it->ActorHasTag(FName(TEXT("BombUpperRight"))))
+		{
+			upperRightPoint = *it;
+		}
+
+		if (it->ActorHasTag(FName(TEXT("BombLowerLeft"))))
+		{
+			lowerLeftPoint = *it;
+		}
+
+		if (it->ActorHasTag(FName(TEXT("BombLowerRight"))))
+		{
+			lowerRightPoint = *it;
+		}
+	}
+
+	if (!centerPoint || !upperLeftPoint || !upperRightPoint || !lowerLeftPoint || !lowerRightPoint)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("1 of 5 not found TargetPoint"));
+
 		return;
 	}
 
+	bombPatternCenter = centerPoint->GetActorLocation();
+	bombUpeerLeft = upperLeftPoint->GetActorLocation();
+	bombUpeerRight = upperRightPoint->GetActorLocation();
+	bombLowerLeft = lowerLeftPoint->GetActorLocation();
+	bombLowerRight = lowerRightPoint->GetActorLocation();
+
+	bombPatternIndex = 0;
+
 	bIsBombGameActive = true;
 
-	progress = 0.0f;
+	progress = 0.f;
 
 	targetProgress = static_cast<float>(stage->durationTime);
 
@@ -217,9 +268,11 @@ void ACDDungeonGameMode::StartBombGame()
 
 	GetWorldTimerManager().SetTimer(bombSpawnTimer, this, &ThisClass::SpawnBomb, stage->bombSpawnInterval, true);
 
-    GetWorldTimerManager().SetTimer(bombCompleteTimer, this, &ThisClass::CompleteBombGame, targetProgress, false);
+	GetWorldTimerManager().SetTimer(bombCompleteTimer, this, &ThisClass::CompleteBombGame, targetProgress, false);
 
 	GetWorldTimerManager().SetTimer(bombProgressTimer, this, &ThisClass::UpdateBombProgress, 0.1f, true);
+
+	SpawnBomb();
 }
 
 void ACDDungeonGameMode::SpawnBomb()
@@ -229,35 +282,103 @@ void ACDDungeonGameMode::SpawnBomb()
 		return;
 	}
 
+	const FVector upperLeftDirection = (bombPatternCenter - bombUpeerLeft).GetSafeNormal();
+
+	const FVector upperRightDirection = (bombPatternCenter - bombUpeerRight).GetSafeNormal();
+
+	const FVector lowerLeftDirection = (bombPatternCenter - bombLowerLeft).GetSafeNormal();
+
+	const FVector lowerRightDirection = (bombPatternCenter - bombLowerRight).GetSafeNormal();
+
+	switch (bombPatternIndex)
+	{
+		case 0:
+		{
+			SpawnPatternBomb(bombPatternCenter, FVector::ForwardVector, false);
+		
+			break;
+		}
+
+		case 1:
+		{
+			SpawnPatternBomb(bombUpeerLeft,upperLeftDirection, true);
+			SpawnPatternBomb(bombUpeerRight, upperRightDirection, true);
+			SpawnPatternBomb(bombLowerLeft, lowerLeftDirection, true);
+			SpawnPatternBomb(bombLowerRight, lowerRightDirection, true);
+
+			break;
+		}
+		
+		case 2:
+		{
+			SpawnPatternBomb(bombUpeerLeft, upperLeftDirection, true);
+		
+			break;
+		}
+
+		case 3:
+		{
+			SpawnPatternBomb(bombUpeerRight, upperRightDirection, true);
+		 
+			break;
+		}
+
+		case 4:
+		{
+			SpawnPatternBomb(bombLowerRight, lowerRightDirection, true);
+
+			break;
+		}
+		
+		case 5:
+		{
+			SpawnPatternBomb(bombLowerLeft, lowerLeftDirection, true);
+
+			break;
+		}
+	}
+
+	bombPatternIndex = (bombPatternIndex + 1) % 6;
+}
+
+void ACDDungeonGameMode::SpawnPatternBomb(const FVector& origin, const FVector& direction, bool bIsCone)
+{
 	const UCDStageData* stage = GetRun()->GetCurrentStage();
-	//APawn* player = UGameplayStatics::GetPlayerPawn(this, 0);
 
-	//const float spawnRange = 600.0f;
+	const float radius = bIsCone ? coneBombRadius : centerBombRadius;
 
-	// Todo: 맵 패턴 개념으로 수정 - yoonsang 
-	//FVector spawnLocation = player->GetActorLocation();
-	//spawnLocation.X += FMath::FRandRange(-spawnRange, spawnRange);
-	//spawnLocation.Y += FMath::FRandRange(-spawnRange, spawnRange);
-	//spawnLocation.Z += 1500.0f;
+	FVector spawnLocation = origin;
 
-	FVector spawnHugeBombLocation(0.0f, 0.0f, 1500.0f);
+	if (bIsCone)
+	{
+		const float landingDistance = FMath::Clamp(bombLandingDistance, 0.f, radius * 0.8f);
 
+		spawnLocation += direction * landingDistance;
+	}
 
-	FActorSpawnParameters spawnParameters;
-	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	spawnLocation.Z += bombDropHeight;
 
-	AActor* bomb = GetWorld()->SpawnActor<AActor>(
+	const FTransform spawnTransform(FRotator::ZeroRotator, spawnLocation);
+
+	ACDMinigameBomb* bomb = GetWorld()->SpawnActorDeferred<ACDMinigameBomb>(
 		stage->bombClass,
-		spawnHugeBombLocation,
-		FRotator::ZeroRotator,
-		spawnParameters);
+		spawnTransform,
+		this,
+		nullptr,
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+	);
+
+	if (!IsValid(bomb))
+	{
+		return;
+	}
+
+	bomb->InitializePattern(origin, direction, radius, bIsCone);
+
+	bomb->FinishSpawning(spawnTransform);
 
 	if (IsValid(bomb))
 	{
-		FVector Scale(30.f);
-
-		bomb->SetActorScale3D(Scale);
-
 		spawnedBombs.Add(bomb);
 	}
 }

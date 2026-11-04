@@ -69,6 +69,9 @@ private:
 	/* 떨어질 위치 정하고 폭탄 생성 - yoonsang */
 	void SpawnBomb();
 
+	/* 지정된 방향에 패턴 포탄 생성 - yoonsang */
+	void SpawnPatternBomb(const FVector& origin, const FVector& direction, bool bIsCone);
+
 	/* 생존 시간 완료 및 ClearStage - yoonsang */
 	void CompleteBombGame();
 
@@ -105,6 +108,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Portal")
 	TSubclassOf<ACDInteractable> exitDoorClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "BombPattern", meta = (ClampMin = "1.0"))
+	float centerBombRadius = 1500.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "BombPattern", meta = (ClampMin = "1.0"))
+	float coneBombRadius = 2500.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "BombPattern", meta = (ClampMin = "0.0"))
+	float bombLandingDistance = 1200.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "BombPattern", meta = (ClampMin = "1.0"))
+	float bombDropHeight = 1700.f;
+
 private:
 	/** 메시지 구독 핸들 */
 	TArray<FCDListenerHandle> listenerHandles;
@@ -136,4 +151,22 @@ private:
 
 	/* 진행도 갱신 주기 관리 - yoonsang */
 	FTimerHandle bombProgressTimer;
+
+	/* 현재 실행하는 패턴 번호 */
+	int32 bombPatternIndex = 0;
+
+	/* 맵 바닥의 패턴 중심 */
+	FVector bombPatternCenter = FVector::ZeroVector;
+
+	/* 왼쪽 위 콘 공격 꼭짓점 위치 */
+	FVector bombUpeerLeft = FVector::ZeroVector;
+
+	/* 오른쪽 위 콘 공격 꼭짓점 위치 */
+	FVector bombUpeerRight = FVector::ZeroVector;
+
+	/* 왼쪽 아래 콘 공격 꼭짓점 위치 */
+	FVector bombLowerLeft = FVector::ZeroVector;
+
+	/* 오른쪽 아래 콘 공격 꼭짓점 위치 */
+	FVector bombLowerRight = FVector::ZeroVector;
 };
