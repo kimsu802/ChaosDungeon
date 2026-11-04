@@ -3,12 +3,14 @@
 #include "AbilitySystem/CDAbilityTask_ManageReticle.h"
 #include "AbilitySystem/CDGameplayEffects.h"
 #include "AbilitySystem/CDAttributeSet.h"
+#include "AbilitySystem/CDProjectileBase.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
 #include "Data/CDSkillData.h"
+#include "Data/CDProjectileData.h"
 #include "Player/CDAwakenDirectorComponent.h"
 #include "Player/CDSpeechBubbleComponent.h"
 
@@ -194,6 +196,15 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 			}
 			else
 			{
+				// 투사체 BP가 설정된 기본 공격
+				if (skillData->projectileData.projectileClass)
+				{
+					FireProjectile();
+
+					// 기존 즉발 타격 처리는 실행하지 않음
+					return;
+				}
+
 				// 10.29 각성기 연출: 지연 베기 (피격 이펙트가 Impact 화면 위에 나오도록 ApplyHit 보다 먼저)
 				if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
 				{
@@ -375,6 +386,38 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 	montageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->OnCancelled.AddDynamic(this, &ThisClass::OnMontageCancelled);
 	montageTask->ReadyForActivation();
+}
+
+void UCDPlayerSkillAbility::FireProjectile()
+{
+	const ACDCharacterBase* character = GetCDCharacter();
+	const FVector forward = character->GetActorForwardVector();
+	const FVector direction = forward.GetSafeNormal2D();
+
+	if (direction.IsNearlyZero())
+	{
+		return;
+	}
+
+	FCDProjectileBaseData launchData = skillData->projectileData;
+	const FVector origin = character->GetActorLocation();
+
+	const int projectileCount = FMath::Max(1, launchData.bossData.projectileCount);
+	
+	const float spreadAngle = launchData.bossData.spreadAngle;
+	const float baseAngle = projectileCount > 1 ? -spreadAngle * 0.5f : 0.0f;
+	const float angleStep = projectileCount > 1 ? spreadAngle / (projectileCount - 1) : 0.0f;
+
+
+	for (int i = 0; i < projectileCount; i++)
+	{
+		const float fireAngle = baseAngle + angleStep * i;
+		const FVector fireDirection = direction.RotateAngleAxis(fireAngle, FVector::UpVector);
+
+		launchData.launchLocation = origin + fireDirection * 80.f;
+		launchData.targetPoint = launchData.launchLocation + fireDirection * launchData.speed;
+		SpawnProjectile(launchData, skillData->damageCoefficient);
+	}
 }
 
 UCDAwakenDirectorComponent* UCDPlayerSkillAbility::GetAwakenDirector() const

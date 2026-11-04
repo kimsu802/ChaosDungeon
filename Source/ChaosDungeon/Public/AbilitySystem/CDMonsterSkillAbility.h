@@ -42,7 +42,7 @@ protected:
 	virtual void ClearReticle();
 
 	// 투사체 발사. 보스 특수 패턴은 이 함수 재정의 할 것
-	virtual void FireProjectile();
+	virtual void FireProjectile() override;
 
 private:
 	void SetUntargetable(bool bNewUntargetable);
