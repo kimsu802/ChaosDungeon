@@ -110,4 +110,6 @@ struct CHAOSDUNGEON_API FCDProjectileBaseData
 	UPROPERTY(EditAnywhere, Category = "Projectile / Boss")
 	FCDBossProjectileData bossData;
 
+	// 비행 중 캐릭터 명중 검사
+	bool bHitActorsFlight = true;
 };
