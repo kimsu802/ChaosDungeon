@@ -2,6 +2,7 @@
 
 
 #include "AbilitySystem/CDProjectileBase.h"
+#include "AbilitySystem/CDReticleActor.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Core/CDGameplayTags.h"
@@ -37,6 +38,11 @@ ACDProjectileBase::ACDProjectileBase()
 	niagaraComp->SetAutoActivate(false);
 }
 
+void ACDProjectileBase::SetLandingReticle(ACDReticleActor* reticle)
+{
+	landingReticle = reticle;
+}
+
 void ACDProjectileBase::InitializeProjectile(const FCDProjectileBaseData& inData)
 {
 	projectileData = inData;
@@ -58,7 +64,7 @@ void ACDProjectileBase::InitializeProjectile(const FCDProjectileBaseData& inData
 	sphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	previousLocation = GetActorLocation();
-	bTraceEnabled = true;
+	bTraceEnabled = projectileData.bHitActorsFlight;
 
 	projectileMove->Activate();
 	niagaraComp->Activate();
@@ -150,6 +156,17 @@ void ACDProjectileBase::BeginPlay()
 
 	// 이동 중단 이벤트 
 	projectileMove->OnProjectileStop.AddDynamic(this, &ACDProjectileBase::OnProjectileStop);
+}
+
+void ACDProjectileBase::EndPlay(const EEndPlayReason::Type endPlayReason)
+{
+	if (IsValid(landingReticle.Get()))
+	{
+		landingReticle->Destroy();
+		landingReticle = nullptr;
+	}
+
+	Super::EndPlay(endPlayReason);
 }
 
 void ACDProjectileBase::Tick(float deltaSeconds)
@@ -276,6 +293,25 @@ void ACDProjectileBase::OnProjectileStop(const FHitResult& hit)
 	}
 
 	bTraceEnabled = false;
+
+	// GCN 태그 여부를 확인해서 사라지는 여부 확인
+	// 태그가 없으면 그냥 Destroy()
+	if (impactCueTag.IsValid())
+	{
+		UAbilitySystemComponent* sourceASC = projectileData.sourceASC.Get();
+
+		if (IsValid(sourceASC))
+		{
+			FGameplayCueParameters params;
+			params.Location = hit.ImpactPoint;
+			params.Normal = hit.ImpactNormal;
+			params.Instigator = projectileData.sourceActor.Get();
+			params.EffectCauser = this;
+
+			sourceASC->ExecuteGameplayCue(impactCueTag, params);
+		}
+	}
+
 	Destroy();
 }
 
