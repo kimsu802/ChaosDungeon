@@ -9,7 +9,8 @@ enum class ECDHitShapeType : uint8
 {
 	Circle,  // 원형 (장판 = 원형 + 커서 위치 기준)
 	Cone,    // 부채꼴
-	Line     // 직선 (찌르기/원거리/돌진)
+	Line,     // 직선 (찌르기/원거리/돌진)
+	MonsterCircle // 몬스터 전용 원형 (콘을 사용)
 };
 
 /**

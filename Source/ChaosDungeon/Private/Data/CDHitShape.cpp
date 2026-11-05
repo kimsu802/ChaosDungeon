@@ -28,7 +28,9 @@ bool FCDHitShape::Contains(const FVector& origin, const FVector& forward, const 
 
 	switch (type)
 	{
+		/* 몬스터도 원형 판정을 사용 - yoonsang */
 	case ECDHitShapeType::Circle:
+	case ECDHitShapeType::MonsterCircle:
 	{
 		return toPoint.SizeSquared() <= FMath::Square(radius);
 	}
@@ -63,7 +65,9 @@ void FCDHitShape::DrawDebug(const UWorld* world, const FVector& origin, const FV
 	const FVector direction = forward.GetSafeNormal2D();
 	switch (type)
 	{
+		/* 몬스터도 같은 원형 판정을 사용 - yoonsang */
 	case ECDHitShapeType::Circle:
+	case ECDHitShapeType::MonsterCircle:
 	{
 		DrawDebugCircle(world, origin, radius, 32, color, false, duration, 0, 2.f, FVector::ForwardVector, FVector::RightVector, false);
 		break;
