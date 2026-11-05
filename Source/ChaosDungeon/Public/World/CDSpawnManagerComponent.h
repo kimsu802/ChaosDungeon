@@ -98,6 +98,9 @@ private:
 	/** 데이터별 누적 스폰 수 (maxCount 판정) */
 	TMap<TObjectPtr<const UCDMonsterData>, int32> spawnCounts;
 
+	/** 현재 스테이지에 보스가 생성됐는지 여부 */
+	bool bBossSpawned = false;
+
 	/** 살아있는 몬스터 수 */
 	int32 aliveCount = 0;
 
