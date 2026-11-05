@@ -43,6 +43,46 @@ void ACDProjectileBase::SetLandingReticle(ACDReticleActor* reticle)
 	landingReticle = reticle;
 }
 
+void ACDProjectileBase::PauseFlight()
+{
+	projectileMove->StopMovementImmediately();
+	SetFlightHitEnabled(false);
+}
+
+void ACDProjectileBase::LaunchAtLocation(
+	const FVector& location,
+	float speed,
+	const FGameplayTag& launchCueTag)
+{
+	projectileData.targetPoint = location;
+	projectileData.speed = speed;
+	projectileData.projectileType = ECDProjectileType::Straight;
+
+	if (!ConfigureMovement())
+	{
+		Destroy();
+		return;
+	}
+
+	// 현재 위치부터 명중 검사 시작
+	SetFlightHitEnabled(true);
+	projectileMove->Activate(true);
+
+	UAbilitySystemComponent* sourceASC =
+		projectileData.sourceASC.Get();
+
+	if (launchCueTag.IsValid() && IsValid(sourceASC))
+	{
+		FGameplayCueParameters params;
+		params.Location = GetActorLocation();
+		params.Normal = projectileMove->Velocity.GetSafeNormal();
+		params.Instigator = projectileData.sourceActor.Get();
+		params.EffectCauser = this;
+
+		sourceASC->ExecuteGameplayCue(launchCueTag, params);
+	}
+}
+
 void ACDProjectileBase::InitializeProjectile(const FCDProjectileBaseData& inData)
 {
 	projectileData = inData;
@@ -270,6 +310,16 @@ void ACDProjectileBase::OnTargetHit(const FHitResult& hit)
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(target, CDTags::Event_Hit, payload);
 	}
 
+	if (impactCueTag.IsValid())
+	{
+		FGameplayCueParameters params;
+		params.Location = hit.ImpactPoint;
+		params.Normal = hit.ImpactNormal;
+		params.Instigator = projectileData.sourceActor.Get();
+		params.EffectCauser = this;
+
+		sourceASC->ExecuteGameplayCue(impactCueTag, params);
+	}
 
 	if (hitComp)
 	{
