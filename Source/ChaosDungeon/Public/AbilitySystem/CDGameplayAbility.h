@@ -43,7 +43,8 @@ protected:
 	ACDCharacterBase* GetCDCharacter() const;
 
 	/** 이동을 멈추고 location 을 바라본다 (시전 시작 공용 처리) */
-	void BeginCastTowards(const FVector& location) const;
+	/*  몬스터쪽에서 오버라이드 해서 사용 - yoonsang */
+	virtual void BeginCastTowards(const FVector& location);
 
 	/** 돌진/회피 공용 이동. 어빌리티가 끝나면 이동도 끝난다 */
 	void StartDash(const FVector& direction, float distance, float duration);
