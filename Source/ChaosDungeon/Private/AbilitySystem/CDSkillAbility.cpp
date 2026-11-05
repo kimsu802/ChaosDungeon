@@ -121,3 +121,6 @@ void UCDSkillAbility::SetCasting(bool bNewCasting)
 		abilitySystem->RemoveLooseGameplayTag(CDTags::State_Casting);
 	}
 }
+
+void UCDSkillAbility::FireProjectile()
+{}

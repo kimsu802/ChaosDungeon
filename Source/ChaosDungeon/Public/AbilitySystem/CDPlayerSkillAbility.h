@@ -42,6 +42,8 @@ protected:
 	/** 기존 Activate 함수 별도 호출용 함수 */
 	void ActivateSkillAbility();
 
+	virtual void FireProjectile() override;
+
 private:
 	void GatherAwakeningGauge();
 

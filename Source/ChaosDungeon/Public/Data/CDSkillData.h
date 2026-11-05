@@ -112,20 +112,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	ECDSkillCastPolicy castPolicy;
 
-	/** 스킬 조준 방식 */
+	/** 판정 기준점 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
-	ECDSkillTargetingType skillMode;
+	ECDSkillOrigin origin = ECDSkillOrigin::Self;
 
 	/** 스킬 시전 시 경직 면역 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	bool bIsBlockHitReact = false;
 
-	/** 판정 기준점 */
+	/** 스킬 조준 방식 */
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	ECDSkillOrigin origin = ECDSkillOrigin::Self;
+	ECDSkillTargetingType targetingType;
 
 	/** 장판 최대 사거리 */
-	UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (EditCondition = "origin == ECDSkillOrigin::Cursor"))
+	UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (EditCondition = "targetingType != ECDSkillTargetingType::None"))
 	float maxRange = 1000.f;
 
 	/** 판정 도형 */

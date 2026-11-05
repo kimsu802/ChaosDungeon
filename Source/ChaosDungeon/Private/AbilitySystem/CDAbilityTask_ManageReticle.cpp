@@ -67,7 +67,7 @@ void UCDAbilityTask_ManageReticle::TickTask(float DeltaTime)
 
 	if (nullptr == pc)
 	{
-		switch (skillData->skillMode)
+		switch (skillData->targetingType)
 		{
 			// [영역 지정]
 		case ECDSkillTargetingType::Location:
@@ -97,7 +97,7 @@ void UCDAbilityTask_ManageReticle::TickTask(float DeltaTime)
 	}
 	else
 	{
-		switch (skillData->skillMode)
+		switch (skillData->targetingType)
 		{
 		case ECDSkillTargetingType::Location:
 		{

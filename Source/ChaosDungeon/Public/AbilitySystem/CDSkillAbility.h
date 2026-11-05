@@ -71,6 +71,8 @@ protected:
 	/** State.Casting 부여/해제 */
 	void SetCasting(bool bNewCasting);
 
+	virtual void FireProjectile();
+
 protected:
 	/** 스킬 데이터 (Spec 의 SourceObject) */
 	UPROPERTY(Transient)
