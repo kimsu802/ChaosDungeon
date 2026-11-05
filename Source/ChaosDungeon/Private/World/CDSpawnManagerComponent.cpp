@@ -15,6 +15,7 @@ void UCDSpawnManagerComponent::Initialize(const TArray<FVector>& inSpawnPoints, 
 	stage = inStage;
 	difficulty = inDifficulty;
 	spawnCounts.Reset();
+	bBossSpawned = false;
 }
 
 void UCDSpawnManagerComponent::StartSpawning()
@@ -32,6 +33,12 @@ ACDMonsterBase* UCDSpawnManagerComponent::SpawnMonsterAt(const UCDMonsterData* d
 	UWorld* world = GetWorld();
 
 	if (!world || !IsValid(stage.Get()) || !IsValid(data) || !data->monsterClass)
+	{
+		return nullptr;
+	}
+
+	const bool bIsBoss = data->grade == ECDMonsterGrade::Boss;
+	if (bIsBoss && bBossSpawned)
 	{
 		return nullptr;
 	}
@@ -78,6 +85,7 @@ ACDMonsterBase* UCDSpawnManagerComponent::SpawnMonsterAt(const UCDMonsterData* d
 		return nullptr;
 	}
 
+	bBossSpawned |= bIsBoss;
 	// 기존 능력치·스킬·활성화 처리 사용
 	monster->ActivateFromPool(data, difficulty, groundLocation);
 
@@ -118,6 +126,12 @@ const UCDMonsterData* UCDSpawnManagerComponent::PickMonster() const
 	float totalWeight = 0.f;
 	for (const FCDSpawnEntry& entry : stage->spawns)
 	{
+		if (!IsValid(entry.monster.Get()) ||
+			(bBossSpawned && entry.monster->grade == ECDMonsterGrade::Boss))
+		{
+			continue;
+		}
+
 		const int32* spawned = spawnCounts.Find(entry.monster);
 		if (entry.maxCount > 0 && spawned && *spawned >= entry.maxCount)
 		{
