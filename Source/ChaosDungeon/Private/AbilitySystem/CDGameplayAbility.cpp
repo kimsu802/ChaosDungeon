@@ -6,11 +6,14 @@
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
 #include "Character/CDPlayerCharacter.h"
+#include "Character/CDMonsterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Data/CDProjectileData.h"
+#include "Data/CDMonsterData.h"
 #include "Engine/World.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
 
 TAutoConsoleVariable<bool> CVarDebugHitShape(TEXT("CD.DebugHitShape"), false, TEXT("일반 공격 및 스킬 판정 범위를 그린다"));
 
@@ -64,9 +67,10 @@ ACDCharacterBase* UCDGameplayAbility::GetCDCharacter() const
 	return Cast<ACDCharacterBase>(GetAvatarActorFromActorInfo());
 }
 
-void UCDGameplayAbility::BeginCastTowards(const FVector& location) const
+void UCDGameplayAbility::BeginCastTowards(const FVector& location)
 {
 	ACDCharacterBase* character = GetCDCharacter();
+	
 	if (AController* controller = character->GetController())
 	{
 		controller->StopMovement();
@@ -81,6 +85,7 @@ void UCDGameplayAbility::BeginCastTowards(const FVector& location) const
 	}
 
 	const FVector toTarget = location - character->GetActorLocation();
+
 	if (!toTarget.IsNearlyZero())
 	{
 		character->SetActorRotation(FRotator(0.f, toTarget.Rotation().Yaw, 0.f));

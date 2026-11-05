@@ -41,6 +41,9 @@ protected:
 
 	virtual void ClearReticle();
 
+	/* 원거리 몬스터 로테이션 값 재정의 - yoonsang */
+	virtual void BeginCastTowards(const FVector& location) override;
+
 	// 투사체 발사. 보스 특수 패턴은 이 함수 재정의 할 것
 	virtual void FireProjectile() override;
 

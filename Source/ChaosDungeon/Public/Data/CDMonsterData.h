@@ -52,6 +52,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float attackRange = 200.f;
 
+	/* RangedMonster 회전 속도 조절을 위한 추가 - yoonsang */
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	bool useSmoothAttackRotation = false;
+
 	/** 앞쪽일수록 우선 시도 (정예의 특수 공격은 앞에 두고 긴 쿨다운을 준다) */
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	TArray<TObjectPtr<UCDSkillData>> attackSkills;

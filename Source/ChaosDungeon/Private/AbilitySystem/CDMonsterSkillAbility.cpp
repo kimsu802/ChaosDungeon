@@ -12,6 +12,7 @@
 #include "Data/CDMonsterData.h"
 #include "Engine/World.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UCDMonsterSkillAbility::UCDMonsterSkillAbility()
 {
@@ -255,6 +256,29 @@ void UCDMonsterSkillAbility::ClearReticle()
 		}
 	}
 		spawnedReticle.Reset();
+}
+
+void UCDMonsterSkillAbility::BeginCastTowards(const FVector& location)
+{
+	ACDCharacterBase* character = GetCDCharacter();
+	const ACDMonsterBase* monster = Cast<ACDMonsterBase>(character);
+
+	/* 몬스터일때만 몬스터 데이터 가져오기 - yoonsang */
+	const UCDMonsterData* monsterData = monster ? monster->GetMonsterData() : nullptr;
+
+
+	/* 원거리 몬스터 SetActorRotation 시 끊기는 현상 개선 - yoonsang */
+	if (monsterData && monsterData->useSmoothAttackRotation)
+	{
+		if (UCharacterMovementComponent* movement = character->GetCharacterMovement())
+		{
+			movement->bOrientRotationToMovement = false;
+			movement->bUseControllerDesiredRotation = true;
+
+			movement->RotationRate = FRotator(0.f, 180.f, 0.f);
+		}
+	}
+
 }
 
 void UCDMonsterSkillAbility::FireProjectile()
