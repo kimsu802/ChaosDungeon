@@ -39,6 +39,12 @@ public:
 	/** 이 투사체의 착탄 표시 등록 */
 	void SetLandingReticle(ACDReticleActor* reticle);
 
+	// 공중에서 이동과 캐릭터 명중 검사 중지
+	void PauseFlight();
+
+	// 지정 위치로 방향을 확정하고 직선 발사
+	void LaunchAtLocation(const FVector& location, float speed, const FGameplayTag& launchCueTag);
+
 protected:
 	// 투사체 움직임 
 	virtual bool ConfigureMovement();
@@ -54,6 +60,13 @@ protected:
 	virtual void OnTargetHit(const FHitResult& hit);
 
 	void ApplyImpactDamage();
+
+	// 비행 중 캐릭터 명중 검사
+	void SetFlightHitEnabled(bool bEnabled)
+	{
+		previousLocation = GetActorLocation();
+		bTraceEnabled = bEnabled;
+	}
 
 protected:
 	// 충돌로 투사체 이동이 멈췄을 때 실행
