@@ -271,8 +271,6 @@ void ACDDungeonGameMode::StartBombGame()
 	GetWorldTimerManager().SetTimer(bombCompleteTimer, this, &ThisClass::CompleteBombGame, targetProgress, false);
 
 	GetWorldTimerManager().SetTimer(bombProgressTimer, this, &ThisClass::UpdateBombProgress, 0.1f, true);
-
-	SpawnBomb();
 }
 
 void ACDDungeonGameMode::SpawnBomb()
