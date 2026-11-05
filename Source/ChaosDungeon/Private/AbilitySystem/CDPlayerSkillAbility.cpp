@@ -44,7 +44,7 @@ void UCDPlayerSkillAbility::ActivateAbility(const FGameplayAbilitySpecHandle han
 	{
 		bool bCanActivate = true;
 
-		if (skillData->skillIdTag == CDTags::Ability_Skill_Awakening)
+		if (skillData->skillIdTag.MatchesTag(CDTags::Ability_Skill_Awakening))
 		{
 			UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
 			const float awakenGauge = abilitySystem->GetNumericAttribute(UCDAttributeSet::GetAwakenGaugeAttribute());
@@ -331,7 +331,7 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 		return;
 	}
 
-	if (skillData->skillIdTag == CDTags::Ability_Skill_Awakening)
+	if (skillData->skillIdTag.MatchesTag(CDTags::Ability_Skill_Awakening))
 	{
 		const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
 		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, -100.f);
@@ -422,7 +422,7 @@ void UCDPlayerSkillAbility::FireProjectile()
 
 UCDAwakenDirectorComponent* UCDPlayerSkillAbility::GetAwakenDirector() const
 {
-	if ((skillData == nullptr) || (skillData->skillIdTag != CDTags::Ability_Skill_Awakening))
+	if ((skillData == nullptr) || !skillData->skillIdTag.MatchesTag(CDTags::Ability_Skill_Awakening))
 	{
 		return nullptr;
 	}
@@ -464,7 +464,7 @@ void UCDPlayerSkillAbility::HideCastLine()
 void UCDPlayerSkillAbility::GatherAwakeningGauge()
 {
 	// 각성기가 아니면 각성기 게이지 습득
-	if (skillData->skillIdTag != CDTags::Ability_Skill_Awakening)
+	if (!skillData->skillIdTag.MatchesTag(CDTags::Ability_Skill_Awakening))
 	{
 		// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
 		const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
