@@ -60,6 +60,12 @@ void ACDReticleActor::SetReticleConfig(const UCDSkillData& skillData)
 	{
 		SetConeReticleSize(skillData.hitShape.radius, skillData.hitShape.angle);
 	}
+
+	/* 몬스터 전용 Circle을 위한 처리 항상 원을 표시하기 위해 고정 값 사용 - yoonsang */
+	else if (skillData.hitShape.type == ECDHitShapeType::MonsterCircle)
+	{
+		SetConeReticleSize(skillData.hitShape.radius, 360.f);
+	}
 	else
 	{
 		SetReticleSize(skillData.hitShape.width * 0.5f, skillData.hitShape.length * 0.5f);
