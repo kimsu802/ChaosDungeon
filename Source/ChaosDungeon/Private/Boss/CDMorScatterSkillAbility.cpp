@@ -9,7 +9,7 @@
 #include <Character/CDBossCharacter.h>
 #include <Engine/World.h>
 
-void UCDMorScatterSkillAbility::FireProjectile()
+void UCDMorScatterSkillAbility::FireProjectileWithYaw(float /*yawOffset*/)
 {
 	ACDBossCharacter* boss = Cast<ACDBossCharacter>(GetCDCharacter());
 	UWorld* world = GetWorld();
@@ -44,7 +44,7 @@ void UCDMorScatterSkillAbility::ApplyHit()
 
 void UCDMorScatterSkillAbility::ShowReticle()
 {
-	// 착탄 표시는 FireProjectile()에서 탄마다 생성한다.
+	// 착탄 표시는 탄마다 생성한다.
 }
 
 ACDReticleActor* UCDMorScatterSkillAbility::SpawnLandingReticle(const FVector& location)

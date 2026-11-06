@@ -123,12 +123,7 @@ void UCDMonsterSkillAbility::ApplyHit()
 	// 투사체 스킬
 	if (skillData->projectileData.projectileClass)
 	{
-		int32 projectileCount = skillData->projectileData.bossData.projectileCount;
-
-		for (int ix = 0; ix < projectileCount; ++ix)
-		{
-			FireProjectile();
-		}
+		FireProjectile();
 		return;
 	}
 
@@ -276,12 +271,31 @@ void UCDMonsterSkillAbility::BeginCastTowards(const FVector& location)
 			movement->bUseControllerDesiredRotation = true;
 
 			movement->RotationRate = FRotator(0.f, 180.f, 0.f);
+			return;
 		}
 	}
-
+	Super::BeginCastTowards(location);
 }
 
 void UCDMonsterSkillAbility::FireProjectile()
+{
+	if (!IsValid(skillData))
+	{
+		return;
+	}
+
+	const FCDBossProjectileData& data = skillData->projectileData.bossData;
+	const int32 count = data.projectileCount;
+	const float baseAngle = count > 1 ? -data.spreadAngle * 0.5f : 0.f;
+	const float angleStep = count > 1 ? data.spreadAngle / (count - 1) : 0.f;
+
+	for (int32 index = 0; index < count; ++index)
+	{
+		FireProjectileWithYaw(baseAngle + angleStep * index);
+	}
+}
+
+void UCDMonsterSkillAbility::FireProjectileWithYaw(float yawOffset)
 {
 	const ACDCharacterBase* character = GetCDCharacter();
 
@@ -300,6 +314,11 @@ void UCDMonsterSkillAbility::FireProjectile()
 	// 발사 위치와 시전 시점에 확정한 조준점
 	launchData.launchLocation = character->GetActorLocation();
 	launchData.targetPoint = targetLocation;
+	if (yawOffset != 0.f)
+	{
+		const FVector aimOffset = targetLocation - launchData.launchLocation;
+		launchData.targetPoint = launchData.launchLocation + aimOffset.RotateAngleAxis(yawOffset, FVector::UpVector);
+	}
 
 	// 이후 방향 전환 패턴에서 사용할 대상 Actor
 	const AAIController* aiController = character->GetController<AAIController>();
