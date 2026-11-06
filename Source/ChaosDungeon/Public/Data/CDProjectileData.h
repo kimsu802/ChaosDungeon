@@ -86,6 +86,10 @@ struct CHAOSDUNGEON_API FCDProjectileBaseData
 	UPROPERTY(Transient)
 	FGameplayEffectSpecHandle damageSpec;
 
+	// 명중 시 적용할 각성기 게이지 Spec
+	UPROPERTY(Transient)
+	FGameplayEffectSpecHandle awakenSpec;
+
 	// 투사체가 피격 반응을 발생 여부
 	UPROPERTY(Transient)
 	bool bCausesHitReact = false;

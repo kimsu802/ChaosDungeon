@@ -295,6 +295,9 @@ void ACDProjectileBase::OnTargetHit(const FHitResult& hit)
 	// 데미지 적용
 	sourceASC->ApplyGameplayEffectSpecToTarget(*projectileData.damageSpec.Data, targetASC);
 
+	// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
+	sourceASC->ApplyGameplayEffectSpecToSelf(*projectileData.awakenSpec.Data);
+
 	// 데미지 적용 후 피격 이벤트 전송
 	AActor* sourceActor = projectileData.sourceActor.Get();
 

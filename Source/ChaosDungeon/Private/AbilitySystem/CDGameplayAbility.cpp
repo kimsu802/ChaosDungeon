@@ -139,15 +139,17 @@ ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseDa
     launchData.sourceActor = sourceActor;
     launchData.sourceASC = sourceASC;
 
-    // 현재 Ability의 발사자를 기준으로 데미지 Spec 생성
+    // 현재 Ability의 발사자를 기준으로 데미지/각성기 Spec 생성
     launchData.damageSpec = MakeOutgoingGameplayEffectSpec( UCDDamageEffect::StaticClass(), GetAbilityLevel());
+	launchData.awakenSpec = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
 
-    if (!launchData.damageSpec.IsValid())
+    if (!launchData.damageSpec.IsValid() || !launchData.awakenSpec.IsValid())
     {
         return nullptr;
     }
 
     launchData.damageSpec.Data->SetSetByCallerMagnitude( CDTags::SetByCaller_Coefficient, damageCoefficient);
+	launchData.awakenSpec.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, 10.f);
 
     FActorSpawnParameters spawnParams;
     spawnParams.Owner = sourceActor;
