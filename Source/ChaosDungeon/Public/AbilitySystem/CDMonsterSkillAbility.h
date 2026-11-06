@@ -44,8 +44,11 @@ protected:
 	/* 원거리 몬스터 로테이션 값 재정의 - yoonsang */
 	virtual void BeginCastTowards(const FVector& location) override;
 
-	// 투사체 발사. 보스 특수 패턴은 이 함수 재정의 할 것
+	// 발사 수와 확산 각도에 따라 투사체를 동시에 발사한다.
 	virtual void FireProjectile() override;
+
+	// 탄마다 조준 방식이 다른 특수 패턴에서 재정의한다.
+	virtual void FireProjectileWithYaw(float yawOffset);
 
 private:
 	void SetUntargetable(bool bNewUntargetable);
