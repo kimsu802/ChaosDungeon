@@ -17,11 +17,11 @@ class CHAOSDUNGEON_API UCDMorScatterSkillAbility : public UCDMonsterSkillAbility
 	GENERATED_BODY()
 	
 public:
-	virtual void FireProjectile() override;
-
 	virtual void ApplyHit() override;
 
 protected:
+	virtual void FireProjectileWithYaw(float yawOffset) override;
+
 	/** 기본 조준 표시는 생략하고 탄별 착탄 표시를 사용 */
 	virtual void ShowReticle() override;
 
