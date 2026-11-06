@@ -205,11 +205,15 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 					return;
 				}
 
-				// 10.29 각성기 연출: 지연 베기 (피격 이펙트가 Impact 화면 위에 나오도록 ApplyHit 보다 먼저)
-				if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
+				if (skillData->skillIdTag.MatchesTag(CDTags::Ability_Skill_Awakening))
 				{
-					director->EnterPhase(ECDAwakenPhase::Impact);
+					// 10.29 각성기 연출: 지연 베기 (피격 이펙트가 Impact 화면 위에 나오도록 ApplyHit 보다 먼저)
+					if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
+					{
+						director->EnterPhase(ECDAwakenPhase::Impact);
+					}
 				}
+
 				ApplyHit();
 			}
 		}
@@ -280,10 +284,10 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 	}
 	else
 	{
-		for (const FCDSkillVFX& vfx : skillData->skillEffects)
-		{
-			if (tag == vfx.VFXCueTag)
-			{
+		//for (const FCDSkillVFX& vfx : skillData->skillEffects)
+		//{
+		//	if (tag == vfx.VFXCueTag)
+		//	{
 				UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
 				FGameplayCueParameters params;
 
@@ -306,20 +310,20 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 				// 10.29 이펙트 방향 = 시전자 정면 (각성기 참격선처럼 돌진 방향을 따라야 하는 이펙트용, GCN 스폰 회전에 사용)
 				params.Normal = GetCDCharacter()->GetActorForwardVector();
 
-				if (vfx.effectType == ECDSkillVFXType::Burst)
+				//if (vfx.effectType == ECDSkillVFXType::Burst)
 				{
 					abilitySystem->ExecuteGameplayCue(tag, params);
 				}
-				else
+				//else
 				{
 					// Looping - AddGameplayCue / RemoveGameplayCue
 					// 몽타주와 별도로 생성이 필요한 경우(설치기 등)에 사용
 					// abilitySystem->AddGameplayCue(tag, params);
 				}
 
-				break;
-			}
-		}
+				//break;
+		//	}
+		//}
 	}
 }
 
