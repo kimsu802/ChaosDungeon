@@ -110,11 +110,19 @@ void UCDPlayerSkillAbility::EndAbility(const FGameplayAbilitySpecHandle handle, 
 		onConfirmInput.Unbind();
 	}
 
+	UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
 	if (skillData->bIsBlockHitReact)
 	{
-		UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+		abilitySystem->RemoveLooseGameplayTag(CDTags::State_Invincible);
+	}
+	
+	// 만약 삭제가 안됐을 경우에 한해서 제거
+	if (abilitySystem->HasMatchingGameplayTag(CDTags::State_Immune_Stagger))
+	{
 		abilitySystem->RemoveLooseGameplayTag(CDTags::State_Immune_Stagger);
 	}
+
+	abilitySystem->UnBlockAbilitiesWithTags(FGameplayTagContainer(CDTags::Ability_Dodge));
 
 	// 10.29 각성기 연출: 취소면 즉시 복귀, 정상 종료면 남은 연출(지연 베기 · 복귀)은 끝까지
 	if (UCDAwakenDirectorComponent* director = GetAwakenDirector())
@@ -225,11 +233,13 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 			{
 				UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
 				abilitySystem->RemoveLooseGameplayTag(CDTags::State_Untargetable);
+				abilitySystem->RemoveLooseGameplayTag(CDTags::State_Invincible);
 			}
 			else if (tag == CDTags::Event_Montage_Untargetable)
 			{
 				UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
 				abilitySystem->AddLooseGameplayTag(CDTags::State_Untargetable);
+				abilitySystem->AddLooseGameplayTag(CDTags::State_Invincible);
 			}
 			else if (tag == CDTags::Event_Montage_Land)
 			{
@@ -335,6 +345,10 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 		return;
 	}
 
+	// 11.06 - Jun6 스킬 시전 시작 시 Dodge에 의해 멈추는 현상 방지
+	UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+	abilitySystem->BlockAbilitiesWithTags(FGameplayTagContainer(CDTags::Ability_Dodge));
+
 	if (skillData->skillIdTag.MatchesTag(CDTags::Ability_Skill_Awakening))
 	{
 		const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
@@ -355,7 +369,6 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 
 	if (skillData->bIsBlockHitReact)
 	{
-		UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
 		abilitySystem->AddLooseGameplayTag(CDTags::State_Immune_Stagger);
 	}
 
