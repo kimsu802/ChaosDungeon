@@ -92,12 +92,6 @@ ACDMonsterBase* UCDSpawnManagerComponent::SpawnMonsterAt(const UCDMonsterData* d
 	++aliveCount;
 	++spawnCounts.FindOrAdd(data);
 
-	if (IsValid(monster))
-	{
-		monster->onReleased.AddUObject(
-			this, &ThisClass::ReleaseMonster);
-	}
-
 	return monster;
 }
 
@@ -110,9 +104,15 @@ void UCDSpawnManagerComponent::SpawnWave()
 	{
 		const UCDMonsterData* data = PickMonster();
 		FVector location;
-		if (!data || !FindSpawnLocation(location))
+
+		if (!data)
 		{
 			return;
+		}
+
+		if (!FindSpawnLocation(location))
+		{
+			continue;
 		}
 
 		SpawnMonsterAt(data, location);
@@ -215,7 +215,7 @@ bool UCDSpawnManagerComponent::IsOnScreen(const FVector& location) const
 
 ACDMonsterBase* UCDSpawnManagerComponent::AcquireMonster(const UCDMonsterData* data)
 {
-	FCDMonsterPool& pool = pools.FindOrAdd(data);
+ 	FCDMonsterPool& pool = pools.FindOrAdd(data);
 	if (!pool.inactive.IsEmpty())
 	{
 		return pool.inactive.Pop();

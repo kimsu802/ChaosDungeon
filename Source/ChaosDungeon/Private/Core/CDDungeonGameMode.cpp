@@ -164,6 +164,8 @@ void ACDDungeonGameMode::HandleDamage(const FCDDamageMessage& message)
 
 void ACDDungeonGameMode::HandleDeath(const FCDDeathMessage& message)
 {
+	const UCDStageData* stage = GetRun()->GetCurrentStage();
+
 	if (!message.bIsPlayer)
 	{
 		++GetRun()->GetMutableRecord().kills;
@@ -171,12 +173,19 @@ void ACDDungeonGameMode::HandleDeath(const FCDDeathMessage& message)
 		{
 			return;
 		}
-		progress += message.contribution;
+
+		if (stage->gameModeType == ECDGameModeType::DungeonGameMode)
+		{
+			progress += message.contribution;
+		}
+
 		BroadcastStage(CDTags::Msg_Stage_Progress);
+
 		if (progress >= targetProgress)
 		{
 			ClearStage();
 		}
+
 		return;
 	}
 
