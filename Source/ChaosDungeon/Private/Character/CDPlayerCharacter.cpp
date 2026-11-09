@@ -18,6 +18,7 @@
 #include "Player/CDOcclusionFadeComponent.h"
 #include "Player/CDAwakenDirectorComponent.h"
 #include "Player/CDSpeechBubbleComponent.h"
+#include "Player/CDPhantomComponent.h"
 
 ACDPlayerCharacter::ACDPlayerCharacter()
 {
@@ -47,6 +48,9 @@ ACDPlayerCharacter::ACDPlayerCharacter()
 	// 머리 위 대사창: 메시의 head 소켓 (소켓 이름이 다르면 BP 에서 Parent Socket 변경)
 	speechBubble = CreateDefaultSubobject<UCDSpeechBubbleComponent>(TEXT("SpeechBubble"));
 	speechBubble->SetupAttachment(GetMesh(), TEXT("head"));
+
+	// 11.03 환영 버프: State.Buff.Phantom 동안 노란 잔영 + 스킬 · 평타 추가 타격
+	phantom = CreateDefaultSubobject<UCDPhantomComponent>(TEXT("Phantom"));
 
 	// 벽 뒤 실루엣: 항상 CustomDepth 렌더 (포스트프로세스 머티리얼에서 처리)
 	GetMesh()->SetRenderCustomDepth(false);

@@ -9,6 +9,7 @@
 #include "Core/CDGameplayTags.h"
 #include "Character/CDCharacterBase.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Player/CDPhantomComponent.h"
 
 UCDAttackAbility::UCDAttackAbility()
 {
@@ -97,6 +98,15 @@ void UCDAttackAbility::ApplyHit()
 
 		SpawnProjectile(launchData, damageCoefficient);
 
+		// 11.03 환영 버프: 잔영이 같은 자리 · 방향으로 한 발 더
+		if (UCDPhantomComponent* phantom = character->FindComponentByClass<UCDPhantomComponent>())
+		{
+			phantom->QueueEcho(this, [this, launchData]()
+				{
+					SpawnProjectile(launchData, damageCoefficient);
+				});
+		}
+
 		// 기존 즉발 타격 처리는 실행하지 않음
 		return;
 	}
@@ -104,10 +114,14 @@ void UCDAttackAbility::ApplyHit()
 	const FVector origin = character->GetActorLocation();
 	TArray<AActor*> hitActors;
 	hitShape.FindActors(GetWorld(), origin, forward, hitActors);
+
+	// 11.03 환영 버프: 맞은 적을 모아 두었다가 잔영이 한 번 더 때림
+	TArray<TWeakObjectPtr<AActor>> echoTargets;
 	for (AActor* actor : hitActors)
 	{
 		if (character->IsHostileTo(actor))
 		{
+			echoTargets.Add(actor);
 			ApplyDamageTo(actor);
 
 			// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
@@ -119,10 +133,49 @@ void UCDAttackAbility::ApplyHit()
 		}
 	}
 
+	QueueEchoHit(echoTargets);
+
 	if (CVarDebugHitShape.GetValueOnGameThread())
 	{
 		hitShape.DrawDebug(GetWorld(), origin, forward, FColor::Red, 1.f);
 	}
+}
+
+void UCDAttackAbility::QueueEchoHit(const TArray<TWeakObjectPtr<AActor>>& targets)
+{
+	if (targets.IsEmpty())
+	{
+		return;
+	}
+
+	const ACDCharacterBase* character = GetCDCharacter();
+	UCDPhantomComponent* phantom = character ? character->FindComponentByClass<UCDPhantomComponent>() : nullptr;
+	if (phantom == nullptr)
+	{
+		return;
+	}
+
+	// 버프 중이 아니면 QueueEcho 가 무시. 각성 게이지는 원래 타격에서만
+	phantom->QueueEcho(this, [this, targets]()
+		{
+			const ACDCharacterBase* owner = GetCDCharacter();
+			if (owner == nullptr)
+			{
+				return;
+			}
+
+			for (const TWeakObjectPtr<AActor>& weakTarget : targets)
+			{
+				AActor* target = weakTarget.Get();
+				if ((target == nullptr) || (owner->IsHostileTo(target) == false))
+				{
+					continue;
+				}
+
+				ApplyDamageTo(target);
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(target, hitNiagara, target->GetActorLocation(), target->GetActorRotation());
+			}
+		});
 }
 
 void UCDAttackAbility::ApplyDamageTo(AActor* target) const

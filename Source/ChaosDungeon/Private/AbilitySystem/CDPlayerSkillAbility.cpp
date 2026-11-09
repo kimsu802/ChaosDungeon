@@ -13,6 +13,7 @@
 #include "Data/CDProjectileData.h"
 #include "Player/CDAwakenDirectorComponent.h"
 #include "Player/CDSpeechBubbleComponent.h"
+#include "Player/CDPhantomComponent.h"
 
 
 UCDPlayerSkillAbility::UCDPlayerSkillAbility()
@@ -165,10 +166,14 @@ void UCDPlayerSkillAbility::ApplyHit()
 
 	TArray<AActor*> hitActors;
 	skillData->hitShape.FindActors(GetWorld(), origin, forward, hitActors);
+
+	// 11.03 환영 버프: 맞은 적을 모아 두었다가 잔영이 한 번 더 때림
+	TArray<TWeakObjectPtr<AActor>> echoTargets;
 	for (AActor* actor : hitActors)
 	{
 		if (character->IsHostileTo(actor))
 		{
+			echoTargets.Add(actor);
 			ApplyDamageTo(actor);
 
 			GatherAwakeningGauge();
@@ -180,10 +185,53 @@ void UCDPlayerSkillAbility::ApplyHit()
 		}
 	}
 
+	QueueEchoHit(echoTargets);
+
 	if (CVarDebugHitShape.GetValueOnGameThread())
 	{
 		skillData->hitShape.DrawDebug(GetWorld(), origin, forward, FColor::Red, 1.f);
 	}
+}
+
+void UCDPlayerSkillAbility::QueueEchoHit(const TArray<TWeakObjectPtr<AActor>>& targets)
+{
+	if (targets.IsEmpty())
+	{
+		return;
+	}
+
+	const ACDCharacterBase* character = GetCDCharacter();
+	UCDPhantomComponent* phantom = character ? character->FindComponentByClass<UCDPhantomComponent>() : nullptr;
+	if (phantom == nullptr)
+	{
+		return;
+	}
+
+	// 버프 중이 아니면 QueueEcho 가 무시. this 가 사라지면 실행 안 됨 (context = this)
+	phantom->QueueEcho(this, [this, targets]()
+		{
+			const ACDCharacterBase* owner = GetCDCharacter();
+			if (owner == nullptr)
+			{
+				return;
+			}
+
+			for (const TWeakObjectPtr<AActor>& weakTarget : targets)
+			{
+				// 그 사이 죽었거나 사라진 적은 건너뜀 (게이지 수집 없음)
+				AActor* target = weakTarget.Get();
+				if ((target == nullptr) || (owner->IsHostileTo(target) == false))
+				{
+					continue;
+				}
+
+				ApplyDamageTo(target);
+
+				FGameplayCueParameters params;
+				params.Location = target->GetActorLocation();
+				GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(CDTags::GameplayCue_HitEffect, params);
+			}
+		});
 }
 
 void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
@@ -200,6 +248,8 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 				const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDBuffEffect::StaticClass(), GetAbilityLevel());
 				specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Buff, skillData->damageCoefficient);
 				specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_BuffDuration, skillData->cooldown - 4.0f);
+				// 11.03 버프 상태 태그 (예: State.Buff.Phantom) → GE 가 살아 있는 동안만 붙어 있음
+				specHandle.Data->DynamicGrantedTags.AppendTags(skillData->buffGrantedTags);
 				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
 			}
 			else
@@ -426,6 +476,9 @@ void UCDPlayerSkillAbility::FireProjectile()
 	const float angleStep = projectileCount > 1 ? spreadAngle / (projectileCount - 1) : 0.0f;
 
 
+	// 11.09 환영 버프: 잔영이 같은 자리 · 방향으로 한 번 더 발사하도록 이번 발사 정보를 모아 둠
+	TArray<FCDProjectileBaseData> echoShots;
+
 	for (int i = 0; i < projectileCount; i++)
 	{
 		const float fireAngle = baseAngle + angleStep * i;
@@ -434,6 +487,20 @@ void UCDPlayerSkillAbility::FireProjectile()
 		launchData.launchLocation = origin + fireDirection * 80.f;
 		launchData.targetPoint = launchData.launchLocation + fireDirection * launchData.speed;
 		SpawnProjectile(launchData, skillData->damageCoefficient);
+		echoShots.Add(launchData);
+	}
+
+	UCDPhantomComponent* phantom = character->FindComponentByClass<UCDPhantomComponent>();
+	if (phantom != nullptr)
+	{
+		const float coefficient = skillData->damageCoefficient;
+		phantom->QueueEcho(this, [this, echoShots, coefficient]()
+			{
+				for (const FCDProjectileBaseData& shot : echoShots)
+				{
+					SpawnProjectile(shot, coefficient);
+				}
+			});
 	}
 }
 

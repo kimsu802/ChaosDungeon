@@ -9,6 +9,7 @@ class UCDCharacterClassData;
 class UCDOcclusionFadeComponent;
 class UCDAwakenDirectorComponent;
 class UCDSpeechBubbleComponent;
+class UCDPhantomComponent;
 
 /**
  * 플레이어 캐릭터: 쿼터뷰 카메라 + 직업 데이터로 스킬 구성
@@ -66,6 +67,10 @@ protected:
 	/** 머리 위 대사창 (BP 에서 Parent Socket = head, Widget Class = WBP_SpeechBubble 지정) */
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TObjectPtr<UCDSpeechBubbleComponent> speechBubble;
+
+	/** 환영 버프 (노란 잔영 + 추가 타격). 잔영 머티리얼은 BP 에서 지정 */
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	TObjectPtr<UCDPhantomComponent> phantom;
 
 	/** 직업 데이터 (스탯, 기본 스킬, 회피). 기본 직업이며, 직업을 고른 뒤에는 UCDPlayerClassSubsystem 값으로 바뀐다 */
 	UPROPERTY(EditDefaultsOnly, Category = "Class")

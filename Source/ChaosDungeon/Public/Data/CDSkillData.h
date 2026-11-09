@@ -108,6 +108,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	ECDSkillType skillType;
 
+	/** 버프 스킬: 버프가 걸려 있는 동안 시전자에게 붙는 상태 태그 (예: State.Buff.Phantom → 노란 잔영 + 추가 타격) */
+	UPROPERTY(EditDefaultsOnly, Category = "Ability", meta = (Categories = "State.Buff", EditCondition = "skillType == ECDSkillType::Buff"))
+	FGameplayTagContainer buffGrantedTags;
+
 	/** 스킬 조준 방식 */
 	UPROPERTY(EditDefaultsOnly, Category = "Ability")
 	ECDSkillCastPolicy castPolicy;

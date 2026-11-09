@@ -52,6 +52,9 @@ private:
 	UFUNCTION()
 	void OnAnimNotifyCallback(FGameplayEventData eventData);
 
+	/** 환영 버프 중이면 맞은 적에게 잔영 추가 타격 예약 */
+	void QueueEchoHit(const TArray<TWeakObjectPtr<AActor>>& targets);
+
 private:
 	/** 공격 몽타주 */
 	UPROPERTY(EditDefaultsOnly, Category = "Attack/Montage")
