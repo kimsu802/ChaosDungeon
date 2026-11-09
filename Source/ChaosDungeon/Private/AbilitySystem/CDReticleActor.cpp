@@ -4,10 +4,12 @@
 #include "AbilitySystem/CDReticleActor.h"
 #include "Components/DecalComponent.h"
 #include "Materials/MaterialInstance.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 ACDReticleActor::ACDReticleActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 	
 	USceneComponent* root = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
 	RootComponent = root;
@@ -20,13 +22,31 @@ ACDReticleActor::ACDReticleActor()
 void ACDReticleActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
 void ACDReticleActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	/* 장판 채우기 효과를 위한 추가 - yoonsang */
+	if (!IsValid(reticleMID))
+	{
+		SetActorTickEnabled(false);
+		return;
+	}
+
+	fillElapsedTime += DeltaTime;
+
+	const float fillAmount = FMath::Clamp(fillElapsedTime / fillDuration, 0.f, 1.f);
+
+	reticleMID->SetScalarParameterValue(TEXT("FillAmount"), fillAmount);
+
+	if (fillAmount >= 1.f)
+	{
+		SetActorTickEnabled(false);
+	}
 
 }
 
@@ -46,6 +66,10 @@ void ACDReticleActor::SetReticleConfig(const UCDSkillData& skillData)
 
 
 	reticleMID = UMaterialInstanceDynamic::Create(*material, this);
+
+	SetActorTickEnabled(false);
+
+	reticleMID->SetScalarParameterValue(TEXT("FillAmount"), 1.f);
 
 	reticleMID->SetVectorParameterValue(FName("BaseColor"), skillData.reticleConfig.reticleColor);
 
@@ -94,4 +118,15 @@ void ACDReticleActor::SetConeReticleSize(const float radius, const float degree)
 void ACDReticleActor::SetValidColor(bool bIsValid)
 {
 	reticleMID->SetScalarParameterValue(FName("IsValid"), bIsValid ? 1.0f : 0.0f);
+}
+
+void ACDReticleActor::StartFill(float duration)
+{
+	fillElapsedTime = 0.f;
+
+	fillDuration = duration;
+
+	reticleMID->SetScalarParameterValue(TEXT("FillAmount"), 0.f);
+
+	SetActorTickEnabled(true);
 }

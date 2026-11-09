@@ -235,6 +235,11 @@ void UCDMonsterSkillAbility::ShowReticle()
 
 	reticle->SetReticleConfig(*skillData);
 
+	if (skillData->reticleConfig.displayMode == ECDReticleDisplayMode::Fill)
+	{
+		reticle->StartFill(skillData->reticleConfig.fillDuration);
+	}
+
 	if (skillData->origin == ECDSkillOrigin::Self)
 	{
 		reticle->AttachToActor(character, FAttachmentTransformRules::KeepWorldTransform);

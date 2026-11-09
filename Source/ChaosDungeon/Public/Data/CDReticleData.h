@@ -25,4 +25,8 @@ public:
 	/** Reticle 색상 */
 	UPROPERTY(EditDefaultsOnly, Category = "Reticle", meta = (EditCondition = "displayMode != ECDReticleDisplayMode::None", EditConditionHides))
 	FLinearColor reticleColor = FLinearColor::Red;
+
+	/* 장판 채워지는 데 걸리는 시간 - yoonsang */
+	UPROPERTY(EditDefaultsOnly, Category = "Reticle", meta = (ClampMin ="0.01", EditCondition = "displayMode == ECDReticleDisplayMode::Fill", EditConditionHides))
+	float fillDuration = 1.f;
 };

@@ -32,6 +32,9 @@ public:
 
 	void SetValidColor(bool bIsValid);
 
+	/* 지정된 시간 동안 장판 채우는 함수 - yoonsang */
+	void StartFill(float duration);
+
 protected:
 	// AActor::BeginPlay()
 	virtual void BeginPlay() override;
@@ -47,4 +50,11 @@ protected:
 	/** HitShape - MaterialInstance 저장 변수 - editor에서 설정*/
 	UPROPERTY(EditDefaultsOnly, Category = "Hit Shape")
 	TMap<ECDHitShapeType, class UMaterialInstance*> shapeMaterials;
+
+private:
+	/* 장판 경과 시간 - yoonsang */
+	float fillElapsedTime = 0.f;
+
+	/* 장판을 채우는 시간 - yoonsang */
+	float fillDuration = 1.0f;
 };
