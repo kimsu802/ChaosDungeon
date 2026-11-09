@@ -137,6 +137,10 @@ struct CHAOSDUNGEON_API FCDDifficultySettings
 	/** 허용 사망 횟수. -1 = 무제한 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 maxDeaths = -1;
+
+	/* 난이도 배율  - yoonsang */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0.0"))
+	float contributionDifficulty = 1.f;
 };
 
 /** 한 번의 던전 도전 기록 (결과 화면/기록 게시판) */
