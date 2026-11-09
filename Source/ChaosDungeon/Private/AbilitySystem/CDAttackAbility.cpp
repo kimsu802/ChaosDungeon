@@ -39,7 +39,9 @@ void UCDAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle handle, 
 
 	UAbilityTask_PlayMontageAndWait* playAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, montage, 1.0f);
 	playAttackTask->OnCompleted.AddDynamic(this, &ThisClass::OnCompleteCallback);
+	playAttackTask->OnBlendOut.AddDynamic(this, &ThisClass::OnCompleteCallback);
 	playAttackTask->OnInterrupted.AddDynamic(this, &ThisClass::OnInterruptedCallback);
+	playAttackTask->OnCancelled.AddDynamic(this, &ThisClass::OnInterruptedCallback);
 	playAttackTask->ReadyForActivation();
 
 	// 몽타주 내 공격 노티파이 수신 기능
