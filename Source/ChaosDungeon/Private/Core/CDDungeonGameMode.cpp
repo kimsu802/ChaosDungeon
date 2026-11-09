@@ -176,7 +176,8 @@ void ACDDungeonGameMode::HandleDeath(const FCDDeathMessage& message)
 
 		if (stage->gameModeType == ECDGameModeType::DungeonGameMode)
 		{
-			progress += message.contribution;
+			const float contributionDifficulty = GetRun()->GetDifficultySettings().contributionDifficulty;
+			progress += message.contribution * contributionDifficulty;
 		}
 
 		BroadcastStage(CDTags::Msg_Stage_Progress);
