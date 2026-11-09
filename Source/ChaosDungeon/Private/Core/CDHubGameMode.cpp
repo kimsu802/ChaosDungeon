@@ -9,6 +9,7 @@
 #include "Core/CDMessages.h"
 #include "Core/CDGameplayTags.h"
 #include "Data/CDStageData.h"
+#include "Character/CDCharacterBase.h"
 
 ACDHubGameMode::ACDHubGameMode()
 {
@@ -64,6 +65,10 @@ void ACDHubGameMode::EnterHub(bool bSkipBlend)
 	{
 		playerController->EnableInput(playerController);
 		playerController->SetViewTargetWithBlend(playerController->GetPawn(), blendTime, VTBlend_Cubic);
+		if (ACDCharacterBase* character = Cast<ACDCharacterBase>(playerController->GetPawn()))
+		{
+			character->SetOutlineEnabled(true);
+		}
 
 		if (UCDUIManagerSubsystem* uiManager = UCDUIManagerSubsystem::Get(playerController))
 		{
