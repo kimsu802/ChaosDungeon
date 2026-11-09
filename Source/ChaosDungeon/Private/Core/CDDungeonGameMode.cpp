@@ -27,7 +27,16 @@ void ACDDungeonGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
-	UCDUIManagerSubsystem::Get(playerController)->ShowGameHud();
+	if (playerController)
+	{
+		if (ACDCharacterBase* character = Cast<ACDCharacterBase>(playerController->GetPawn()))
+		{
+			character->SetOutlineEnabled(true);
+		}
+
+		UCDUIManagerSubsystem::Get(playerController)->ShowGameHud();
+	}
+
 
 	UCDMessageSubsystem& messages = UCDMessageSubsystem::Get(this);
 	listenerHandles.Add(messages.Listen(CDTags::Msg_Combat_Damage, this, &ThisClass::HandleDamage));
@@ -176,7 +185,8 @@ void ACDDungeonGameMode::HandleDeath(const FCDDeathMessage& message)
 
 		if (stage->gameModeType == ECDGameModeType::DungeonGameMode)
 		{
-			progress += message.contribution;
+			const float contributionDifficulty = GetRun()->GetDifficultySettings().contributionDifficulty;
+			progress += message.contribution * contributionDifficulty;
 		}
 
 		BroadcastStage(CDTags::Msg_Stage_Progress);

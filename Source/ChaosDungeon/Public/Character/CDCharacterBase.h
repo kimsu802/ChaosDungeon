@@ -64,6 +64,9 @@ public:
 	/** Target 선정 가능 여부 */
 	virtual bool CanBeTargeted() const;
 
+	/* 외곽선 표시*/
+	void SetOutlineEnabled(bool bEnabled);
+
 protected:
 	/** 스탯 적용 + 공통 어빌리티 부여. 재호출 가능 (풀링 재사용) */
 	void InitializeAbilitySystem(const FCDBaseStats& stats, float healthMultiplier = 1.f, float attackMultiplier = 1.f);
