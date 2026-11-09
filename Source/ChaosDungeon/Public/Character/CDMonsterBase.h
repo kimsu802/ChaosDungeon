@@ -3,6 +3,7 @@
 #include "Character/CDCharacterBase.h"
 #include "Core/CDTypes.h"
 #include "GameplayTagContainer.h"
+#include "Data/CDMonsterDataInterface.h"
 #include "CDMonsterBase.generated.h"
 
 class ACDMonsterBase;
@@ -18,7 +19,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FCDMonsterEvent, ACDMonsterBase*);
  * AI 컨트롤러 클래스는 BP 에서 지정한다 (몬스터는 AI 클래스를 모름, AI → 몬스터 단방향)
  */
 UCLASS()
-class CHAOSDUNGEON_API ACDMonsterBase : public ACDCharacterBase
+class CHAOSDUNGEON_API ACDMonsterBase : public ACDCharacterBase, public ICDMonsterDataInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +41,8 @@ public:
 
 	// ACDCharacterBase::GetAimLocation()
 	virtual FVector GetAimLocation() const override;
+
+	virtual ECDMonsterGrade GetMonsterGrade() const override;
 
 protected:
 	/** 디버그용 - HitReactAbility 추가용 */

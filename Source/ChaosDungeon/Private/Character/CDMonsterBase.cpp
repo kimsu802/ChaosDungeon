@@ -94,6 +94,11 @@ FVector ACDMonsterBase::GetAimLocation() const
 	return target->GetActorLocation();
 }
 
+ECDMonsterGrade ACDMonsterBase::GetMonsterGrade() const
+{
+	return monsterData->grade;
+}
+
 void ACDMonsterBase::BeginPlay()
 {
 	Super::BeginPlay();
