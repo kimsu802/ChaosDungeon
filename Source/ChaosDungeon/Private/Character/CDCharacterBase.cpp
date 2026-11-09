@@ -71,6 +71,11 @@ bool ACDCharacterBase::CanBeTargeted() const
 	return true;
 }
 
+void ACDCharacterBase::SetOutlineEnabled(bool bEnabled)
+{
+	GetMesh()->SetRenderCustomDepth(bEnabled);
+}
+
 void ACDCharacterBase::InitializeAbilitySystem(const FCDBaseStats& stats, float healthMultiplier, float attackMultiplier)
 {
 	abilitySystem->InitAbilityActorInfo(this, this);

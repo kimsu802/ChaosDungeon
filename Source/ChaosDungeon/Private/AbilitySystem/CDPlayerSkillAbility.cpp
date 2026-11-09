@@ -22,6 +22,7 @@ UCDPlayerSkillAbility::UCDPlayerSkillAbility()
 
 	// 후딜 캔슬 시 이전 스킬 종료
 	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Skill);
+	CancelAbilitiesWithTag.AddTag(CDTags::Ability_Attack);
 
 	// 10.22 Jun6 - 일반 공격 시 스킬 씹히는 현상 방어용
 	BlockAbilitiesWithTag.AddTag(CDTags::Ability_Attack);
