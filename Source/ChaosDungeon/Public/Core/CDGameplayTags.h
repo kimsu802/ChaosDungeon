@@ -36,6 +36,7 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Untargetable);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Immune_Stagger);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Immune_Knockback);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Buff_Phantom);			// 11.03 환영 버프: 노란 잔영 + 스킬 · 평타 1회 추가 타격
 
 	// 이벤트
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage);					// 몽타주 관련 상위 태그 - 노티파이 필터링용

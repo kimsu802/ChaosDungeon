@@ -56,6 +56,9 @@ private:
 	/** 이 스킬이 띄운 시전 대사만 내림 */
 	void HideCastLine();
 
+	/** 환영 버프 중이면 맞은 적에게 잔영 추가 타격 예약 */
+	void QueueEchoHit(const TArray<TWeakObjectPtr<AActor>>& targets);
+
 private:
 	/** 2차 입력 스킬에 대한 확인 입력 시 Task에 정보 전달용 Delegate 변수 */
 	FOnConfirmInput onConfirmInput;

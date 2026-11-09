@@ -28,6 +28,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(State_Untargetable, "State.Untargetable");
 	UE_DEFINE_GAMEPLAY_TAG(State_Immune_Stagger, "State.Immune.Stagger");
 	UE_DEFINE_GAMEPLAY_TAG(State_Immune_Knockback, "State.Immune.Knockback");
+	UE_DEFINE_GAMEPLAY_TAG(State_Buff_Phantom, "State.Buff.Phantom");
 
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage, "Event.Montage");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Hit, "Event.Montage.Hit");
