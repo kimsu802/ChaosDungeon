@@ -9,8 +9,11 @@
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
+#include "Core/CDTypes.h"
+#include "Core/CDRunSubsystem.h"
 #include "Data/CDSkillData.h"
 #include "Data/CDProjectileData.h"
+#include "Data/CDMonsterDataInterface.h"
 #include "Player/CDAwakenDirectorComponent.h"
 #include "Player/CDSpeechBubbleComponent.h"
 #include "Player/CDPhantomComponent.h"
@@ -177,7 +180,7 @@ void UCDPlayerSkillAbility::ApplyHit()
 			echoTargets.Add(actor);
 			ApplyDamageTo(actor);
 
-			GatherAwakeningGauge();
+			GatherAwakeningGauge(actor);
 
 			// 데미지 입힘과 동시에 게임플레이 큐로 히트 이펙트 적용
 			FGameplayCueParameters params;
@@ -546,14 +549,34 @@ void UCDPlayerSkillAbility::HideCastLine()
 	castLineId = INDEX_NONE;
 }
 
-void UCDPlayerSkillAbility::GatherAwakeningGauge()
+void UCDPlayerSkillAbility::GatherAwakeningGauge(AActor* actor)
 {
 	// 각성기가 아니면 각성기 게이지 습득
 	if (!skillData->skillIdTag.MatchesTag(CDTags::Ability_Skill_Awakening))
 	{
 		// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
 		const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
-		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, 10.f);
+
+		ICDMonsterDataInterface* interface = Cast<ICDMonsterDataInterface>(actor);
+		UCDRunSubsystem* runSub = GetWorld()->GetGameInstance()->GetSubsystem<UCDRunSubsystem>();
+		if (nullptr == interface || nullptr == runSub)
+		{
+			return;
+		}
+
+		ECDMonsterGrade grade = interface->GetMonsterGrade();
+		int modifier = static_cast<int>(grade) + 1;
+
+		FCDRunRecord rec = runSub->GetRecord();
+		ECDDifficulty dif = rec.difficulty;
+		int difficulty = 3 - static_cast<int>(dif);
+		
+		// 난이도/등급별 | 폭탄 | 일반 | 엘리트
+		//	   이지		   3	  6		 9
+		//	   노말		   2	  4		 6   
+		//	   하드		   1	  2		 3
+		// -> / 5.0f
+		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, static_cast<float>(modifier * difficulty) / 5.0f);
 		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
 	}
 }

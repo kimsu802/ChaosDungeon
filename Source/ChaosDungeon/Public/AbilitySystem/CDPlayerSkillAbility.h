@@ -45,7 +45,7 @@ protected:
 	virtual void FireProjectile() override;
 
 private:
-	void GatherAwakeningGauge();
+	void GatherAwakeningGauge(AActor* actor);
 
 	/** 각성기일 때만 시전자의 연출 감독 (아니면 null) */
 	UCDAwakenDirectorComponent* GetAwakenDirector() const;

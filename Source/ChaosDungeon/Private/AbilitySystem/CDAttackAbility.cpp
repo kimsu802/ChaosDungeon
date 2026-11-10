@@ -7,7 +7,10 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/CDProjectileBase.h"
 #include "Core/CDGameplayTags.h"
+#include "Core/CDTypes.h"
+#include "Core/CDRunSubsystem.h"
 #include "Character/CDCharacterBase.h"
+#include "Data/CDMonsterDataInterface.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Player/CDPhantomComponent.h"
 
@@ -128,7 +131,28 @@ void UCDAttackAbility::ApplyHit()
 
 			// 10.28 Jun6 - 각성기 게이지 관련 코드 추가
 			const FGameplayEffectSpecHandle specHandle = MakeOutgoingGameplayEffectSpec(UCDAwakenEffect::StaticClass(), GetAbilityLevel());
-			specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, 10.f);
+
+			ICDMonsterDataInterface* interface = Cast<ICDMonsterDataInterface>(actor);
+			UCDRunSubsystem* runSub = GetWorld()->GetGameInstance()->GetSubsystem<UCDRunSubsystem>();
+			if (nullptr == interface || nullptr == runSub)
+			{
+				return;
+			}
+
+			ECDMonsterGrade grade = interface->GetMonsterGrade();
+			int modifier = static_cast<int>(grade) + 1;
+
+			FCDRunRecord rec = runSub->GetRecord();
+			ECDDifficulty dif = rec.difficulty;
+			int difficulty = 3 - static_cast<int>(dif);
+
+
+			// 난이도/등급별 | 폭탄 | 일반 | 엘리트 | 보스
+			//	   이지		   3	  6		 9      12
+			//	   노말		   2	  4		 6		8
+			//	   하드		   1	  2		 3		4
+			// -> / 5.0f
+			specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, static_cast<float>(modifier * difficulty) / 5.0f);
 			GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
 
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(actor, hitNiagara, actor->GetActorLocation(), actor->GetActorRotation());
