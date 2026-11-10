@@ -9,6 +9,9 @@
 #include "CollisionShape.h"
 #include <Engine/World.h>
 
+/* 측정을 위한 헤더 추가*/
+#include "ProfilingDebugging/CpuProfilerTrace.h"
+
 void UCDSpawnManagerComponent::Initialize(const TArray<FVector>& inSpawnPoints, const UCDStageData* inStage, const FCDDifficultySettings& inDifficulty)
 {
 	spawnPoints = inSpawnPoints;
@@ -30,6 +33,8 @@ void UCDSpawnManagerComponent::StopSpawning()
 
 ACDMonsterBase* UCDSpawnManagerComponent::SpawnMonsterAt(const UCDMonsterData* data, const FVector& groundLocation)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(CD_SpawnMonsterAt);
+
 	UWorld* world = GetWorld();
 
 	if (!world || !IsValid(stage.Get()) || !IsValid(data) || !data->monsterClass)
@@ -215,6 +220,8 @@ bool UCDSpawnManagerComponent::IsOnScreen(const FVector& location) const
 
 ACDMonsterBase* UCDSpawnManagerComponent::AcquireMonster(const UCDMonsterData* data)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(CD_AcquireMonster);
+
  	FCDMonsterPool& pool = pools.FindOrAdd(data);
 	if (!pool.inactive.IsEmpty())
 	{
@@ -230,6 +237,17 @@ ACDMonsterBase* UCDSpawnManagerComponent::AcquireMonster(const UCDMonsterData* d
 
 void UCDSpawnManagerComponent::ReleaseMonster(ACDMonsterBase* monster)
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(CD_ReleaseMonster);
+
 	--aliveCount;
+
+	/* 폴링이 없을 시 파괴 테스트 - yoonsang */
+	if (!bUseMonsterPooling)
+	{
+		monster->Destroy();
+
+		return;
+	}
+
 	pools.FindOrAdd(monster->GetMonsterData()).inactive.Add(monster);
 }

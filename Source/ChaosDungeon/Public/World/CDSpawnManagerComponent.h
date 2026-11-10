@@ -106,4 +106,8 @@ private:
 
 	/** 웨이브 타이머 */
 	FTimerHandle spawnTimer;
+
+	/* 성능 비교 시 몬스터 풀 사용 여부 - yoonsang */
+	UPROPERTY(EditAnywhere, Category = "Debug|Pooling")
+	bool bUseMonsterPooling = true;
 };
