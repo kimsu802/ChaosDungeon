@@ -66,6 +66,11 @@ void ACDDungeonGameMode::EndPlay(const EEndPlayReason::Type endPlayReason)
 	Super::EndPlay(endPlayReason);
 }
 
+void ACDDungeonGameMode::FinishRun_Implementation()
+{
+	GetRun()->FinishRun(true);
+}
+
 void ACDDungeonGameMode::AbandonRun()
 {
 	FailRun();
@@ -103,7 +108,7 @@ void ACDDungeonGameMode::ClearStage()
 
 	if (GetRun()->IsLastStage())
 	{
-		GetRun()->FinishRun(true);
+		FinishRun();
 		return;
 	}
 
@@ -126,7 +131,7 @@ void ACDDungeonGameMode::ClearStage()
 	}
 }
 
-void ACDDungeonGameMode::FailRun()
+void ACDDungeonGameMode::FailRun_Implementation()
 {
 	StopBombGame();
 
