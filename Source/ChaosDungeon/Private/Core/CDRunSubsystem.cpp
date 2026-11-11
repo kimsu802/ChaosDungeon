@@ -68,11 +68,11 @@ void UCDRunSubsystem::StartRun(ECDDifficulty difficulty)
 	TArray<TObjectPtr<UCDStageData>> nextStages = dungeonData->stages;
 
 	// 뒤에서부터 임의의 항목과 교환하여 방문 순서를 섞는다.
-	//for (int32 i = nextStages.Num() - 1; i > 0; --i)
-	//{
-	//	const int32 randomIndex = FMath::RandRange(0, i);
-	//	nextStages.Swap(i, randomIndex);
-	//}
+	for (int32 i = nextStages.Num() - 1; i > 0; --i)
+	{
+		const int32 randomIndex = FMath::RandRange(0, i);
+		nextStages.Swap(i, randomIndex);
+	}
 
 	nextStages.Add(dungeonData->bossStage);
 
