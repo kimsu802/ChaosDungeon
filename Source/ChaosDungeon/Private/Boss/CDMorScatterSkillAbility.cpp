@@ -3,11 +3,29 @@
 
 #include "Boss/CDMorScatterSkillAbility.h"
 #include "AbilitySystem/CDReticleActor.h"
+#include "Core/CDProjectilePoolSubSystem.h"
 #include <AbilitySystem/CDProjectileBase.h>
 #include <Data/CDProjectileData.h>
 #include <Data/CDSkillData.h>
 #include <Character/CDBossCharacter.h>
 #include <Engine/World.h>
+
+void UCDMorScatterSkillAbility::OnGiveAbility(const FGameplayAbilityActorInfo* actorInfo, const FGameplayAbilitySpec& spec)
+{
+	Super::OnGiveAbility(actorInfo, spec);
+	UWorld* world = GetWorld();
+	if (!IsValid(world) || !world->IsGameWorld() || !IsValid(skillData))
+	{
+		return;
+	}
+	if (UCDProjectilePoolSubSystem* pool = world->GetSubsystem<UCDProjectilePoolSubSystem>())
+	{
+		const TSubclassOf<ACDReticleActor> landingClass = skillData->reticleConfig.displayMode != ECDReticleDisplayMode::None
+			? reticleClass : nullptr;
+		pool->Prewarm(skillData->projectileData.projectileClass,
+			skillData->projectileData.bossData.projectileCount, landingClass, skillData);
+	}
+}
 
 void UCDMorScatterSkillAbility::FireProjectileWithYaw(float /*yawOffset*/)
 {
@@ -29,10 +47,10 @@ void UCDMorScatterSkillAbility::FireProjectileWithYaw(float /*yawOffset*/)
 	launchData.launchLocation = boss->GetActorLocation();
 	launchData.targetPoint = landingLocation;
 
-	ACDProjectileBase* projectile = SpawnProjectile(launchData, skillData->damageCoefficient);
+	ACDProjectileBase* projectile = SpawnProjectile(launchData, skillData->damageCoefficient, true);
 	if (IsValid(projectile))
 	{
-		ACDReticleActor* reticle = SpawnLandingReticle(landingLocation);
+		ACDReticleActor* reticle = SpawnLandingReticle(landingLocation, projectile);
 		projectile->SetLandingReticle(reticle);
 	}
 }
@@ -44,10 +62,10 @@ void UCDMorScatterSkillAbility::ApplyHit()
 
 void UCDMorScatterSkillAbility::ShowReticle()
 {
-	// 착탄 표시는 탄마다 생성한다.
+	// 착탄 표시는 각 투사체에 연결된 것을 재사용한다.
 }
 
-ACDReticleActor* UCDMorScatterSkillAbility::SpawnLandingReticle(const FVector& location)
+ACDReticleActor* UCDMorScatterSkillAbility::SpawnLandingReticle(const FVector& location, ACDProjectileBase* projectile)
 {
 	UWorld* world = GetWorld();
 
@@ -57,18 +75,21 @@ ACDReticleActor* UCDMorScatterSkillAbility::SpawnLandingReticle(const FVector& l
 		return nullptr;
 	}
 
-	FActorSpawnParameters spawnParams;
-	spawnParams.Owner = GetCDCharacter();
-	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	ACDReticleActor* reticle = world->SpawnActor<ACDReticleActor>(
-		reticleClass, location, FRotator::ZeroRotator, spawnParams);
+	ACDReticleActor* reticle = projectile->GetLandingReticle();
+	if (!IsValid(reticle))
+	{
+		reticle = world->SpawnActor<ACDReticleActor>(reticleClass);
+		if (IsValid(reticle)) reticle->SetActorEnableCollision(false);
+	}
 	if (!IsValid(reticle))
 	{
 		return nullptr;
 	}
 
-	reticle->SetReticleConfig(*skillData);
+	reticle->SetOwner(GetCDCharacter());
+	reticle->SetActorLocationAndRotation(location, FRotator::ZeroRotator);
+	reticle->SetReticleConfig(*skillData, true);
+	reticle->SetActorHiddenInGame(false);
 
 	const float radius = skillData->projectileData.hitRadius;
 	reticle->SetReticleSize(radius, radius);

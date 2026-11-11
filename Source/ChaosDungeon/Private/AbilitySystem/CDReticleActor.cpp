@@ -50,7 +50,7 @@ void ACDReticleActor::Tick(float DeltaTime)
 
 }
 
-void ACDReticleActor::SetReticleConfig(const UCDSkillData& skillData)
+void ACDReticleActor::SetReticleConfig(const UCDSkillData& skillData, bool bReuseMaterial)
 {
 	//if (nullptr == skillData)
 	//{
@@ -65,9 +65,14 @@ void ACDReticleActor::SetReticleConfig(const UCDSkillData& skillData)
 	}
 
 
-	reticleMID = UMaterialInstanceDynamic::Create(*material, this);
+	// Scatter 풀의 표시는 같은 MID를 재사용한다. 일반 표시는 기존 생성 경로 유지.
+	if (!bReuseMaterial || !IsValid(reticleMID) || reticleMID->Parent != *material)
+	{
+		reticleMID = UMaterialInstanceDynamic::Create(*material, this);
+	}
 
 	SetActorTickEnabled(false);
+	fillElapsedTime = 0.f;
 
 	reticleMID->SetScalarParameterValue(TEXT("FillAmount"), 1.f);
 

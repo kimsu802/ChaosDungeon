@@ -53,7 +53,7 @@ protected:
 	void OnDashFinished();
 
 	/** 투사체 한 발 생성 및 초기화 */
-	ACDProjectileBase* SpawnProjectile(const FCDProjectileBaseData& inData, float damageCoefficient = 1.f) const;
+	ACDProjectileBase* SpawnProjectile(const FCDProjectileBaseData& inData, float damageCoefficient = 1.f, bool bUsePool = false) const;
 
 
 protected:

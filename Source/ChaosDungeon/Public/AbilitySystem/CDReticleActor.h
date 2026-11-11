@@ -22,7 +22,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/** 장판(Reticle) 설정 함수 */
-	void SetReticleConfig(const UCDSkillData& skillData);
+	void SetReticleConfig(const UCDSkillData& skillData, bool bReuseMaterial = false);
 
 	/** 장판(Reticle) 크기 설정 함수 */
 	void SetReticleSize(const float newHorizontalSize, const float newVerticalSize);

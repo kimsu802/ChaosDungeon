@@ -17,6 +17,8 @@ class CHAOSDUNGEON_API UCDMorScatterSkillAbility : public UCDMonsterSkillAbility
 	GENERATED_BODY()
 	
 public:
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* actorInfo, const FGameplayAbilitySpec& spec) override;
+
 	virtual void ApplyHit() override;
 
 protected:
@@ -29,7 +31,7 @@ private:
 	bool FindRandomPoint(FVector& outLocation);
 
 	/** 지정된 착탄 위치에 표시 생성 */
-	ACDReticleActor* SpawnLandingReticle(const FVector& location);
+	ACDReticleActor* SpawnLandingReticle(const FVector& location, ACDProjectileBase* projectile);
 
 
 private:

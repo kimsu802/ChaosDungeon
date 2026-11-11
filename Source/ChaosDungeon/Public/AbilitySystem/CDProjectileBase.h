@@ -22,6 +22,7 @@ class UStaticMeshComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class ACDReticleActor;
+class UCDProjectilePoolSubSystem;
 
 UCLASS()
 class CHAOSDUNGEON_API ACDProjectileBase : public AActor
@@ -36,8 +37,11 @@ public:
 	// ProjectileBaseData 초기화
 	void InitializeProjectile(const FCDProjectileBaseData& inData);
 
+	bool IsProjectileActive() const { return bProjectileActive; }
+
 	/** 이 투사체의 착탄 표시 등록 */
 	void SetLandingReticle(ACDReticleActor* reticle);
+	ACDReticleActor* GetLandingReticle() const { return landingReticle.Get(); }
 
 	// 공중에서 이동과 캐릭터 명중 검사 중지
 	void PauseFlight();
@@ -52,6 +56,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
+	virtual void LifeSpanExpired() override;
+
+	/** 풀링 여부에 따라 반환하거나 파괴하는 공통 종료 경로 */
+	void FinishProjectile();
 
 	// 이전 위치부터 현재 위치까지 명중 검사
 	void TraceHit(const FVector& start, const FVector& end);
@@ -95,6 +103,17 @@ protected:
 	FGameplayTag impactCueTag;
 
 private:
+	friend class UCDProjectilePoolSubSystem;
+
+	void InitializePool(UCDProjectilePoolSubSystem* pool);
+	void DeactivateToPool();
+	void ClearLandingReticle();
+
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UCDProjectilePoolSubSystem> projectilePool;
+
+	bool bProjectileActive = false;
+
 	/** 투사체가 사라질 때 함께 제거할 착탄 표시 */
 	UPROPERTY(Transient)
 	TObjectPtr<ACDReticleActor> landingReticle = nullptr;

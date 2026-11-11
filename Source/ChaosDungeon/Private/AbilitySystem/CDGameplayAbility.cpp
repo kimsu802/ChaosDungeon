@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "Character/CDCharacterBase.h"
 #include "Core/CDGameplayTags.h"
+#include "Core/CDProjectilePoolSubSystem.h"
 #include "Character/CDPlayerCharacter.h"
 #include "Character/CDMonsterBase.h"
 #include "Components/CapsuleComponent.h"
@@ -118,7 +119,7 @@ void UCDGameplayAbility::StartDash(const FVector& direction, float distance, flo
 	task->ReadyForActivation();
 }
 
-ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseData& inData, float damageCoefficient) const
+ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseData& inData, float damageCoefficient, bool bUsePool) const
 {
     if (!GetCurrentActorInfo())
     {
@@ -158,7 +159,25 @@ ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseDa
 
     const FRotator launchRotation = (launchData.targetPoint - launchData.launchLocation).Rotation();
 
-    ACDProjectileBase* projectile = world->SpawnActor<ACDProjectileBase>(launchData.projectileClass, launchData.launchLocation, launchRotation, spawnParams);
+    ACDProjectileBase* projectile = nullptr;
+    if (bUsePool)
+    {
+        UCDProjectilePoolSubSystem* pool = world->GetSubsystem<UCDProjectilePoolSubSystem>();
+        if (pool)
+        {
+            pool->Prewarm(launchData.projectileClass, 1);
+            projectile = pool->Acquire(launchData.projectileClass);
+            if (projectile)
+            {
+                projectile->SetOwner(sourceActor);
+                projectile->SetInstigator(Cast<APawn>(sourceActor));
+            }
+        }
+    }
+    else
+    {
+        projectile = world->SpawnActor<ACDProjectileBase>(launchData.projectileClass, launchData.launchLocation, launchRotation, spawnParams);
+    }
 
     if (!IsValid(projectile))
     {
@@ -169,7 +188,7 @@ ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseDa
     projectile->InitializeProjectile(launchData);
 
     // 이동 설정 실패로 초기화 중 제거된 경우
-    if (!IsValid(projectile) || projectile->IsActorBeingDestroyed())
+    if (!IsValid(projectile) || projectile->IsActorBeingDestroyed() || !projectile->IsProjectileActive())
     {
         return nullptr;
     }
