@@ -161,6 +161,11 @@ void ACDPlayerCharacter::ApplySelectedClass()
 		meshComponent->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 		meshComponent->SetAnimInstanceClass(classData->animClass);
 	}
+
+	if (nullptr != classData->deathMontage)
+	{
+		deathMontage = classData->deathMontage;
+	}
 }
 
 FVector ACDPlayerCharacter::GetAimLocation() const
