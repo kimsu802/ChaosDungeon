@@ -55,6 +55,9 @@ public:
 	/** 타겟팅 스킬 발동 취소 - 10.15 Jun6 추가 */
 	void CancelTargetingSkill();
 
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+	void SetBlockGamePlayTag(bool bBlock, UPARAM(meta = (Categories = Ability))FGameplayTag InTag);
+
 private:
 	/** 입력 태그로 Spec 검색 */
 	const FGameplayAbilitySpec* FindSpecByInputTag(FGameplayTag inputTag) const;

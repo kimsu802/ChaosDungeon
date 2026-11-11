@@ -209,6 +209,13 @@ void UCDAbilitySystemComponent::CancelTargetingSkill()
 	}
 }
 
+void UCDAbilitySystemComponent::SetBlockGamePlayTag(bool bBlock, FGameplayTag InTag)
+{
+	bBlock ?
+		BlockAbilitiesWithTags(FGameplayTagContainer(InTag))
+		: UnBlockAbilitiesWithTags(FGameplayTagContainer(InTag));
+}
+
 const FGameplayAbilitySpec* UCDAbilitySystemComponent::FindSpecByInputTag(FGameplayTag inputTag) const
 {
 	for (const FGameplayAbilitySpec& spec : ActivatableAbilities.Items)
