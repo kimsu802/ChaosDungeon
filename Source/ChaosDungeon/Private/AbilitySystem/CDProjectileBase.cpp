@@ -6,6 +6,8 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Core/CDGameplayTags.h"
+#include "Core/CDProjectilePoolSubSystem.h"
+#include "TimerManager.h"
 #include <Components/SphereComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <Character/CDCharacterBase.h>
@@ -43,6 +45,70 @@ void ACDProjectileBase::SetLandingReticle(ACDReticleActor* reticle)
 	landingReticle = reticle;
 }
 
+void ACDProjectileBase::InitializePool(UCDProjectilePoolSubSystem* pool)
+{
+	projectilePool = pool;
+	projectileMove->SetAutoActivate(false);
+	niagaraComp->SetAutoActivate(false);
+	DeactivateToPool();
+}
+
+void ACDProjectileBase::ClearLandingReticle()
+{
+	ACDReticleActor* reticle = landingReticle.Get();
+	landingReticle = nullptr;
+	if (IsValid(reticle))
+	{
+		reticle->Destroy();
+	}
+}
+
+void ACDProjectileBase::DeactivateToPool()
+{
+	bProjectileActive = false;
+	bTraceEnabled = false;
+	SetLifeSpan(0.f);
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+	sphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
+	projectileMove->StopMovementImmediately();
+	projectileMove->Deactivate();
+	projectileMove->SetComponentTickEnabled(false);
+	niagaraComp->DeactivateImmediate();
+	niagaraComp->SetComponentTickEnabled(false);
+	SetActorHiddenInGame(true);
+	// 같은 탄에 연결된 표시는 다음 발사에서도 재사용한다.
+	if (IsValid(landingReticle))
+	{
+		landingReticle->SetActorHiddenInGame(true);
+		landingReticle->SetActorTickEnabled(false);
+		landingReticle->SetOwner(nullptr);
+	}
+	SetOwner(nullptr);
+	SetInstigator(nullptr);
+	projectileData = FCDProjectileBaseData();
+	previousLocation = FVector::ZeroVector;
+}
+
+void ACDProjectileBase::FinishProjectile()
+{
+	if (UCDProjectilePoolSubSystem* pool = projectilePool.Get())
+	{
+		pool->Release(this);
+	}
+	else
+	{
+		bProjectileActive = false;
+		Destroy();
+	}
+}
+
+void ACDProjectileBase::LifeSpanExpired()
+{
+	FinishProjectile();
+}
+
 void ACDProjectileBase::PauseFlight()
 {
 	projectileMove->StopMovementImmediately();
@@ -60,7 +126,7 @@ void ACDProjectileBase::LaunchAtLocation(
 
 	if (!ConfigureMovement())
 	{
-		Destroy();
+		FinishProjectile();
 		return;
 	}
 
@@ -85,7 +151,18 @@ void ACDProjectileBase::LaunchAtLocation(
 
 void ACDProjectileBase::InitializeProjectile(const FCDProjectileBaseData& inData)
 {
+	bProjectileActive = true;
 	projectileData = inData;
+
+	if (projectilePool.IsValid())
+	{
+		SetActorEnableCollision(false);
+		projectileMove->SetUpdatedComponent(sphereComp);
+		projectileMove->SetComponentTickEnabled(true);
+		niagaraComp->SetComponentTickEnabled(true);
+		SetActorTickEnabled(true);
+		SetActorHiddenInGame(false);
+	}
 
 	SetActorLocation(projectileData.launchLocation);
 
@@ -95,19 +172,23 @@ void ACDProjectileBase::InitializeProjectile(const FCDProjectileBaseData& inData
 
 	if (!ConfigureMovement())
 	{
-		Destroy();
+		FinishProjectile();
 		return;
 	}
 
 	sphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	sphereComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	sphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	if (projectilePool.IsValid())
+	{
+		SetActorEnableCollision(true);
+	}
 
 	previousLocation = GetActorLocation();
 	bTraceEnabled = projectileData.bHitActorsFlight;
 
 	projectileMove->Activate();
-	niagaraComp->Activate();
+	niagaraComp->Activate(projectilePool.IsValid());
 }
 
 bool ACDProjectileBase::ConfigureMovement()
@@ -200,11 +281,8 @@ void ACDProjectileBase::BeginPlay()
 
 void ACDProjectileBase::EndPlay(const EEndPlayReason::Type endPlayReason)
 {
-	if (IsValid(landingReticle.Get()))
-	{
-		landingReticle->Destroy();
-		landingReticle = nullptr;
-	}
+	bProjectileActive = false;
+	ClearLandingReticle();
 
 	Super::EndPlay(endPlayReason);
 }
@@ -277,6 +355,10 @@ void ACDProjectileBase::TraceHit(const FVector& start, const FVector& end)
 
 void ACDProjectileBase::OnTargetHit(const FHitResult& hit)
 {
+	if (!bProjectileActive)
+	{
+		return;
+	}
 	AActor* target = hit.GetActor();
 
 	UAbilitySystemComponent* sourceASC = projectileData.sourceASC.Get();
@@ -288,7 +370,7 @@ void ACDProjectileBase::OnTargetHit(const FHitResult& hit)
 		!IsValid(targetASC) ||
 		!projectileData.damageSpec.IsValid())
 	{
-		Destroy();
+		FinishProjectile();
 		return;
 	}
 
@@ -329,17 +411,21 @@ void ACDProjectileBase::OnTargetHit(const FHitResult& hit)
 		// 피격 나이아가라 생성 (자동 제거)
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, hitComp, hit.ImpactPoint, FRotator::ZeroRotator, FVector(1, 1, 1), true);
 	}
-	Destroy();
+	FinishProjectile();
 }
 
 void ACDProjectileBase::OnProjectileStop(const FHitResult& hit)
 {
+	if (!bProjectileActive)
+	{
+		return;
+	}
 	if (bTraceEnabled)
 	{
 		TraceHit(previousLocation, GetActorLocation());
 
-		// 앞에 있던 적을 맞혀 이미 제거 중이라면 종료
-		if (IsActorBeingDestroyed())
+		// 캐릭터 명중으로 파괴되거나 풀로 반환된 경우 종료
+		if (!bProjectileActive || IsActorBeingDestroyed())
 		{
 			return;
 		}
@@ -347,8 +433,7 @@ void ACDProjectileBase::OnProjectileStop(const FHitResult& hit)
 
 	bTraceEnabled = false;
 
-	// GCN 태그 여부를 확인해서 사라지는 여부 확인
-	// 태그가 없으면 그냥 Destroy()
+	// 착탄 연출을 실행한 뒤 반환/파괴한다.
 	if (impactCueTag.IsValid())
 	{
 		UAbilitySystemComponent* sourceASC = projectileData.sourceASC.Get();
@@ -365,7 +450,7 @@ void ACDProjectileBase::OnProjectileStop(const FHitResult& hit)
 		}
 	}
 
-	Destroy();
+	FinishProjectile();
 }
 
 
