@@ -19,6 +19,7 @@ void ACDMonsterAIController::Tick(float deltaSeconds)
 	Super::Tick(deltaSeconds);
 
 	AActor* target = FindTarget();
+
 	if (target)
 	{
 		SetFocus(target);
@@ -41,6 +42,10 @@ void ACDMonsterAIController::Tick(float deltaSeconds)
 		// 풀에서 재사용되면 이동이 멈춘 채로 Chase 일 수 있으므로 Idle 이면 다시 이동
 		if (GetMoveStatus() == EPathFollowingStatus::Idle)
 		{
+			//const EPathFollowingRequestResult::Type moveResult = MoveToActor(target, acceptanceRadius);
+
+			//UE_LOG(LogTemp, Warning, TEXT("MoveResult: %d"), static_cast<int32>(moveResult));
+
 			MoveToActor(target, acceptanceRadius);
 		}
 		break;
@@ -61,8 +66,12 @@ void ACDMonsterAIController::Tick(float deltaSeconds)
 AActor* ACDMonsterAIController::FindTarget() const
 {
 	ACDCharacterBase* player = Cast<ACDCharacterBase>(UGameplayStatics::GetPlayerPawn(this, 0));
+	const ACDMonsterBase* monster = GetPawn<ACDMonsterBase>();
+
 	if (!player || player->IsDead() || !player->CanBeTargeted())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Monster Miss Target: %s"), *monster->GetName());
+
 		return nullptr;
 	}
 	return player;
@@ -87,6 +96,8 @@ ECDMonsterState ACDMonsterAIController::EvaluateState(const AActor* target) cons
 	}
 	if (!target)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Doing IDle: %s"), *monster->GetName());
+
 		return ECDMonsterState::Idle;
 	}
 
@@ -103,6 +114,10 @@ void ACDMonsterAIController::EnterState(ECDMonsterState newState)
 	state = newState;
 	if (state != ECDMonsterState::Chase)
 	{
+		const ACDMonsterBase* monster = GetPawn<ACDMonsterBase>();
+
+		UE_LOG(LogTemp, Warning, TEXT("Stop Movement: %s"), *monster->GetName());
+
 		StopMovement();
 	}
 }
