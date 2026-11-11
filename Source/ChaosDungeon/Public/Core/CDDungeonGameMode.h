@@ -38,15 +38,19 @@ protected:
 	// AActor::EndPlay()
 	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FinishRun();
+
+	/** 데스카운트 초과/포기: 런 실패 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FailRun();
+
 private:
 	/** "STAGE N" 표시 + 스폰 시작 */
 	void BeginStage();
 
 	/** 처치 게이지 달성: 스폰 중지, 포탈 열기 또는 런 성공 */
 	void ClearStage();
-
-	/** 데스카운트 초과/포기: 런 실패 */
-	void FailRun();
 
 	/** 스테이지 경과 시간을 기록에 누적 */
 	void CommitStageTime();
