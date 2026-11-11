@@ -20,7 +20,7 @@ void UCDGameUserSettings::ApplyVolumes() const
     {
         if (USoundClass* loadedClass = soundClass.LoadSynchronous())
         {
-            loadedClass->Properties.Volume = volume;
+            loadedClass->Properties.Volume = FMath::Max(volume, 0.001f);
         }
     };
 
