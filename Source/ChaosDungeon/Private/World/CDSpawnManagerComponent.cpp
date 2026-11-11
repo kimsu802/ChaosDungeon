@@ -232,6 +232,12 @@ ACDMonsterBase* UCDSpawnManagerComponent::AcquireMonster(const UCDMonsterData* d
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	ACDMonsterBase* monster = GetWorld()->SpawnActor<ACDMonsterBase>(data->monsterClass, FTransform::Identity, spawnParams);
 	monster->onReleased.AddUObject(this, &ThisClass::ReleaseMonster);
+
+	FString result = monster->GetName();
+	
+	++spawnMonster;
+
+	UE_LOG(LogTemp, Warning, TEXT("NewMonster: %s, MonsterIndex: %d"), *result, spawnMonster);
 	return monster;
 }
 
