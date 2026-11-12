@@ -344,6 +344,41 @@ void UCDPlayerSkillAbility::OnEventReceived(FGameplayEventData payload)
 					StartDash(character->GetActorForwardVector(), skillData->dashDistance, skillData->dashDuration);
 				}
 			}
+
+			else if (tag == CDTags::Event_Montage_CooldownClear)
+			{
+				UAbilitySystemComponent* abilitySystem = GetAbilitySystemComponentFromActorInfo();
+				if (abilitySystem == nullptr)
+				{
+					return;
+				}
+
+				// 쿨타임은 전부 UCDCooldownEffect 하나로 걸린다 → 이 GE 만 골라낸다
+				FGameplayEffectQuery query;
+				query.EffectDefinition = UCDCooldownEffect::StaticClass();
+
+				// 남겨 둘 쿨타임: 회피 · 원거리 평타, 그리고 방금 쓴 이 스킬
+				FGameplayTagContainer keepTags;
+				keepTags.AddTag(CDTags::Cooldown_RangedAttack);
+				keepTags.AddTag(GetCooldownTag());
+
+				for (const FActiveGameplayEffectHandle& handle : abilitySystem->GetActiveEffects(query))
+				{
+					const FActiveGameplayEffect* effect = abilitySystem->GetActiveGameplayEffect(handle);
+					if (effect == nullptr)
+					{
+						continue;
+					}
+
+					// 쿨타임 태그는 DynamicGrantedTags 로 붙어 있다 (UCDGameplayAbility::ApplyCooldown)
+					if (effect->Spec.DynamicGrantedTags.HasAny(keepTags))
+					{
+						continue;
+					}
+
+					abilitySystem->RemoveActiveGameplayEffect(handle);
+				}
+			}
 		}
 	}
 	else
@@ -426,7 +461,10 @@ void UCDPlayerSkillAbility::ActivateSkillAbility()
 		abilitySystem->AddLooseGameplayTag(CDTags::State_Immune_Stagger);
 	}
 
-	BeginCastTowards(aimLocation);
+	if (skillData->bBlockMovement)
+	{
+		BeginCastTowards(aimLocation);
+	}
 	SetCasting(true);
 
 	// 몽타주 내 공격 노티파이 수신 기능
@@ -575,8 +613,8 @@ void UCDPlayerSkillAbility::GatherAwakeningGauge(AActor* actor)
 		//	   이지		   3	  6		 9
 		//	   노말		   2	  4		 6   
 		//	   하드		   1	  2		 3
-		// -> / 5.0f
-		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, static_cast<float>(modifier * difficulty) / 5.0f);
+		// -> / 1.3f
+		specHandle.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, static_cast<float>(modifier * difficulty) / 1.3f);
 		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*specHandle.Data);
 	}
 }

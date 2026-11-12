@@ -178,4 +178,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	FCDProjectileBaseData projectileData;
+
+	/* 이동을 막을건지 말건지*/
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	bool bBlockMovement = true;
 };

@@ -150,7 +150,7 @@ ACDProjectileBase* UCDGameplayAbility::SpawnProjectile(const FCDProjectileBaseDa
     }
 
     launchData.damageSpec.Data->SetSetByCallerMagnitude( CDTags::SetByCaller_Coefficient, damageCoefficient);
-	launchData.awakenSpec.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, 10.f);
+	launchData.awakenSpec.Data->SetSetByCallerMagnitude(CDTags::SetByCaller_Awakening, 5.f);
 
     FActorSpawnParameters spawnParams;
     spawnParams.Owner = sourceActor;
