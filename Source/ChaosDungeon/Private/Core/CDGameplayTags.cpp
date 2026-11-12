@@ -41,6 +41,7 @@ namespace CDTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Untargetable, "Event.Montage.UnTargetable");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_Land, "Event.Montage.Land");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_AwakenFreeze, "Event.Montage.AwakenFreeze");
+	UE_DEFINE_GAMEPLAY_TAG(Event_Montage_CooldownClear, "Event.Montage.CooldownClear");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Hit, "Event.Hit");
 
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dodge, "Cooldown.Dodge");

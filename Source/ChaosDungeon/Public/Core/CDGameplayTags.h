@@ -50,6 +50,7 @@ namespace CDTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Untargetable);		// 애님 노티파이: 궁극기 발사 시 콜리전 제거용
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_Land);				// 애님 노티파이: 궁극기 착지 시 위치 이동용
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_AwakenFreeze);		// 애님 노티파이: 각성기 돌진 도착 (정적 · 히트스톱 시작)
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Montage_CooldownClear)		// 애님 노티파이: 쿨타임 해제
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Hit);						// 피격 리액션 트리거
 
 	// 쿨다운
